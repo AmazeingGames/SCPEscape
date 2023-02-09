@@ -7,11 +7,13 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    [SerializeField] bool shouldPrintCard;
+
     public List<Resource> deck = new List<Resource>();
     public List<Transform> handSlots = new List<Transform>();
     public List<bool> availableHandSlots = new List<bool>();
 
-    Resource holdingResource = null;
+    ResourceCard holdingResource = null;
 
     void Awake()
     {
@@ -49,9 +51,12 @@ public class GameManager : MonoBehaviour
         return mousePos;
     }
 
-    public void GrabCard(Resource cardHolding)
+    public void GrabCard(ResourceCard cardToGrab)
     {
-        holdingResource = cardHolding;
+        holdingResource = cardToGrab;
+
+        if(shouldPrintCard)
+            holdingResource.PrintCard();
     }
 
     public void DropCard()

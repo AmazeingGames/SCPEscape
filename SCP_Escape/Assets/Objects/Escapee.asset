@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
   m_Name: Escapee
   m_EditorClassIdentifier: 
-  ECardType: 0
+  eCardType: 1
   symbol: {fileID: 0}
+  texture: {fileID: 0}
   cardColor: {r: 0, g: 0, b: 0, a: 0}
-  initial: 0
+  initial: 69

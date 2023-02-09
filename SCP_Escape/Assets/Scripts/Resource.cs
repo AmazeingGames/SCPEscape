@@ -7,25 +7,25 @@ using UnityEngine.TextCore.Text;
 
 public class Resource : ScriptableObject
 {
-    public enum CardType { Anomaly, Escapee, Prisoner, Food, Key, Misfortune }
+    public enum CardType { Anomaly, Escapee, Food, Insanity, Munition, Scientist}
 
-    [SerializeField] CardType ECardType;
+    [SerializeField] CardType eCardType;
+
     [SerializeField] Sprite symbol;
+    [SerializeField] Sprite texture;
     [SerializeField] Color cardColor;
     [SerializeField] char initial;
 
+    public CardType _ECardType { get => eCardType; private set => eCardType = value; }
+    public Sprite _Symbol { get => symbol; private set => symbol = value; }
+    public Sprite _Texture { get => texture; private set => texture = value; }
+    public Color _CardColor { get => cardColor; private set => cardColor = value; }
+    public char _Initial { get => initial; private set => initial = value; }
+    
+
+
     public bool HasBeenPlayed { get; protected set; }
     public bool HasBeenConsumed { get; protected set; }
-
     public int HandIndex { get; protected set; }
 
-    public void OnMouseDown()
-    {
-        GameManager.Instance.GrabCard(this);
-    }
-
-    public void OnMouseUp()
-    {
-        GameManager.Instance.DropCard();
-    }
 }
