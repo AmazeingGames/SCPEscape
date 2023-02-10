@@ -1,17 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.UIElements;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] bool shouldPrintCard;
+    [SerializeField] GameObject resourcePool;
 
-    public List<Resource> deck = new List<Resource>();
+    [SerializeField] int resourcePoolSize;
+    [SerializeField] ResourceCard resourceCard;
+    [SerializeField] Resource ration;
+    [SerializeField] Resource escapee;
+    [SerializeField] Resource scientist;
+    [SerializeField] Resource insanity;
+    [SerializeField] Resource munition;
+    [SerializeField] Resource anomaly;
+
+    public List<GameObject> deck = new List<GameObject>();
+
+    public List<ResourceCard> hand = new List<ResourceCard>();
     public List<Transform> handSlots = new List<Transform>();
-    public List<bool> availableHandSlots = new List<bool>();
+    //public List<bool> availableHandSlots = new List<bool>();
 
     ResourceCard holdingResource = null;
     Vector3 grabbedPosition;
@@ -26,7 +38,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
+        for(int i = 0; i < resourcePoolSize; i++)
+        {
+            Instantiate(resourceCard, resourcePool.transform);
+        }
     }
 
     void Update()
@@ -35,11 +50,64 @@ public class GameManager : MonoBehaviour
         {
             holdingResource.GameObject().transform.position = GetMousePosition();
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            AddResourceToHand(anomaly);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            AddResourceToHand(escapee);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            AddResourceToHand(insanity);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            AddResourceToHand(munition);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            AddResourceToHand(ration);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            AddResourceToHand(scientist);
+        }
     }
 
-    public void AddResource(Resource.CardType cardType)
+    void AddResourceToHand(Resource resource)
     {
-        
+        Debug.Log($"Added {resource} to hand");
+        if (resourcePool.transform.childCount > 0)
+        {
+            ResourceCard cardToAdd = resourcePool.transform.GetChild(0).GetComponent<ResourceCard>();
+
+            cardToAdd.SetResource(resource);
+
+            cardToAdd.gameObject.SetActive(true);
+
+            cardToAdd.transform.position = GetMousePosition();
+
+            if (hand.Count > 1)
+                for (int i = 0; i < hand.Count; i++)
+                {
+                    Debug.Log($"Is hand null? : {hand == null}. Is Resouce null? : {resource == null}");
+
+                    if (hand[i]._Resource._ECardType == resource._ECardType)
+                    {
+                        hand.Insert(i, cardToAdd);
+                    }
+                }
+            else
+                hand.Add(cardToAdd);
+        }
+    }
+
+    void DebugHand()
+    {
+        Debug.Log($"Cards in hand are: {hand}");
     }
 
     static public Vector3 GetMousePosition()
@@ -55,9 +123,6 @@ public class GameManager : MonoBehaviour
     public void GrabCard(ResourceCard cardToGrab)
     {
         holdingResource = cardToGrab;
-
-        if(shouldPrintCard)
-            holdingResource.PrintCard();
     }
 
     public void DropCard()
@@ -67,6 +132,7 @@ public class GameManager : MonoBehaviour
         holdingResource = null;
     }
 
+    
     
 
 }

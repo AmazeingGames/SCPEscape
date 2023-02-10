@@ -22,8 +22,6 @@ public class Resource : ScriptableObject
     public Sprite _Texture { get => texture; private set => texture = value; }
     public Color _CardColor { get => cardColor; private set => cardColor = value; }
     public char _Initial { get => initial; private set => initial = value; }
-    
-
 
     public bool HasBeenPlayed { get; protected set; }
     public bool HasBeenConsumed { get; protected set; }

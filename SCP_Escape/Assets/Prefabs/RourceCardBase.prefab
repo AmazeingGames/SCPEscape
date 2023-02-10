@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 242349905}
   m_Layer: 0
   m_Name: Symbol
-  m_TagString: Symbol
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.764151, g: 0.69513476, b: 0.19103774, a: 0.39215687}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -165,7 +165,7 @@ GameObject:
   - component: {fileID: 4620007420011227402}
   m_Layer: 0
   m_Name: InitialTxt
-  m_TagString: Initial
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -218,7 +218,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: A
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 5693896453331829225}
   - component: {fileID: 3122245917416674458}
   m_Layer: 0
-  m_Name: MaskCardBase
+  m_Name: RourceCardBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -413,6 +413,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resource: {fileID: 0}
+  canvasParent: {fileID: 0}
+  symbolComponent: {fileID: 242349905}
+  textureComponent: {fileID: 708618599130566332}
+  initialComponent: {fileID: 4620007420011227402}
 --- !u!1 &4482658189467459811
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,7 +616,7 @@ GameObject:
   - component: {fileID: 708618599130566332}
   m_Layer: 0
   m_Name: Texture
-  m_TagString: Texture
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -665,7 +669,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 034c4414351b15a479c3ec75b2e6aa4c, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
