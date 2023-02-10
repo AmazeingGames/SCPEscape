@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public List<bool> availableHandSlots = new List<bool>();
 
     ResourceCard holdingResource = null;
+    Vector3 grabbedPosition;
 
     void Awake()
     {
@@ -61,7 +62,9 @@ public class GameManager : MonoBehaviour
 
     public void DropCard()
     {
+        holdingResource.transform.position = GetMousePosition();
 
+        holdingResource = null;
     }
 
     

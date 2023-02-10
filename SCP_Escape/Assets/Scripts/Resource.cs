@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.TextCore.Text;
 
 [CreateAssetMenu(menuName = "Cards/Resources")]
