@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 
@@ -26,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<Transform> handSlots = new List<Transform>();
+    public List<Resource> resources;
     //public List<bool> availableHandSlots = new List<bool>();
 
     ResourceCard holdingResource = null;
@@ -39,24 +42,32 @@ public class GameManager : MonoBehaviour
             Instance = this;
         else
             Destroy(Instance);
+
+        resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
+
+        for (int i = 0; i < resources.Count; i++)
+        {
+            for (int n = 0; n < resourcePoolSize; n++)
+            {
+                var card = Instantiate(resourceCard, resourcePool.transform);
+                card.SetResource(resources[i]);
+                card.gameObject.SetActive(false);
+            }
+        }
+        
     }
 
     void Start()
     {
-        for(int i = 0; i < resourcePoolSize; i++)
+        for (int i = 0; i < 2; i++)
         {
-            var card = Instantiate(resourceCard, resourcePool.transform);
-            card.gameObject.SetActive(false);
+            AddResourceToHand(anomaly);
+            AddResourceToHand(escapee);
+            AddResourceToHand(scientist);
+            AddResourceToHand(insanity);
+            AddResourceToHand(munition);
+            AddResourceToHand(ration);
         }
-
-        /*
-        AddResourceToHand(anomaly);
-        AddResourceToHand(escapee); 
-        AddResourceToHand(scientist);
-        AddResourceToHand(insanity);
-        AddResourceToHand(munition);
-        AddResourceToHand(ration);
-        */
     }
 
     void Update()
@@ -65,23 +76,6 @@ public class GameManager : MonoBehaviour
         if (holdingResource != null)
         {
             holdingResource.GameObject().transform.position = GetMousePosition();
-        }
-
-        if (!hasAddedResources)
-        {
-            hasAddedResources = true;
-
-            AddResourceToHand(anomaly);
-            AddResourceToHand(escapee);
-            AddResourceToHand(scientist);
-            AddResourceToHand(insanity);
-            AddResourceToHand(munition);
-            AddResourceToHand(ration);
-        }
-
-        if(Input.GetKeyDown(KeyCode.Alpha1)
-        {
-            Debug.Log("Pressed Down");
         }
 
         /*
@@ -121,46 +115,58 @@ public class GameManager : MonoBehaviour
 
             for (int i = 0; i < resourcePool.transform.childCount; i++)
             {
-                if (resourcePool.transform.GetChild(i).gameObject.activeSelf == false)
+                var child = resourcePool.transform.GetChild(i);
+
+                if (child.gameObject.activeSelf == false)
                 {
-                    cardToAdd = resourcePool.transform.GetChild(i).GetComponent<ResourceCard>();
-                    break;
+                    var childResourceCard = child.GetComponent<ResourceCard>();
+
+                    if (childResourceCard._Resource == resource)
+                    {
+                        cardToAdd = childResourceCard;
+                        break;
+                    }
                 }
             }
 
-            if (cardToAdd == null)
+            if (cardToAdd != null)
+            {
+                Debug.Log($"Added {resource} to hand");
+
+                cardToAdd.gameObject.SetActive(true);
+
+                cardToAdd.transform.position = GetMousePosition();
+
+                if (hand.Count > 1)
+                    for (int i = 0; i < hand.Count; i++)
+                    {
+                        if (hand[i]._Resource == resource)
+                        {
+                            hand.Insert(i, cardToAdd);
+                        }
+                    }
+                else
+                    hand.Add(cardToAdd);
+            }
+            else
             {
                 Debug.LogWarning("Card to Add is null; no more cards in resource pool to add.");
                 return;
-            }
-            else
-                Debug.Log($"Added {resource}, {cardToAdd} to hand");
-
-
-            cardToAdd.SetResource(resource);
-
-            cardToAdd.gameObject.SetActive(true);
-
-            cardToAdd.transform.position = GetMousePosition();
-
-            if (hand.Count > 1)
-                for (int i = 0; i < hand.Count; i++)
-                {
-                    if (hand[i]._Resource._ECardType == resource._ECardType)
-                    {
-                        hand.Insert(i, cardToAdd);
-                    }
-                }
-            else
-                hand.Add(cardToAdd);
-
-            DebugHand();
+            }   
+            //PrintHand();
         }
     }
 
-    void DebugHand()
+    void PrintHand()
     {
-        Debug.Log($"Cards in hand are: {hand}");
+        string result = "List contents: ";
+        for(int i = 0; i < hand.Count; i++)
+        {
+            ResourceCard item = hand[i];
+
+            result += item._Resource.ToString() + ", ";
+        }
+        Debug.Log(result);
     }
 
     static public Vector3 GetMousePosition()
