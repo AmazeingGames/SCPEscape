@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Resource munition;
     [SerializeField] Resource anomaly;
 
+    public bool hasAddedResources = false;
+
     public List<GameObject> deck = new List<GameObject>();
 
     public List<ResourceCard> hand = new List<ResourceCard>();
@@ -27,6 +30,8 @@ public class GameManager : MonoBehaviour
 
     ResourceCard holdingResource = null;
     Vector3 grabbedPosition;
+
+    //NOTE TO SELF: Remove instantiated card from resource pool into the hand OR only grab resource cards that are setActice to false. Unity crashes otherwise.
 
     void Awake()
     {
@@ -40,21 +45,51 @@ public class GameManager : MonoBehaviour
     {
         for(int i = 0; i < resourcePoolSize; i++)
         {
-            Instantiate(resourceCard, resourcePool.transform);
+            var card = Instantiate(resourceCard, resourcePool.transform);
+            card.gameObject.SetActive(false);
         }
+
+        /*
+        AddResourceToHand(anomaly);
+        AddResourceToHand(escapee); 
+        AddResourceToHand(scientist);
+        AddResourceToHand(insanity);
+        AddResourceToHand(munition);
+        AddResourceToHand(ration);
+        */
     }
 
     void Update()
     {
+        
         if (holdingResource != null)
         {
             holdingResource.GameObject().transform.position = GetMousePosition();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (!hasAddedResources)
+        {
+            hasAddedResources = true;
+
+            AddResourceToHand(anomaly);
+            AddResourceToHand(escapee);
+            AddResourceToHand(scientist);
+            AddResourceToHand(insanity);
+            AddResourceToHand(munition);
+            AddResourceToHand(ration);
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha1)
+        {
+            Debug.Log("Pressed Down");
+        }
+
+        /*
+        if (Input.GetKeyUp(KeyCode.Alpha1))
         {
             AddResourceToHand(anomaly);
         }
+        
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             AddResourceToHand(escapee);
@@ -75,14 +110,32 @@ public class GameManager : MonoBehaviour
         {
             AddResourceToHand(scientist);
         }
+        */
     }
 
     void AddResourceToHand(Resource resource)
     {
-        Debug.Log($"Added {resource} to hand");
         if (resourcePool.transform.childCount > 0)
         {
-            ResourceCard cardToAdd = resourcePool.transform.GetChild(0).GetComponent<ResourceCard>();
+            ResourceCard cardToAdd = null;
+
+            for (int i = 0; i < resourcePool.transform.childCount; i++)
+            {
+                if (resourcePool.transform.GetChild(i).gameObject.activeSelf == false)
+                {
+                    cardToAdd = resourcePool.transform.GetChild(i).GetComponent<ResourceCard>();
+                    break;
+                }
+            }
+
+            if (cardToAdd == null)
+            {
+                Debug.LogWarning("Card to Add is null; no more cards in resource pool to add.");
+                return;
+            }
+            else
+                Debug.Log($"Added {resource}, {cardToAdd} to hand");
+
 
             cardToAdd.SetResource(resource);
 
@@ -93,8 +146,6 @@ public class GameManager : MonoBehaviour
             if (hand.Count > 1)
                 for (int i = 0; i < hand.Count; i++)
                 {
-                    Debug.Log($"Is hand null? : {hand == null}. Is Resouce null? : {resource == null}");
-
                     if (hand[i]._Resource._ECardType == resource._ECardType)
                     {
                         hand.Insert(i, cardToAdd);
@@ -102,6 +153,8 @@ public class GameManager : MonoBehaviour
                 }
             else
                 hand.Add(cardToAdd);
+
+            DebugHand();
         }
     }
 

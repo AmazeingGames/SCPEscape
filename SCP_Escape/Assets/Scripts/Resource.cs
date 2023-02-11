@@ -19,7 +19,7 @@ public class Resource : ScriptableObject
 
     public CardType _ECardType { get => eCardType; private set => eCardType = value; }
     public Sprite _Symbol { get => symbol; private set => symbol = value; }
-    public Sprite _Texture { get => texture; private set => texture = value; }
+    public Sprite _Texture { get => symbol; private set => texture = value; }
     public Color _CardColor { get => cardColor; private set => cardColor = value; }
     public char _Initial { get => initial; private set => initial = value; }
 

@@ -25,7 +25,7 @@ public class ResourceCard : MonoBehaviour
         
         if (resource == null)
         {
-            Debug.LogWarning("RESOURCE SHOULD NOT BE NULL");
+            Debug.LogWarning("Resource should not be null");
         }
         else
         {
