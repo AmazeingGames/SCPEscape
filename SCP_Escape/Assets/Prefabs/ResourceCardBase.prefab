@@ -422,6 +422,12 @@ MonoBehaviour:
   symbolComponent: {fileID: 242349905}
   textureComponent: {fileID: 708618599130566332}
   initialComponent: {fileID: 4620007420011227402}
+  handLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  consumerLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &2125645192467005704
 MonoBehaviour:
   m_ObjectHideFlags: 0

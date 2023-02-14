@@ -14,10 +14,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     GameObject resourcePool;
-    HandHolder handHolder;
-    ResourceConsumer resourceConsumer;
+    GameObject handHolder;
+    GameObject resourceConsumer;
 
     public float holdingCardScaleMultiplier;
+    [SerializeField] Vector3 resourceConsumerCardScale;
+    [SerializeField] Vector3 handHolderCardScale;
+    [SerializeField] LayerMask handHolderLayer;
+    [SerializeField] LayerMask resourceConsumerLayer;
     [SerializeField] LayerMask cardLayer;
     [SerializeField] int resourcePoolSize;
     [SerializeField] ResourceCard resourceCard;
@@ -33,6 +37,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> deckDiscard = new List<GameObject>();
     public List<GameObject> deck = new List<GameObject>();
     public List<ResourceCard> hand = new List<ResourceCard>();
+    public List<ResourceCard> consumer = new List<ResourceCard>();
     public List<Resource> resources;
     //public List<bool> availableHandSlots = new List<bool>();
 
@@ -49,9 +54,9 @@ public class GameManager : MonoBehaviour
         else
             Destroy(Instance);
 
-        handHolder = GameObject.Find("HandHolder").GetComponent<HandHolder>();
+        handHolder = GameObject.Find("HandHolder");
         resourcePool = GameObject.Find("ResourcePool");
-        resourceConsumer = GameObject.Find("ResourceConsumer").GetComponent<ResourceConsumer>();
+        resourceConsumer = GameObject.Find("ResourceConsumer");
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
 
@@ -78,12 +83,32 @@ public class GameManager : MonoBehaviour
         GrabCard();
         DragCard();
         DropCard();
-        
+
+        CheckCardSizes();
+
+        //Debug.Log($"Is over card? : {(IsOverCard() == true)}");
+        //Debug.Log($"Is over hand? : {(IsOverHandHolder() == true)}");
+        //Debug.Log($"Is over consumer? : {(IsOverResourceConsumer() == true)}");
     }
 
     RaycastHit2D IsOverCard()
     {
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, cardLayer);
+        return IsOver(cardLayer);
+    }
+
+    RaycastHit2D IsOverHandHolder()
+    {
+        return IsOver(handHolderLayer);
+    }
+
+    RaycastHit2D IsOverResourceConsumer()
+    {
+        return IsOver(resourceConsumerLayer);
+    }
+
+    RaycastHit2D IsOver(LayerMask layer)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, layer);
 
         return hit;
     }
@@ -189,6 +214,25 @@ public class GameManager : MonoBehaviour
         AddCardToHand(cardToAdd);
     }
 
+    void CheckCardSizes()
+    {
+        CheckCardSize(hand, handHolderCardScale);
+        CheckCardSize(consumer, resourceConsumerCardScale);
+    }
+
+    void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatoryHandSize)
+    {
+        for(int i = 0; i < listToCheck.Count; i++)
+        {
+            var currentCard = listToCheck[i];
+
+            if (currentCard.transform.localScale != mandatoryHandSize)
+            {
+                currentCard.transform.localScale = mandatoryHandSize;
+            }
+        }
+    }
+
     ResourceCard GetFromResourcePool(Resource resource)
     {
         if (!(resourcePool.transform.childCount > 0))
@@ -211,9 +255,11 @@ public class GameManager : MonoBehaviour
 
     void AddCardToHand(ResourceCard resourceCard)
     {
-        AddTo(resourceCard, handHolder.transform, true);
+        AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
 
         hand.Add(resourceCard);
+
+        consumer.Remove(resourceCard);
     }
 
     void AddCardToConsumer(ResourceCard resourceCard)
@@ -225,10 +271,14 @@ public class GameManager : MonoBehaviour
         if (resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()) == null)
             Debug.Log("Warning, cannot find resource consumer card holder");
 
-        AddTo(resourceCard, resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()), false);
+        AddTo(resourceCard, resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()), false, resourceConsumerCardScale);
+
+        consumer.Add(resourceCard);
+
+        hand.Remove(resourceCard);
     }
 
-    void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition)
+    void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
     {
         if (!resourceCard.isActiveAndEnabled)
             resourceCard.gameObject.SetActive(true);
@@ -236,6 +286,8 @@ public class GameManager : MonoBehaviour
         resourceCard.transform.SetParent(transformParent, keepWorldPosition);
 
         resourceCard.transform.localPosition = Vector3.zero;
+
+        resourceCard.transform.localScale = newLocalScale;
     }
 
     void PrintHand()
@@ -256,7 +308,7 @@ public class GameManager : MonoBehaviour
 
         if (isOverCard && Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Grabbing card");
+            //Debug.Log("Grabbing card");
 
             holdingResourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
@@ -270,23 +322,24 @@ public class GameManager : MonoBehaviour
     {
         if (holdingResourceCard != null && Input.GetMouseButtonUp(0))
         {
-            Debug.Log("Dropping card");
+            //Debug.Log("Dropping card");
 
             holdingResourceCard.transform.localScale = regularScale;
 
-
-            if (resourceConsumer.IsMouseOver && handHolder.IsMouseOver)
+            if (IsOverHandHolder() && IsOverResourceConsumer())
             {
                 Debug.LogWarning("Mouse is over two colliders. Bug.");
             }
 
-            if (resourceConsumer.IsMouseOver)
+            if (IsOverHandHolder() && !hand.Contains(holdingResourceCard))
             {
-                AddCardToConsumer(holdingResourceCard);
-            }
-            else if (handHolder.IsMouseOver)
-            {
+                Debug.Log("Dropped card in hand");
                 AddCardToHand(holdingResourceCard);
+            }
+            else if (IsOverResourceConsumer() && !consumer.Contains(holdingResourceCard))
+            {
+                Debug.Log("Dropped card in consumer");
+                AddCardToConsumer(holdingResourceCard);
             }
             else
             {
@@ -303,6 +356,9 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null)
         {
             holdingResourceCard.transform.position = GetMousePosition();
+
+            //Debug.Log($"Is HoldingCard over hand? : {IsOverHandHolder()}");
+            //Debug.Log($"Is HoldingCard over consumer? : {IsOverResourceConsumer()}");
         }
     }
 

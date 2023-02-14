@@ -13,7 +13,6 @@ public class ResourceCard : MonoBehaviour
     [SerializeField] Image textureComponent;
     [SerializeField] TextMeshProUGUI initialComponent;
 
-
     public Resource _Resource { get => resource; private set => resource = value; }
 
     void Awake()
@@ -35,19 +34,6 @@ public class ResourceCard : MonoBehaviour
             DataMatchResource();
         }
         
-    }
-
-    public void OnMouseDown()
-    {
-    }
-
-    public void OnMouseUp()
-    {
-        
-    }
-
-    public void OnMouseDrag()
-    {
     }
 
     public void SetResource(Resource resource)
