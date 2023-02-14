@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using JetBrains.Annotations;
 
 public class ResourceCard : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class ResourceCard : MonoBehaviour
     [SerializeField] Image symbolComponent;
     [SerializeField] Image textureComponent;
     [SerializeField] TextMeshProUGUI initialComponent;
+
 
     public Resource _Resource { get => resource; private set => resource = value; }
 
@@ -22,7 +24,7 @@ public class ResourceCard : MonoBehaviour
     void Start()
     {
         //Debug.Log($"Is GameManager.Instance null? : {GameManager.Instance == null}");
-        
+
         if (resource == null)
         {
             Debug.LogWarning("Resource should not be null");
@@ -37,12 +39,15 @@ public class ResourceCard : MonoBehaviour
 
     public void OnMouseDown()
     {
-        GameManager.Instance.GrabCard(this);
     }
 
     public void OnMouseUp()
     {
-        GameManager.Instance.DropCard();
+        
+    }
+
+    public void OnMouseDrag()
+    {
     }
 
     public void SetResource(Resource resource)

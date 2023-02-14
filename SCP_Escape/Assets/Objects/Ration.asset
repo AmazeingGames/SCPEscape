@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
-  m_Name: Rations
+  m_Name: Ration
   m_EditorClassIdentifier: 
-  eCardType: 2
+  eCardType: 4
   symbol: {fileID: 21300000, guid: faed85312dc8874409fa9845d620d6c5, type: 3}
   texture: {fileID: 0}
   cardColor: {r: 0, g: 0, b: 0, a: 0}

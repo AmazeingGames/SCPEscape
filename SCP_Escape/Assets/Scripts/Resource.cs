@@ -8,7 +8,7 @@ using UnityEngine.TextCore.Text;
 
 public class Resource : ScriptableObject
 {
-    public enum CardType { Anomaly, Escapee, Ration, Insanity, Munition, Scientist}
+    public enum CardType { Anomaly, Escapee, Insanity, Munition, Ration, Scientist }
 
     [SerializeField] CardType eCardType;
 

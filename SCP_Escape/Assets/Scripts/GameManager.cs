@@ -13,8 +13,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] GameObject resourcePool;
+    GameObject resourcePool;
+    HandHolder handHolder;
+    ResourceConsumer resourceConsumer;
 
+    public float holdingCardScaleMultiplier;
+    [SerializeField] LayerMask cardLayer;
     [SerializeField] int resourcePoolSize;
     [SerializeField] ResourceCard resourceCard;
     [SerializeField] Resource ration;
@@ -26,17 +30,17 @@ public class GameManager : MonoBehaviour
 
     public bool hasAddedResources = false;
 
+    public List<GameObject> deckDiscard = new List<GameObject>();
     public List<GameObject> deck = new List<GameObject>();
-
     public List<ResourceCard> hand = new List<ResourceCard>();
-    public List<Transform> handSlots = new List<Transform>();
     public List<Resource> resources;
     //public List<bool> availableHandSlots = new List<bool>();
 
-    ResourceCard holdingResource = null;
+    ResourceCard holdingResourceCard = null;
     Vector3 grabbedPosition;
+    Vector3 regularScale = Vector3.one;
 
-    //NOTE TO SELF: Remove instantiated card from resource pool into the hand OR only grab resource cards that are setActice to false. Unity crashes otherwise.
+    //NOTE TO SELF: In order to create cool card overlap effect, create slots that hold the cards and make sure to have worldPosition stay true when setting the parent
 
     void Awake()
     {
@@ -45,8 +49,57 @@ public class GameManager : MonoBehaviour
         else
             Destroy(Instance);
 
+        handHolder = GameObject.Find("HandHolder").GetComponent<HandHolder>();
+        resourcePool = GameObject.Find("ResourcePool");
+        resourceConsumer = GameObject.Find("ResourceConsumer").GetComponent<ResourceConsumer>();
+
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
 
+        CreateResourcePool();
+    }
+
+    void Start()
+    {
+        for (int i = 0; i < 1; i++)
+        {
+            AddPoolResourcesToHand(1, 1, 1, 1, 1, 1);
+        }
+
+        for(int i = 0; i < resources.Count; i++)
+        {
+            AddCardToConsumer(GetFromResourcePool(resources[i]));
+        }
+    }
+
+    void Update()
+    {
+        //Debug.Log($"Is over card? : {IsOverCard()}");
+
+        GrabCard();
+        DragCard();
+        DropCard();
+        
+    }
+
+    RaycastHit2D IsOverCard()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, cardLayer);
+
+        return hit;
+    }
+
+    static public Vector3 GetMousePosition()
+    {
+        Vector3 mousePos;
+
+        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z += Camera.main.nearClipPlane;
+
+        return mousePos;
+    }
+
+    void CreateResourcePool()
+    {
         for (int i = 0; i < resources.Count; i++)
         {
             for (int n = 0; n < resourcePoolSize; n++)
@@ -56,32 +109,10 @@ public class GameManager : MonoBehaviour
                 card.gameObject.SetActive(false);
             }
         }
-        
     }
 
-    void Start()
+    void AddPoolResourcesToHand(int anomalies, int escapees, int insanities, int munitions, int rations, int scientists)
     {
-        for (int i = 0; i < 1; i++)
-        {
-            AddResourcesToHand(1, 1, 1, 1, 1, 1);
-        }
-    }
-
-    void Update()
-    {
-        
-        if (holdingResource != null)
-        {
-            holdingResource.GameObject().transform.position = GetMousePosition();
-        }
-
-    }
-
-    void AddResourcesToHand(int anomalies, int escapees, int insanities, int munitions, int rations, int scientists)
-    {
-        if (resourcePool.transform.childCount <= 0)
-            return;
-
         List<ResourceCard> resourcesToAdd = new List<ResourceCard>();
 
         for(int i = 0; i < resourcePool.transform.childCount; i++)
@@ -142,11 +173,11 @@ public class GameManager : MonoBehaviour
         {
             var currentCard = resourcesToAdd[i];
 
-            AddToHand(currentCard);
+            AddCardToHand(currentCard);
         }
     }
 
-    void AddResourceToHand(Resource resource)
+    void AddPoolResourceToHand(Resource resource)
     {
         ResourceCard cardToAdd = GetFromResourcePool(resource);
 
@@ -155,9 +186,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Card to Add is null; no more cards in resource pool to add.");
             return;
         }
-        AddToHand(cardToAdd);
-            
-        //PrintHand();
+        AddCardToHand(cardToAdd);
     }
 
     ResourceCard GetFromResourcePool(Resource resource)
@@ -180,15 +209,33 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    void AddToHand(ResourceCard resourceInPool)
+    void AddCardToHand(ResourceCard resourceCard)
     {
-        Debug.Log($"Added {resourceInPool} to hand");
+        AddTo(resourceCard, handHolder.transform, true);
 
-        resourceInPool.gameObject.SetActive(true);
+        hand.Add(resourceCard);
+    }
 
-        resourceInPool.transform.position = GetMousePosition();
+    void AddCardToConsumer(ResourceCard resourceCard)
+    {
+        if (resourceCard._Resource == null)
+            Debug.LogWarning("Resource ResouceCard is null");
+        if (resourceConsumer == null)
+            Debug.LogWarning("ResourceConsumer is null");
+        if (resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()) == null)
+            Debug.Log("Warning, cannot find resource consumer card holder");
 
-        hand.Add(resourceInPool);
+        AddTo(resourceCard, resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()), false);
+    }
+
+    void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition)
+    {
+        if (!resourceCard.isActiveAndEnabled)
+            resourceCard.gameObject.SetActive(true);
+
+        resourceCard.transform.SetParent(transformParent, keepWorldPosition);
+
+        resourceCard.transform.localPosition = Vector3.zero;
     }
 
     void PrintHand()
@@ -203,29 +250,61 @@ public class GameManager : MonoBehaviour
         Debug.Log(result);
     }
 
-    static public Vector3 GetMousePosition()
+    public void GrabCard()
     {
-        Vector3 mousePos;
+        var isOverCard = IsOverCard();
 
-        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z += Camera.main.nearClipPlane;
+        if (isOverCard && Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Grabbing card");
 
-        return mousePos;
-    }
+            holdingResourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
-    public void GrabCard(ResourceCard cardToGrab)
-    {
-        holdingResource = cardToGrab;
+            regularScale = holdingResourceCard.transform.localScale;
+
+            holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
+        }
     }
 
     public void DropCard()
     {
-        holdingResource.transform.position = GetMousePosition();
+        if (holdingResourceCard != null && Input.GetMouseButtonUp(0))
+        {
+            Debug.Log("Dropping card");
 
-        holdingResource = null;
+            holdingResourceCard.transform.localScale = regularScale;
+
+
+            if (resourceConsumer.IsMouseOver && handHolder.IsMouseOver)
+            {
+                Debug.LogWarning("Mouse is over two colliders. Bug.");
+            }
+
+            if (resourceConsumer.IsMouseOver)
+            {
+                AddCardToConsumer(holdingResourceCard);
+            }
+            else if (handHolder.IsMouseOver)
+            {
+                AddCardToHand(holdingResourceCard);
+            }
+            else
+            {
+                Debug.Log("Do something. Mouse is over nothing.");
+            }
+
+            holdingResourceCard = null;
+        }
+        
     }
 
-    
-    
+    public void DragCard()
+    {
+        if (holdingResourceCard != null)
+        {
+            holdingResourceCard.transform.position = GetMousePosition();
+        }
+    }
+
 
 }
