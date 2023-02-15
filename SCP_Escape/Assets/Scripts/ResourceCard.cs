@@ -13,6 +13,9 @@ public class ResourceCard : MonoBehaviour
     [SerializeField] Image textureComponent;
     [SerializeField] TextMeshProUGUI initialComponent;
 
+    public Image numberSymbol;
+    public Image numberColor;
+
     public Resource _Resource { get => resource; private set => resource = value; }
 
     void Awake()

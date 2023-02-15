@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Resource munition;
     [SerializeField] Resource anomaly;
 
+
     public bool hasAddedResources = false;
 
     public List<GameObject> deckDiscard = new List<GameObject>();
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer = new List<ResourceCard>();
     public List<Resource> resources;
+    public List<Sprite> indicators;
     //public List<bool> availableHandSlots = new List<bool>();
 
     ResourceCard holdingResourceCard = null;
@@ -59,6 +61,7 @@ public class GameManager : MonoBehaviour
         resourceConsumer = GameObject.Find("ResourceConsumer");
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
+        //indicators = new List<Sprite> { oneIndicator, twoIndicator, threeIndicator, fourIndicator, fiveIndicator };
 
         CreateResourcePool();
     }
@@ -271,11 +274,28 @@ public class GameManager : MonoBehaviour
         if (resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()) == null)
             Debug.Log("Warning, cannot find resource consumer card holder");
 
-        AddTo(resourceCard, resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()), false, resourceConsumerCardScale);
+        var parent = resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString());
+
+        AddTo(resourceCard, parent, false, resourceConsumerCardScale);
+
+        var resourceType = resourceCard._Resource._ECardType;
+        int indicatorNum = 0;
+
+        for (int i = 0; i < consumer.Count; i++)
+        {
+            var card = consumer[i];
+
+            if (card._Resource._ECardType == resourceType)
+                indicatorNum++;
+        }
+
+        resourceCard.numberSymbol.sprite = indicators[indicatorNum];
 
         consumer.Add(resourceCard);
 
         hand.Remove(resourceCard);
+
+        Debug.Log($"Is numberSymbol null? : {(resourceCard.numberSymbol == null)}");
     }
 
     void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)

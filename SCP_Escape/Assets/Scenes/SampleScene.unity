@@ -171,7 +171,6 @@ GameObject:
   - component: {fileID: 374869048}
   - component: {fileID: 374869047}
   - component: {fileID: 374869049}
-  - component: {fileID: 374869050}
   m_Layer: 6
   m_Name: ResourceConsumer
   m_TagString: Untagged
@@ -202,7 +201,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.020019531, y: -519.5}
+  m_AnchoredPosition: {x: 0.020019531, y: -519.21}
   m_SizeDelta: {x: 7.6688, y: 3.7952}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &374869047
@@ -233,7 +232,7 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 2, y: 3}
+  m_CellSize: {x: 2, y: 3.5}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 2
   m_ConstraintCount: 2
@@ -263,18 +262,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 30.032375, y: 8.705837}
   m_EdgeRadius: 0
---- !u!114 &374869050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 374869045}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85b1f947b5b58474fa17686b8bbe2064, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &514661608
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,6 +292,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdingCardScaleMultiplier: 1.5
+  resourceConsumerCardScale: {x: 0.25, y: 0.25, z: 0.25}
+  handHolderCardScale: {x: 0.325, y: 0.325, z: 0.325}
+  handHolderLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  resourceConsumerLayer:
+    serializedVersion: 2
+    m_Bits: 64
   cardLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -320,7 +315,14 @@ MonoBehaviour:
   deckDiscard: []
   deck: []
   hand: []
+  consumer: []
   resources: []
+  indicators:
+  - {fileID: 21300000, guid: e2c9df69116c5de44a9d4dca37e5f456, type: 3}
+  - {fileID: 21300000, guid: cc752aa28cc52f94688e76836a727c83, type: 3}
+  - {fileID: 21300000, guid: e1e58ecc86250f34ea26c22c1a15f2d4, type: 3}
+  - {fileID: 21300000, guid: ca030c81040d6614a8825839d3c90ddd, type: 3}
+  - {fileID: 21300000, guid: 0041aa5d16ea4f24f8ce191f5ea693ca, type: 3}
 --- !u!4 &514661610
 Transform:
   m_ObjectHideFlags: 0
@@ -501,6 +503,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1134737078}
+  - component: {fileID: 1134737079}
   m_Layer: 5
   m_Name: Anomaly
   m_TagString: Untagged
@@ -528,6 +531,14 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1134737079
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134737077}
+  m_CullTransparentMesh: 1
 --- !u!1 &1477694878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,7 +1013,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6690628766882810513}
   - component: {fileID: 3619560376459957111}
-  - component: {fileID: 6690628766882810515}
   - component: {fileID: 6690628766882810514}
   m_Layer: 7
   m_Name: HandHolder
@@ -1057,15 +1067,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 26.46854, y: 3.270249}
   m_EdgeRadius: 0
---- !u!114 &6690628766882810515
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4286513583563579904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c89f88d84d78621498c4ed8729a50d77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
