@@ -8,20 +8,30 @@ using UnityEngine.TextCore.Text;
 
 public class Resource : ScriptableObject
 {
-    public enum CardType { Anomaly, Escapee, Insanity, Munition, Ration, Scientist }
+    public enum ECardType { Anomaly, Escapee, Insanity, Munition, Ration, Scientist }
 
-    [SerializeField] CardType eCardType;
+    [SerializeField] ECardType cardType;
 
+    [SerializeField] Sprite indicatorBackground;
+    [SerializeField] Sprite indicatorBorder;
     [SerializeField] Sprite symbol;
     [SerializeField] Sprite texture;
-    [SerializeField] Color cardColor;
+    [SerializeField] Color indicatorBackgroundColor;
+    [SerializeField] Color indicatorBorderColor;
+    [SerializeField] Color symbolColor;
+    [SerializeField] Color textureColor;
     [SerializeField] char initial;
 
-    public CardType _ECardType { get => eCardType; private set => eCardType = value; }
-    public Sprite _Symbol { get => symbol; private set => symbol = value; }
-    public Sprite _Texture { get => symbol; private set => texture = value; }
-    public Color _CardColor { get => cardColor; private set => cardColor = value; }
-    public char _Initial { get => initial; private set => initial = value; }
+    public ECardType CardType { get => cardType; private set => cardType = value; }
+    public Sprite Symbol { get => symbol; private set => symbol = value; }
+    public Sprite Texture { get => texture; private set => texture = value; }
+    public Sprite IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
+    public Color IndicatorBackgroundColor { get => indicatorBackgroundColor; private set => indicatorBackgroundColor = value; }
+    public Color IndicatorBorderColor { get => indicatorBorderColor; private set => indicatorBorderColor = value; }
+    public Sprite IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }
+    public char Initial { get => initial; private set => initial = value; }
+    public Color SymbolColor { get => symbolColor; private set => symbolColor = value; }
+    public Color TextureColor { get => textureColor; private set => textureColor = value; }
 
     public bool HasBeenPlayed { get; protected set; }
     public bool HasBeenConsumed { get; protected set; }

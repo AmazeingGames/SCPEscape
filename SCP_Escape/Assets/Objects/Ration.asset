@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
   m_Name: Ration
   m_EditorClassIdentifier: 
-  eCardType: 4
-  symbol: {fileID: 21300000, guid: faed85312dc8874409fa9845d620d6c5, type: 3}
-  texture: {fileID: 0}
-  cardColor: {r: 0.54604167, g: 0.36707902, b: 0.6886792, a: 0}
+  cardType: 4
+  symbol: {fileID: 21300000, guid: cb36de5907a69ea4698a246691c63140, type: 3}
+  texture: {fileID: 21300000, guid: cb36de5907a69ea4698a246691c63140, type: 3}
+  indicatorColor: {r: 0, g: 0, b: 0, a: 0}
+  symbolColor: {r: 0.76862746, g: 0.007843138, b: 0.2, a: 1}
+  textureColor: {r: 0.76862746, g: 0.007843138, b: 0.2, a: 0.101960786}
   initial: 82

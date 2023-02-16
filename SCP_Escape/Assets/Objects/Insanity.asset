@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
   m_Name: Insanity
   m_EditorClassIdentifier: 
-  eCardType: 2
-  symbol: {fileID: 21300000, guid: c12f809f3428b2046a17185de73164cd, type: 3}
-  texture: {fileID: 0}
-  cardColor: {r: 0, g: 0.2304167, b: 0.553, a: 0}
+  cardType: 2
+  symbol: {fileID: 21300000, guid: c416fe6dd75680d4a817024f85f4731f, type: 3}
+  texture: {fileID: 21300000, guid: c416fe6dd75680d4a817024f85f4731f, type: 3}
+  indicatorColor: {r: 0, g: 0, b: 0, a: 0}
+  symbolColor: {r: 1, g: 0.827451, b: 0, a: 1}
+  textureColor: {r: 1, g: 0.827451, b: 0, a: 0.2}
   initial: 73

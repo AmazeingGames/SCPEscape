@@ -9,15 +9,19 @@ public class ResourceCard : MonoBehaviour
 {
     [SerializeField] Resource resource;
 
-    [SerializeField] Image symbolComponent;
     [SerializeField] Image textureComponent;
     [SerializeField] TextMeshProUGUI initialComponent;
-    [SerializeField] Image colorOverlayComponent;
     [SerializeField] Canvas canvasComponent;
+    [SerializeField] Image resourceSymbol;
 
-    public Image numberSymbol;
-    public Image numberColor;
+    [SerializeField] Image indicatorBorder;
+    [SerializeField] Image indicatorNumber;
+    [SerializeField] Image indicatorBackground;
 
+    public Image IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
+    public Image IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }
+    public Image IndicatorNumber { get => indicatorNumber; private set => indicatorNumber = value; }
+    public Image ResourceSymbol { get => resourceSymbol; private set => resourceSymbol = value; }
     public Resource _Resource { get => resource; private set => resource = value; }
     public Canvas _CanvasComponent { get => canvasComponent; private set => canvasComponent = value; }
 
@@ -49,20 +53,26 @@ public class ResourceCard : MonoBehaviour
         DataMatchResource();
     }
 
-    void DataMatchResource()
+    public void DataMatchResource()
     {
-        symbolComponent.sprite = resource._Symbol;
-        textureComponent.sprite = resource._Texture;
-        initialComponent.text = resource._Initial.ToString();
-        //colorOverlayComponent.color = resource._CardColor;
+        resourceSymbol.sprite = resource.Symbol;
+        textureComponent.sprite = resource.Texture;
+        initialComponent.text = resource.Initial.ToString();
+        resourceSymbol.color = resource.SymbolColor;
+        textureComponent.color = resource.TextureColor;
 
-        symbolComponent.preserveAspect = true;
+        indicatorBackground.sprite = resource.IndicatorBackground;
+        indicatorBackground.color = resource.IndicatorBackgroundColor;
+        indicatorBorder.sprite = resource.IndicatorBorder;
+        indicatorBorder.color = resource.IndicatorBorderColor;
+
+        resourceSymbol.preserveAspect = true;
         textureComponent.preserveAspect = true;
     }
 
     public void PrintCard()
     {
-        Debug.Log($"Card Type is: {resource._ECardType}, Symbol is {resource._Symbol}, Texture is {resource._Texture}, Color is {resource._CardColor}, Initial is {resource._Initial}");
+        Debug.Log($"Card Type is: {resource.CardType}, Symbol is {resource.Symbol}, Texture is {resource.Texture}, Color is , Initial is {resource.Initial}");
     }
 
 }

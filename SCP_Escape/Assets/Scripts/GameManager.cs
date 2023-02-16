@@ -77,6 +77,7 @@ public class GameManager : MonoBehaviour
 
         for(int i = 0; i < resources.Count; i++)
         {
+            Debug.Log(resources[i].name);
             AddCardToConsumer(GetFromResourcePool(resources[i]));
         }
     }
@@ -94,6 +95,13 @@ public class GameManager : MonoBehaviour
         //Debug.Log($"Is over card? : {(IsOverCard() == true)}");
         //Debug.Log($"Is over hand? : {(IsOverHandHolder() == true)}");
         //Debug.Log($"Is over consumer? : {(IsOverResourceConsumer() == true)}");
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            DataMatchResources();
+        }
+        //DataMatchResources();
+
     }
 
     RaycastHit2D IsOverCard()
@@ -151,44 +159,44 @@ public class GameManager : MonoBehaviour
 
             if (card.gameObject.activeSelf == false)
             {
-                switch (card._Resource._ECardType)
+                switch (card._Resource.CardType)
                 {
-                    case Resource.CardType.Anomaly:
+                    case Resource.ECardType.Anomaly:
                         if(anomalies > 0)
                         {
                             anomalies--;
                             resourcesToAdd.Add(card);
                         }
                         break;
-                    case Resource.CardType.Escapee:
+                    case Resource.ECardType.Escapee:
                         if(escapees > 0)
                         {
                             escapees--;
                             resourcesToAdd.Add(card);
                         }
                         break;
-                    case Resource.CardType.Insanity:
+                    case Resource.ECardType.Insanity:
                         if(insanities > 0)
                         {
                             insanities--;
                             resourcesToAdd.Add(card);
                         }
                         break;
-                    case Resource.CardType.Munition:
+                    case Resource.ECardType.Munition:
                         if(munitions > 0)
                         {
                             munitions--;
                             resourcesToAdd.Add(card);
                         }
                         break;
-                    case Resource.CardType.Ration: 
+                    case Resource.ECardType.Ration: 
                         if(rations > 0)
                         {
                             rations--;
                             resourcesToAdd.Add(card);
                         }
                         break;
-                    case Resource.CardType.Scientist:
+                    case Resource.ECardType.Scientist:
                         if(scientists > 0)
                         {
                             scientists--;
@@ -217,6 +225,21 @@ public class GameManager : MonoBehaviour
             return;
         }
         AddCardToHand(cardToAdd);
+    }
+
+    void DataMatchResources()
+    {
+        Debug.Log($"Pre | hand size: {hand.Count}. Consumer size: {consumer.Count}");
+
+        var handAndConsumerResources = hand.Concat(consumer);
+
+        Debug.Log($"Post | hand size: {hand.Count}. Consumer size: {consumer.Count}");
+
+
+        foreach(ResourceCard resource in handAndConsumerResources)
+        {
+            resource.DataMatchResource();
+        }
     }
 
     void CheckCardSizes()
@@ -273,31 +296,36 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Resource ResouceCard is null");
         if (resourceConsumer == null)
             Debug.LogWarning("ResourceConsumer is null");
-        if (resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString()) == null)
+        if (resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString()) == null)
             Debug.Log("Warning, cannot find resource consumer card holder");
 
-        var parent = resourceConsumer.transform.Find(resourceCard._Resource._ECardType.ToString());
+        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
+
+        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType.ToString()}");
 
         AddTo(resourceCard, parent, false, resourceConsumerCardScale);
 
-        var resourceType = resourceCard._Resource._ECardType;
+        var resourceType = resourceCard._Resource.CardType;
         int indicatorNum = 0;
 
         for (int i = 0; i < consumer.Count; i++)
         {
             var card = consumer[i];
 
-            if (card._Resource._ECardType == resourceType)
+            if (card._Resource.CardType == resourceType)
                 indicatorNum++;
         }
 
-        resourceCard.numberSymbol.sprite = indicators[indicatorNum];
+        if (indicatorNum >= indicators.Count)
+            indicatorNum = indicators.Count - 1;
+
+        resourceCard.IndicatorNumber.sprite = indicators[indicatorNum];
 
         consumer.Add(resourceCard);
 
         hand.Remove(resourceCard);
 
-        Debug.Log($"Is numberSymbol null? : {(resourceCard.numberSymbol == null)}");
+        Debug.Log($"Is numberSymbol null? : {(resourceCard.ResourceSymbol == null)}");
     }
 
     void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
