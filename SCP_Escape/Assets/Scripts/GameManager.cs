@@ -17,7 +17,8 @@ public class GameManager : MonoBehaviour
     GameObject handHolder;
     GameObject resourceConsumer;
 
-    public float holdingCardScaleMultiplier;
+    [SerializeField] int holdingSortingOrder = 1;
+    [SerializeField] float holdingCardScaleMultiplier;
     [SerializeField] Vector3 resourceConsumerCardScale;
     [SerializeField] Vector3 handHolderCardScale;
     [SerializeField] LayerMask handHolderLayer;
@@ -46,6 +47,7 @@ public class GameManager : MonoBehaviour
     ResourceCard holdingResourceCard = null;
     Vector3 grabbedPosition;
     Vector3 regularScale = Vector3.one;
+    int regularSortingOrder = 0;
 
     //NOTE TO SELF: In order to create cool card overlap effect, create slots that hold the cards and make sure to have worldPosition stay true when setting the parent
 
@@ -333,8 +335,10 @@ public class GameManager : MonoBehaviour
             holdingResourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
             regularScale = holdingResourceCard.transform.localScale;
+            regularSortingOrder = holdingResourceCard._CanvasComponent.sortingOrder;
 
             holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
+            holdingResourceCard._CanvasComponent.sortingOrder = holdingSortingOrder;
         }
     }
 
@@ -345,6 +349,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("Dropping card");
 
             holdingResourceCard.transform.localScale = regularScale;
+            holdingResourceCard._CanvasComponent.sortingOrder = regularSortingOrder;
 
             if (IsOverHandHolder() && IsOverResourceConsumer())
             {

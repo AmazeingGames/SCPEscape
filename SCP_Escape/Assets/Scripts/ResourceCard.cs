@@ -12,11 +12,14 @@ public class ResourceCard : MonoBehaviour
     [SerializeField] Image symbolComponent;
     [SerializeField] Image textureComponent;
     [SerializeField] TextMeshProUGUI initialComponent;
+    [SerializeField] Image colorOverlayComponent;
+    [SerializeField] Canvas canvasComponent;
 
     public Image numberSymbol;
     public Image numberColor;
 
     public Resource _Resource { get => resource; private set => resource = value; }
+    public Canvas _CanvasComponent { get => canvasComponent; private set => canvasComponent = value; }
 
     void Awake()
     {
@@ -51,6 +54,7 @@ public class ResourceCard : MonoBehaviour
         symbolComponent.sprite = resource._Symbol;
         textureComponent.sprite = resource._Texture;
         initialComponent.text = resource._Initial.ToString();
+        //colorOverlayComponent.color = resource._CardColor;
 
         symbolComponent.preserveAspect = true;
         textureComponent.preserveAspect = true;
