@@ -438,7 +438,7 @@ public class GameManager : MonoBehaviour
 
             if(consumer.Contains(holdingResourceCard))
             {
-                holdingNum = UpdateConsumerIndicators(holdingResourceCard._Resource.CardType, -2);
+                UpdateConsumerIndicators(holdingResourceCard._Resource.CardType, -2);
             }
 
            
