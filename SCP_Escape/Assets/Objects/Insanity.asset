@@ -17,8 +17,10 @@ MonoBehaviour:
   indicatorBorder: {fileID: 21300000, guid: e0af763439e54d24da433ec3bf29e5a8, type: 3}
   symbol: {fileID: 21300000, guid: c416fe6dd75680d4a817024f85f4731f, type: 3}
   texture: {fileID: 21300000, guid: c416fe6dd75680d4a817024f85f4731f, type: 3}
-  indicatorBackgroundColor: {r: 1, g: 0.827451, b: 0, a: 1}
+  indicatorBackgroundColor: {r: 1, g: 0.8392157, b: 0.039215688, a: 1}
   indicatorBorderColor: {r: 0, g: 0, b: 0, a: 1}
-  symbolColor: {r: 1, g: 0.827451, b: 0, a: 1}
-  textureColor: {r: 1, g: 0.827451, b: 0, a: 0.29803923}
+  symbolColor: {r: 0.9607843, g: 0.8, b: 0, a: 1}
+  textureColor: {r: 1, g: 0.8392157, b: 0.039215688, a: 0.29803923}
   initial: 73
+  initialColor: {r: 0, g: 0, b: 0, a: 0}
+  textureOffeset: {x: 0, y: 0}

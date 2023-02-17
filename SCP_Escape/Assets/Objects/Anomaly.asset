@@ -22,3 +22,5 @@ MonoBehaviour:
   symbolColor: {r: 0, g: 0.62352943, b: 0.41960785, a: 1}
   textureColor: {r: 0, g: 0.62352943, b: 0.41960785, a: 0.101960786}
   initial: 65
+  initialColor: {r: 0, g: 0, b: 0, a: 0}
+  textureOffeset: {x: 0, y: 0}

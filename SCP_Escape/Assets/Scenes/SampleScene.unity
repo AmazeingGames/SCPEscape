@@ -291,9 +291,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a3c28254846f841adbdeabc5a1331b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holdingCardLayer: 2
+  newestCardLayer: 1
+  defaultLayer: 0
   holdingCardScaleMultiplier: 1.5
   resourceConsumerCardScale: {x: 0.25, y: 0.25, z: 0.25}
-  handHolderCardScale: {x: 0.325, y: 0.325, z: 0.325}
+  handHolderCardScale: {x: 0.3, y: 0.3, z: 0.3}
   handHolderLayer:
     serializedVersion: 2
     m_Bits: 128
