@@ -58,6 +58,7 @@ public class ResourceCard : MonoBehaviour
         resourceSymbol.sprite = resource.Symbol;
         textureComponent.sprite = resource.Texture;
         initialComponent.text = resource.Initial.ToString();
+        initialComponent.color = resource.InitialColor;
         resourceSymbol.color = resource.SymbolColor;
         textureComponent.color = resource.TextureColor;
 

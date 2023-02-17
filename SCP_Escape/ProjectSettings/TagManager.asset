@@ -42,15 +42,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Card White
+  - name: 
     uniqueID: 189355861
     locked: 0
-  - name: Card Safe
+  - name: Newest Consumer
     uniqueID: 2083423449
     locked: 0
-  - name: Card Texture
-    uniqueID: 924261621
-    locked: 0
-  - name: Card Border
-    uniqueID: 1165393895
+  - name: Holding Card
+    uniqueID: 16589251
     locked: 0

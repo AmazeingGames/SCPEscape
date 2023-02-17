@@ -17,7 +17,10 @@ public class GameManager : MonoBehaviour
     GameObject handHolder;
     GameObject resourceConsumer;
 
-    [SerializeField] int holdingSortingOrder = 1;
+    [SerializeField] int holdingCardLayer;
+    [SerializeField] int newestCardLayer;
+    [SerializeField] int defaultLayer;
+
     [SerializeField] float holdingCardScaleMultiplier;
     [SerializeField] Vector3 resourceConsumerCardScale;
     [SerializeField] Vector3 handHolderCardScale;
@@ -48,6 +51,13 @@ public class GameManager : MonoBehaviour
     Vector3 grabbedPosition;
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
+
+    ResourceCard newestAnomaly;
+    ResourceCard newestEscapee;
+    ResourceCard newestInsanity;
+    ResourceCard newestMunition;
+    ResourceCard newestRation;
+    ResourceCard newestScientist;
 
     //NOTE TO SELF: In order to create cool card overlap effect, create slots that hold the cards and make sure to have worldPosition stay true when setting the parent
 
@@ -100,7 +110,7 @@ public class GameManager : MonoBehaviour
         {
             DataMatchResources();
         }
-        //DataMatchResources();
+        DataMatchResources();
 
     }
 
@@ -285,9 +295,29 @@ public class GameManager : MonoBehaviour
     {
         AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
 
+        resourceCard.IndicatorBackground.gameObject.SetActive(false);
+
         hand.Add(resourceCard);
 
         consumer.Remove(resourceCard);
+    }
+
+    void ResetHandCard(ResourceCard resourceCard)
+    {
+        resourceCard.gameObject.transform.SetParent(null, false);
+
+        AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
+
+        resourceCard.IndicatorBackground.gameObject.SetActive(false);
+    }
+
+    void ResetConsumerCard(ResourceCard resourceCard)
+    {
+        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
+
+        resourceCard.IndicatorBackground.gameObject.SetActive(true);
+
+        AddTo(resourceCard, parent, false, resourceConsumerCardScale);
     }
 
     void AddCardToConsumer(ResourceCard resourceCard)
@@ -301,27 +331,16 @@ public class GameManager : MonoBehaviour
 
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
 
-        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType.ToString()}");
+        resourceCard.IndicatorBackground.gameObject.SetActive(true);
+
+        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType}");
 
         AddTo(resourceCard, parent, false, resourceConsumerCardScale);
 
-        var resourceType = resourceCard._Resource.CardType;
-        int indicatorNum = 0;
-
-        for (int i = 0; i < consumer.Count; i++)
-        {
-            var card = consumer[i];
-
-            if (card._Resource.CardType == resourceType)
-                indicatorNum++;
-        }
-
-        if (indicatorNum >= indicators.Count)
-            indicatorNum = indicators.Count - 1;
-
-        resourceCard.IndicatorNumber.sprite = indicators[indicatorNum];
-
+        var indicatorNum = UpdateConsumerIndicators(resourceCard._Resource.CardType, 0);
+        
         consumer.Add(resourceCard);
+        resourceCard.IndicatorNumber.sprite = indicators[indicatorNum];
 
         hand.Remove(resourceCard);
 
@@ -338,6 +357,25 @@ public class GameManager : MonoBehaviour
         resourceCard.transform.localPosition = Vector3.zero;
 
         resourceCard.transform.localScale = newLocalScale;
+    }
+
+    int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
+    {
+        for (int i = 0; i < consumer.Count; i++)
+        {
+            var card = consumer[i];
+
+            if (card._Resource.CardType == resourceType)
+            {
+                indicatorNum++;
+
+                if (indicatorNum >= indicators.Count)
+                    indicatorNum = indicators.Count - 1;
+
+                card.IndicatorNumber.sprite = indicators[indicatorNum];
+            }
+        }
+        return indicatorNum;
     }
 
     void PrintHand()
@@ -366,7 +404,10 @@ public class GameManager : MonoBehaviour
             regularSortingOrder = holdingResourceCard._CanvasComponent.sortingOrder;
 
             holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
-            holdingResourceCard._CanvasComponent.sortingOrder = holdingSortingOrder;
+            
+            holdingResourceCard._CanvasComponent.sortingLayerID = holdingCardLayer;
+
+            UpdateConsumerIndicators(holdingResourceCard._Resource.CardType, -1);
         }
     }
 
@@ -396,7 +437,18 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Do something. Mouse is over nothing.");
+                Debug.Log("Reset Card");
+
+                if (hand.Contains(holdingResourceCard))
+                {
+                    ResetHandCard(holdingResourceCard);
+                }
+                else if (consumer.Contains(holdingResourceCard))
+                {
+                    ResetConsumerCard(holdingResourceCard);
+                }
+                else
+                    Debug.Log("No list contains this card");
             }
 
             holdingResourceCard = null;
