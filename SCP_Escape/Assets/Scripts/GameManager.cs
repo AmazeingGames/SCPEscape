@@ -396,18 +396,10 @@ public class GameManager : MonoBehaviour
     int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
     {
         Debug.Log("Updated Indicators");
-        List<ResourceCard> resourceCards = new List<ResourceCard>();
+        List<ResourceCard> resourceCards = GetResourcesFromConsumer(resourceType);
 
-        for (int i = 0; i < consumer.Count; i++)
-        {
-            var card = consumer[i];
+        indicatorNum += resourceCards.Count;
 
-            if (card._Resource.CardType == resourceType)
-            {
-                indicatorNum++;
-                resourceCards.Add(card);
-            }
-        }
         if (indicatorNum >= indicators.Count)
             indicatorNum = indicators.Count - 1;
 
@@ -418,6 +410,22 @@ public class GameManager : MonoBehaviour
         }
 
         return indicatorNum;
+    }
+
+    List<ResourceCard> GetResourcesFromConsumer(Resource.ECardType resourceType)
+    {
+        List<ResourceCard> resourceCards = new List<ResourceCard>();
+        for (int i = 0; i < consumer.Count; i++)
+        {
+            var card = consumer[i];
+
+            if (card._Resource.CardType == resourceType)
+            {
+                resourceCards.Add(card);
+            }
+        }
+
+        return resourceCards;
     }
 
     void PrintHand()
@@ -469,18 +477,17 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("Mouse is over two colliders. Bug.");
             }
 
-            if (IsOverHandHolder())
-            {
-                Debug.Log("Dropped card in hand");
-                AddCardToHand(holdingResourceCard);
-            }
-            else if (IsOverResourceConsumer())
+            var resources = GetResourcesFromConsumer(holdingResourceCard._Resource.CardType);
+
+            
+            if (IsOverResourceConsumer() && resources.Count < 5)
             {
                 Debug.Log("Dropped card in consumer");
                 AddCardToConsumer(holdingResourceCard);
             }
             else
             {
+                Debug.Log("Dropped card in hand");
                 AddCardToHand(holdingResourceCard);
             }
 
