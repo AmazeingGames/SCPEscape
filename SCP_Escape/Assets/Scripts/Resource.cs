@@ -22,11 +22,13 @@ public class Resource : ScriptableObject
     [SerializeField] Color textureColor;
     [SerializeField] char initial;
     [SerializeField] Color initialColor;
+    [SerializeField] Vector2 textureOffeset;
 
     public ECardType CardType { get => cardType; private set => cardType = value; }
     public Sprite Symbol { get => symbol; private set => symbol = value; }
     public Sprite Texture { get => texture; private set => texture = value; }
     public Sprite IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
+    public Vector2 TextureOffeset { get => textureOffeset; private set => textureOffeset = value; }
     public Color IndicatorBackgroundColor { get => indicatorBackgroundColor; private set => indicatorBackgroundColor = value; }
     public Color IndicatorBorderColor { get => indicatorBorderColor; private set => indicatorBorderColor = value; }
     public Sprite IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }

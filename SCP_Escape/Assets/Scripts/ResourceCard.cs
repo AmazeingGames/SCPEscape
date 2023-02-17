@@ -61,6 +61,7 @@ public class ResourceCard : MonoBehaviour
         initialComponent.color = resource.InitialColor;
         resourceSymbol.color = resource.SymbolColor;
         textureComponent.color = resource.TextureColor;
+        textureComponent.rectTransform.position = resource.TextureOffeset;
 
         indicatorBackground.sprite = resource.IndicatorBackground;
         indicatorBackground.color = resource.IndicatorBackgroundColor;
