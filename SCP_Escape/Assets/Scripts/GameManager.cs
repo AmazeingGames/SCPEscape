@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
 
         for(int i = 0; i < resources.Count; i++)
         {
-            Debug.Log(resources[i].name);
+            //Debug.Log(resources[i].name);
             AddCardToConsumer(GetFromResourcePool(resources[i]));
         }
     }
@@ -263,11 +263,11 @@ public class GameManager : MonoBehaviour
 
     void DataMatchResources()
     {
-        Debug.Log($"Pre | hand size: {hand.Count}. Consumer size: {consumer.Count}");
+        //Debug.Log($"Pre | hand size: {hand.Count}. Consumer size: {consumer.Count}");
 
         var handAndConsumerResources = hand.Concat(consumer);
 
-        Debug.Log($"Post | hand size: {hand.Count}. Consumer size: {consumer.Count}");
+        //Debug.Log($"Post | hand size: {hand.Count}. Consumer size: {consumer.Count}");
 
 
         foreach(ResourceCard resource in handAndConsumerResources)
@@ -378,7 +378,7 @@ public class GameManager : MonoBehaviour
 
         hand.Remove(resourceCard);
 
-        Debug.Log($"Is numberSymbol null? : {(resourceCard.ResourceSymbol == null)}");
+        //Debug.Log($"Is numberSymbol null? : {(resourceCard.ResourceSymbol == null)}");
     }
 
     void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)

@@ -201,7 +201,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.020019531, y: -519.21}
+  m_AnchoredPosition: {x: 0.020019531, y: -519.7396}
   m_SizeDelta: {x: 7.6688, y: 3.7952}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &374869047
@@ -249,7 +249,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.55109215, y: -0.9255607}
+  m_Offset: {x: -0.1917324, y: -1.7766752}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -260,7 +260,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 30.032375, y: 8.705837}
+  m_Size: {x: 30.751095, y: 7.0036087}
   m_EdgeRadius: 0
 --- !u!1 &514661608
 GameObject:
@@ -291,9 +291,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a3c28254846f841adbdeabc5a1331b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holdingCardLayer: 0
+  newestCardLayer: 0
+  defaultLayer: 0
   holdingCardScaleMultiplier: 1.5
   resourceConsumerCardScale: {x: 0.25, y: 0.25, z: 0.25}
-  handHolderCardScale: {x: 0.325, y: 0.325, z: 0.325}
+  handHolderCardScale: {x: 0.28, y: 0.28, z: 0.3}
   handHolderLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -918,8 +921,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999072158}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -550.4966, y: -260.06, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalPosition: {x: -550.4966, y: -260.86, z: 0}
+  m_LocalScale: {x: 0.32, y: 0.32, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1814996655}
