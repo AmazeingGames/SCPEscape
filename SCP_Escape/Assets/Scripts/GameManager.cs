@@ -112,6 +112,30 @@ public class GameManager : MonoBehaviour
         }
         DataMatchResources();
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            AddPoolResourceToHand(anomaly);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            AddPoolResourceToHand(escapee);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            AddPoolResourceToHand(insanity);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            AddPoolResourceToHand(munition);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            AddPoolResourceToHand(ration);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            AddPoolResourceToHand(scientist);
+        }
     }
 
     RaycastHit2D IsOverCard()
@@ -291,6 +315,15 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    void AddToHolding(ResourceCard resourceCard)
+    {
+        holdingResourceCard = resourceCard;
+
+        resourceCard.transform.SetParent(null);
+        hand.Remove(resourceCard);
+        consumer.Remove(resourceCard);
+    }
+
     void AddCardToHand(ResourceCard resourceCard)
     {
         AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
@@ -302,6 +335,7 @@ public class GameManager : MonoBehaviour
         consumer.Remove(resourceCard);
     }
 
+    /*
     void ResetHandCard(ResourceCard resourceCard)
     {
         resourceCard.gameObject.transform.SetParent(null, false);
@@ -319,9 +353,11 @@ public class GameManager : MonoBehaviour
 
         AddTo(resourceCard, parent, false, resourceConsumerCardScale);
     }
+    */
 
     void AddCardToConsumer(ResourceCard resourceCard)
     {
+        /*
         if (resourceCard._Resource == null)
             Debug.LogWarning("Resource ResouceCard is null");
         if (resourceConsumer == null)
@@ -329,18 +365,16 @@ public class GameManager : MonoBehaviour
         if (resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString()) == null)
             Debug.Log("Warning, cannot find resource consumer card holder");
 
-        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
-
+        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType}");
+        */
         resourceCard.IndicatorBackground.gameObject.SetActive(true);
 
-        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType}");
+        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
 
         AddTo(resourceCard, parent, false, resourceConsumerCardScale);
 
-        var indicatorNum = UpdateConsumerIndicators(resourceCard._Resource.CardType, 0);
-        
         consumer.Add(resourceCard);
-        resourceCard.IndicatorNumber.sprite = indicators[indicatorNum];
+        var indicatorNum = UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
 
         hand.Remove(resourceCard);
 
@@ -361,6 +395,9 @@ public class GameManager : MonoBehaviour
 
     int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
     {
+        Debug.Log("Updated Indicators");
+        List<ResourceCard> resourceCards = new List<ResourceCard>();
+
         for (int i = 0; i < consumer.Count; i++)
         {
             var card = consumer[i];
@@ -368,13 +405,18 @@ public class GameManager : MonoBehaviour
             if (card._Resource.CardType == resourceType)
             {
                 indicatorNum++;
-
-                if (indicatorNum >= indicators.Count)
-                    indicatorNum = indicators.Count - 1;
-
-                card.IndicatorNumber.sprite = indicators[indicatorNum];
+                resourceCards.Add(card);
             }
         }
+        if (indicatorNum >= indicators.Count)
+            indicatorNum = indicators.Count - 1;
+
+        for (int i = 0; i < resourceCards.Count; i++)
+        {
+            var card = resourceCards[i];
+            card.IndicatorNumber.sprite = indicators[indicatorNum];
+        }
+
         return indicatorNum;
     }
 
@@ -398,7 +440,9 @@ public class GameManager : MonoBehaviour
         {
             //Debug.Log("Grabbing card");
 
-            holdingResourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
+            var resourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
+
+            AddToHolding(resourceCard);
 
             regularScale = holdingResourceCard.transform.localScale;
             regularSortingOrder = holdingResourceCard._CanvasComponent.sortingOrder;
@@ -425,30 +469,19 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("Mouse is over two colliders. Bug.");
             }
 
-            if (IsOverHandHolder() && !hand.Contains(holdingResourceCard))
+            if (IsOverHandHolder())
             {
                 Debug.Log("Dropped card in hand");
                 AddCardToHand(holdingResourceCard);
             }
-            else if (IsOverResourceConsumer() && !consumer.Contains(holdingResourceCard))
+            else if (IsOverResourceConsumer())
             {
                 Debug.Log("Dropped card in consumer");
                 AddCardToConsumer(holdingResourceCard);
             }
             else
             {
-                Debug.Log("Reset Card");
-
-                if (hand.Contains(holdingResourceCard))
-                {
-                    ResetHandCard(holdingResourceCard);
-                }
-                else if (consumer.Contains(holdingResourceCard))
-                {
-                    ResetConsumerCard(holdingResourceCard);
-                }
-                else
-                    Debug.Log("No list contains this card");
+                AddCardToHand(holdingResourceCard);
             }
 
             holdingResourceCard = null;
@@ -461,9 +494,6 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null)
         {
             holdingResourceCard.transform.position = GetMousePosition();
-
-            //Debug.Log($"Is HoldingCard over hand? : {IsOverHandHolder()}");
-            //Debug.Log($"Is HoldingCard over consumer? : {IsOverResourceConsumer()}");
         }
     }
 
