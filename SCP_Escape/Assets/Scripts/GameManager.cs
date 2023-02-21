@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> deckDiscard = new List<GameObject>();
     public List<GameObject> deck = new List<GameObject>();
     public List<ResourceCard> hand = new List<ResourceCard>();
-    public List<ResourceCard> consumer = new List<ResourceCard>();
+    public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
     public List<Resource> resources;
     public List<Resource> resources1;
 
@@ -169,6 +169,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void ReadyChoices()
+    {
+
+    }
+
+    public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards)
+    {
+        List<Resource.ECardType> returnList = new List<Resource.ECardType>();
+
+        for (int i = 0; i < resourceCards.Count; i++)
+        {
+            var card = resourceCards[i];
+
+            var cardType = card._Resource.CardType;
+
+            returnList.Add(cardType);
+        }
+        return returnList;
+    }
+
+    public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<Resource> resourceCards)
+    {
+        List<Resource.ECardType> returnList = new List<Resource.ECardType>();
+
+        for (int i = 0; i < resourceCards.Count; i++)
+        {
+            var card = resourceCards[i];
+
+            var cardType = card.CardType;
+
+            returnList.Add(cardType);
+        }
+        return returnList;
+    }
+
+    
+
     void SwapResources(List<Resource> resources)
     {
         for(int i = 0; i < allCards.Count; i++)
@@ -200,8 +237,6 @@ public class GameManager : MonoBehaviour
         }
         return null;
     }
-
-   
 
     RaycastHit2D IsOverCard()
     {
@@ -345,12 +380,7 @@ public class GameManager : MonoBehaviour
 
     void DataMatchResources()
     {
-        //Debug.Log($"Pre | hand size: {hand.Count}. Consumer size: {consumer.Count}");
-
         var handAndConsumerResources = hand.Concat(consumer);
-
-        //Debug.Log($"Post | hand size: {hand.Count}. Consumer size: {consumer.Count}");
-
 
         foreach(ResourceCard resource in handAndConsumerResources)
         {
@@ -478,7 +508,7 @@ public class GameManager : MonoBehaviour
 
     int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
     {
-        Debug.Log("Updated Indicators");
+        //Debug.Log("Updated Indicators");
         List<ResourceCard> resourceCards = GetResourcesFromConsumer(resourceType);
 
         indicatorNum += resourceCards.Count;
@@ -565,12 +595,12 @@ public class GameManager : MonoBehaviour
             
             if (IsOverResourceConsumer() && resources.Count < 5)
             {
-                Debug.Log("Dropped card in consumer");
+               //Debug.Log("Dropped card in consumer");
                 AddCardToConsumer(holdingResourceCard);
             }
             else
             {
-                Debug.Log("Dropped card in hand");
+                //Debug.Log("Dropped card in hand");
                 AddCardToHand(holdingResourceCard);
             }
 

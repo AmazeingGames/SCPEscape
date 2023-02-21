@@ -26,11 +26,29 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] GameObject requirementsHolder;
     [SerializeField] GameObject rewardsHolder;
 
+    public bool isReady;
     public Choice _Choice { get => choice; private set => choice = value; }
 
     void Start()
     {
         DataMatchChoice();
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            Debug.Log($"Is Ready? : {IsReady()}");
+        }
+    }
+
+    //Works
+    bool IsReady()
+    {
+        var consumerTypes = GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
+        var requirementTypes = GameManager.ConvertResourceCardListToResourceType(choice.ResourceRequirements.ToList());
+
+        return requirementTypes.Intersect(consumerTypes).Count() == requirementTypes.Count();
     }
 
     void DataMatchChoice()

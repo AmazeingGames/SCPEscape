@@ -9,6 +9,9 @@ public class Icon : MonoBehaviour
     [SerializeField] Image background;
     [SerializeField] Image symbol;
     [SerializeField] TextMeshProUGUI initial;
+
+    public bool isReady;
+
     public Resource IconResource { get; private set; } = null;
 
     void Start()
@@ -16,26 +19,33 @@ public class Icon : MonoBehaviour
         GameManager.Instance.AddIcon(this);   
     }
 
-    public void SetResource(Resource resourceRefernce)
-    {
-        /*
-        if (IconResource != null)
-        {
-            Debug.Log("IconType is already set");
-            return;
-        }
-        */
-        IconResource = resourceRefernce;
-        //symbol.sprite = resourceRefernce.Symbol;
-        //symbol.color = resourceRefernce.SymbolColor;
-        initial.text = $"{resourceRefernce.Initial}";
-        background.color = resourceRefernce.CardColor;
-        //initial.color = resourceRefernce.InitialColor;
-    }
-
     void Update()
     {
+        SetResource(IconResource);
+    }
 
+    public void SetResource(Resource resourceRefernce)
+    {
+        Color backgroundColor;
+
+        if (isReady)
+            backgroundColor = resourceRefernce.CardColor;
+        else
+            backgroundColor = resourceRefernce.SymbolColor;
+
+        IconResource = resourceRefernce;
+        initial.text = $"{resourceRefernce.Initial}";
+        background.color = backgroundColor;
+
+        //symbol.sprite = resourceRefernce.Symbol;
+        //symbol.color = resourceRefernce.SymbolColor;
+        //background.color = resourceRefernce.CardColor;
+        //initial.color = resourceRefernce.CardColor;
+    }
+
+    void BecomeSet()
+    {
+        
     }
 
     
