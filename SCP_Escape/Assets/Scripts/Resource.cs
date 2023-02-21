@@ -11,7 +11,6 @@ public class Resource : ScriptableObject
     public enum ECardType { Anomaly, Escapee, Insanity, Munition, Ration, Scientist }
 
     [SerializeField] ECardType cardType;
-
     [SerializeField] Sprite indicatorBackground;
     [SerializeField] Sprite indicatorBorder;
     [SerializeField] Sprite symbol;
@@ -23,6 +22,7 @@ public class Resource : ScriptableObject
     [SerializeField] char initial;
     [SerializeField] Color initialColor;
     [SerializeField] Vector2 textureOffeset;
+    [SerializeField] Color cardColor;
 
     public ECardType CardType { get => cardType; private set => cardType = value; }
     public Sprite Symbol { get => symbol; private set => symbol = value; }
@@ -36,6 +36,7 @@ public class Resource : ScriptableObject
     public char Initial { get => initial; private set => initial = value; }
     public Color SymbolColor { get => symbolColor; private set => symbolColor = value; }
     public Color TextureColor { get => textureColor; private set => textureColor = value; }
+    public Color CardColor { get => cardColor; private set => cardColor = value; }
 
     public bool HasBeenPlayed { get; protected set; }
     public bool HasBeenConsumed { get; protected set; }

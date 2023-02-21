@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
-  m_Name: Scientist
+  m_Name: Anomaly
   m_EditorClassIdentifier: 
-  cardType: 5
+  cardType: 0
   indicatorBackground: {fileID: 21300000, guid: b9310de03cded024f87137a2374c3184, type: 3}
   indicatorBorder: {fileID: 21300000, guid: e0af763439e54d24da433ec3bf29e5a8, type: 3}
-  symbol: {fileID: 21300000, guid: 653b624a21f034448a0f9afcaeb96e8e, type: 3}
-  texture: {fileID: 21300000, guid: 653b624a21f034448a0f9afcaeb96e8e, type: 3}
-  indicatorBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  symbol: {fileID: 21300000, guid: 2a3e33fc6ae9a3b40b3cb7a3ca82b192, type: 3}
+  texture: {fileID: 21300000, guid: 2a3e33fc6ae9a3b40b3cb7a3ca82b192, type: 3}
+  indicatorBackgroundColor: {r: 0, g: 0.62352943, b: 0.41960785, a: 1}
   indicatorBorderColor: {r: 0, g: 0, b: 0, a: 1}
-  symbolColor: {r: 0.047058824, g: 0.047058824, b: 0.047058824, a: 1}
-  textureColor: {r: 0.047058824, g: 0.047058824, b: 0.047058824, a: 0.101960786}
-  initial: 83
+  symbolColor: {r: 0, g: 0.62352943, b: 0.41960785, a: 1}
+  textureColor: {r: 0, g: 0.62352943, b: 0.41960785, a: 0.101960786}
+  initial: 65
+  initialColor: {r: 0, g: 0, b: 0, a: 0}
+  textureOffeset: {x: 0, y: 0}
+  cardColor: {r: 1, g: 1, b: 1, a: 1}

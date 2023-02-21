@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a1eaeb96e449942b69d9a4d8b9f2bc, type: 3}
-  m_Name: Munition
+  m_Name: Escapee
   m_EditorClassIdentifier: 
-  cardType: 3
+  cardType: 1
   indicatorBackground: {fileID: 21300000, guid: b9310de03cded024f87137a2374c3184, type: 3}
   indicatorBorder: {fileID: 21300000, guid: e0af763439e54d24da433ec3bf29e5a8, type: 3}
-  symbol: {fileID: 21300000, guid: bff99963e87bbd140b75f6950e662568, type: 3}
-  texture: {fileID: 21300000, guid: bff99963e87bbd140b75f6950e662568, type: 3}
-  indicatorBackgroundColor: {r: 1, g: 0.42745098, b: 0, a: 1}
+  symbol: {fileID: 21300000, guid: 358d4492de2a66e4db00f1f49c479da3, type: 3}
+  texture: {fileID: 21300000, guid: 358d4492de2a66e4db00f1f49c479da3, type: 3}
+  indicatorBackgroundColor: {r: 0, g: 0.5294118, b: 0.7411765, a: 1}
   indicatorBorderColor: {r: 0, g: 0, b: 0, a: 1}
-  symbolColor: {r: 1, g: 0.42745098, b: 0, a: 1}
-  textureColor: {r: 1, g: 0.42745098, b: 0, a: 0.101960786}
-  initial: 77
+  symbolColor: {r: 0, g: 0.5294118, b: 0.7411765, a: 1}
+  textureColor: {r: 0, g: 0.5294118, b: 0.7411765, a: 0.101960786}
+  initial: 69
+  initialColor: {r: 0, g: 0, b: 0, a: 0}
+  textureOffeset: {x: 0, y: 0}
+  cardColor: {r: 1, g: 1, b: 1, a: 1}

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
+  m_Name: ChoiceA
+  m_EditorClassIdentifier: 
+  resourceRequirements:
+  - {fileID: 11400000, guid: 065d9315ae517b74e81266fe9584fc13, type: 2}
+  - {fileID: 11400000, guid: b505b2dcb73b06a4c9e8e9c378fd120a, type: 2}
+  - {fileID: 11400000, guid: 960093b93b9769640a1bcbc5ace5235a, type: 2}
+  - {fileID: 11400000, guid: 2187526251643a044bfe6925eec968f5, type: 2}
+  - {fileID: 11400000, guid: 8cf6a079769fc21438b2925ac351162b, type: 2}
+  - {fileID: 11400000, guid: a4324fd582bf4d64db1a5158fe82e8d3, type: 2}
+  resourceRewards:
+  - {fileID: 11400000, guid: 8cf6a079769fc21438b2925ac351162b, type: 2}
+  - {fileID: 11400000, guid: a4324fd582bf4d64db1a5158fe82e8d3, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  cardsToAdd: []
+  shouldWinGame: 0
+  shouldLoseGame: 0
+  flavorText: Flavor!

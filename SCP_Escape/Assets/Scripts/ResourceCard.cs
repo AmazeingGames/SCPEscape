@@ -18,12 +18,21 @@ public class ResourceCard : MonoBehaviour
     [SerializeField] Image indicatorNumber;
     [SerializeField] Image indicatorBackground;
 
+    [SerializeField] Image CardWhite;
+    [SerializeField] Image CardSafeArea;
+    [SerializeField] Icon icon;
+
     public Image IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
     public Image IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }
     public Image IndicatorNumber { get => indicatorNumber; private set => indicatorNumber = value; }
     public Image ResourceSymbol { get => resourceSymbol; private set => resourceSymbol = value; }
     public Resource _Resource { get => resource; private set => resource = value; }
     public Canvas _CanvasComponent { get => canvasComponent; private set => canvasComponent = value; }
+
+    public void SetIcon()
+    {
+
+    }
 
     void Awake()
     {
@@ -44,6 +53,7 @@ public class ResourceCard : MonoBehaviour
             DataMatchResource();
         }
         
+        icon.SetResource(resource);
     }
 
     public void SetResource(Resource resource)
@@ -67,6 +77,9 @@ public class ResourceCard : MonoBehaviour
         indicatorBackground.color = resource.IndicatorBackgroundColor;
         indicatorBorder.sprite = resource.IndicatorBorder;
         indicatorBorder.color = resource.IndicatorBorderColor;
+
+        CardSafeArea.color = resource.CardColor;
+        CardWhite.color = resource.CardColor;
 
         resourceSymbol.preserveAspect = true;
         textureComponent.preserveAspect = true;

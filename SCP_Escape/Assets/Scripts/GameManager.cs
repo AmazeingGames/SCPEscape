@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.UIElements;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,10 +17,14 @@ public class GameManager : MonoBehaviour
     GameObject resourcePool;
     GameObject handHolder;
     GameObject resourceConsumer;
+    GameObject iconPool;
 
     [SerializeField] int holdingCardLayer;
     [SerializeField] int newestCardLayer;
     [SerializeField] int defaultLayer;
+
+    [SerializeField] int iconPoolSize;
+    [SerializeField] Icon icon;
 
     [SerializeField] float holdingCardScaleMultiplier;
     [SerializeField] Vector3 resourceConsumerCardScale;
@@ -36,6 +41,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] Resource munition;
     [SerializeField] Resource anomaly;
 
+    [SerializeField] Resource ration1;
+    [SerializeField] Resource escapee1;
+    [SerializeField] Resource scientist1;
+    [SerializeField] Resource insanity1;
+    [SerializeField] Resource munition1;
+    [SerializeField] Resource anomaly1;
 
     public bool hasAddedResources = false;
 
@@ -44,6 +55,11 @@ public class GameManager : MonoBehaviour
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer = new List<ResourceCard>();
     public List<Resource> resources;
+    public List<Resource> resources1;
+
+    List<ResourceCard> allCards = new List<ResourceCard>();
+    List<Icon> allIcons = new List<Icon>();
+
     public List<Sprite> indicators;
     //public List<bool> availableHandSlots = new List<bool>();
 
@@ -51,13 +67,6 @@ public class GameManager : MonoBehaviour
     Vector3 grabbedPosition;
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
-
-    ResourceCard newestAnomaly;
-    ResourceCard newestEscapee;
-    ResourceCard newestInsanity;
-    ResourceCard newestMunition;
-    ResourceCard newestRation;
-    ResourceCard newestScientist;
 
     //NOTE TO SELF: In order to create cool card overlap effect, create slots that hold the cards and make sure to have worldPosition stay true when setting the parent
 
@@ -71,11 +80,15 @@ public class GameManager : MonoBehaviour
         handHolder = GameObject.Find("HandHolder");
         resourcePool = GameObject.Find("ResourcePool");
         resourceConsumer = GameObject.Find("ResourceConsumer");
+        iconPool = GameObject.Find("IconPool");
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
+        resources1 = new List<Resource> { ration1, escapee1, scientist1, insanity1, munition1, anomaly1 };
+
         //indicators = new List<Sprite> { oneIndicator, twoIndicator, threeIndicator, fourIndicator, fiveIndicator };
 
         CreateResourcePool();
+        CreateIconPool();
     }
 
     void Start()
@@ -88,8 +101,15 @@ public class GameManager : MonoBehaviour
         for(int i = 0; i < resources.Count; i++)
         {
             //Debug.Log(resources[i].name);
-            AddCardToConsumer(GetFromResourcePool(resources[i]));
+            AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
         }
+
+        Debug.Log($"Getting anomaly from Icon Pool: {GetFromIconPool(anomaly)}");
+    }
+
+    public void AddIcon(Icon iconToAdd)
+    {
+        allIcons.Add(iconToAdd);
     }
 
     void Update()
@@ -114,29 +134,74 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            AddPoolResourceToHand(anomaly);
+            AddPoolResourceToHand(Resource.ECardType.Anomaly);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            AddPoolResourceToHand(escapee);
+            AddPoolResourceToHand(Resource.ECardType.Escapee);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            AddPoolResourceToHand(insanity);
+            AddPoolResourceToHand(Resource.ECardType.Insanity);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            AddPoolResourceToHand(munition);
+            AddPoolResourceToHand(Resource.ECardType.Munition);
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            AddPoolResourceToHand(ration);
+            AddPoolResourceToHand(Resource.ECardType.Ration);
         }
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            AddPoolResourceToHand(scientist);
+            AddPoolResourceToHand(Resource.ECardType.Scientist);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            SwapResources(resources);
+            SwapIcons(resources);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            SwapResources(resources1);
+            SwapIcons(resources1);
+
         }
     }
+
+    void SwapResources(List<Resource> resources)
+    {
+        for(int i = 0; i < allCards.Count; i++)
+        {
+            var card = allCards[i];
+
+            card.SetResource(ReturnResourceMatch(resources, card._Resource.CardType));
+        }
+    }
+
+    void SwapIcons(List<Resource> resources)
+    {
+        for (int i = 0; i < allIcons.Count; i++)
+        {
+            var icon = allIcons[i];
+
+            icon.SetResource(ReturnResourceMatch(resources, icon.IconResource.CardType));
+        }
+    }
+
+    Resource ReturnResourceMatch(List<Resource> resources, Resource.ECardType resourceTypeToMatch)
+    {
+        for(int i = 0; i < resources.Count; i++)
+        {
+            var card = resources[i];
+
+            if (card.CardType == resourceTypeToMatch)
+                return card;
+        }
+        return null;
+    }
+
+   
 
     RaycastHit2D IsOverCard()
     {
@@ -179,6 +244,23 @@ public class GameManager : MonoBehaviour
                 var card = Instantiate(resourceCard, resourcePool.transform);
                 card.SetResource(resources[i]);
                 card.gameObject.SetActive(false);
+
+                allCards.Add(card);
+            }
+        }
+    }
+
+    void CreateIconPool()
+    {
+        for (int i = 0; i < resources.Count; i++)
+        {
+            for (int n = 0; n < iconPoolSize; n++)
+            {
+                var icon = Instantiate(this.icon, iconPool.transform);
+                icon.SetResource(resources[i]);
+                icon.gameObject.SetActive(false);
+
+                //allIcons.Add(icon);
             }
         }
     }
@@ -249,16 +331,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void AddPoolResourceToHand(Resource resource)
+    void AddPoolResourceToHand(Resource.ECardType resourceType)
     {
-        ResourceCard cardToAdd = GetFromResourcePool(resource);
+        ResourceCard cardTypeToAdd = GetFromResourcePool(resourceType);
 
-        if (cardToAdd == null)
+        if (cardTypeToAdd == null)
         {
             Debug.LogWarning("Card to Add is null; no more cards in resource pool to add.");
             return;
         }
-        AddCardToHand(cardToAdd);
+        AddCardToHand(cardTypeToAdd);
     }
 
     void DataMatchResources()
@@ -295,7 +377,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    ResourceCard GetFromResourcePool(Resource resource)
+    ResourceCard GetFromResourcePool(Resource.ECardType resourceType)
     {
         if (!(resourcePool.transform.childCount > 0))
             return null;
@@ -306,12 +388,33 @@ public class GameManager : MonoBehaviour
 
             if (cardToReturn.gameObject.activeSelf == false)
             {
-                if (cardToReturn._Resource == resource)
+                if (cardToReturn._Resource.CardType == resourceType)
                 {
                     return cardToReturn;
                 }
             }
         }
+        return null;
+    }
+
+    public Icon GetFromIconPool(Resource resource)
+    {
+        if (!(iconPool.transform.childCount > 0))
+            return null;
+
+        for (int i = 0; i < iconPool.transform.childCount; i++)
+        {
+            Debug.Log($"Is gameobject null? : {iconPool.transform.GetChild(i) == null}");
+            Icon returnIcon = iconPool.transform.GetChild(i).GetComponent<Icon>();
+            Debug.Log($"Is Icon component null? : {returnIcon == null}");
+
+            if (returnIcon.gameObject.activeSelf == false)
+            {
+                if(returnIcon.IconResource == resource)
+                    return returnIcon;
+            }
+        }
+
         return null;
     }
 
@@ -334,26 +437,6 @@ public class GameManager : MonoBehaviour
 
         consumer.Remove(resourceCard);
     }
-
-    /*
-    void ResetHandCard(ResourceCard resourceCard)
-    {
-        resourceCard.gameObject.transform.SetParent(null, false);
-
-        AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
-
-        resourceCard.IndicatorBackground.gameObject.SetActive(false);
-    }
-
-    void ResetConsumerCard(ResourceCard resourceCard)
-    {
-        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
-
-        resourceCard.IndicatorBackground.gameObject.SetActive(true);
-
-        AddTo(resourceCard, parent, false, resourceConsumerCardScale);
-    }
-    */
 
     void AddCardToConsumer(ResourceCard resourceCard)
     {
