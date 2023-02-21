@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
                 icon.SetResource(resources[i]);
                 icon.gameObject.SetActive(false);
 
-                //allIcons.Add(icon);
+                allIcons.Add(icon);
             }
         }
     }

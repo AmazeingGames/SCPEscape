@@ -43,8 +43,34 @@ public class ChoiceCard : MonoBehaviour
 
         flavorText.text = choice.FlavorText;
         rewardText.text = GetRewardText();
-        
+
+        ActivateAndDeactivateRewards();  
+
         SetAllIcons();
+    }
+
+    void ActivateAndDeactivateRewards()
+    {
+        int actualValues = 0;
+
+        for (int i = 0; i < choice.ResourceRewards.Length; i++)
+        {
+            var reward = choice.ResourceRewards[i];
+
+            if (reward != null)
+                actualValues++;
+        }
+
+        if (actualValues > 0)
+        {
+            rewardText.gameObject.SetActive(false);
+        }
+        else
+        {
+            rewardsHolder.gameObject.SetActive(false);
+        }
+
+
     }
 
     void SetAllIcons()
