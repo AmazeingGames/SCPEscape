@@ -42,13 +42,25 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-    //Works
+    //Works. Now I need to translate this logic to set icons to be ready
     bool IsReady()
     {
         var consumerTypes = GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
         var requirementTypes = GameManager.ConvertResourceCardListToResourceType(choice.ResourceRequirements.ToList());
 
-        return requirementTypes.Intersect(consumerTypes).Count() == requirementTypes.Count();
+        if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
+        {
+            Debug.Log("Lists are empty");
+            return false;
+        }
+
+        var overlappingElements = consumerTypes.Where(requirementTypes.Contains).ToList();
+
+        int overlappingElementsCount = overlappingElements.Count();
+
+        Debug.Log($"There is {overlappingElementsCount} items in overlappingElementsCount");
+        
+        return (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
     }
 
     void DataMatchChoice()

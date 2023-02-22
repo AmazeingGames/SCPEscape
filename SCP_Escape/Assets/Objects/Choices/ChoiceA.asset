@@ -29,4 +29,4 @@ MonoBehaviour:
   cardsToAdd: []
   shouldWinGame: 0
   shouldLoseGame: 0
-  flavorText: Flavor!
+  flavorText: Buy a tincture of Duplication. Buy a draught of vitality

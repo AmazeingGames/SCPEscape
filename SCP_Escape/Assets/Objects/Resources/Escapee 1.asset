@@ -17,11 +17,11 @@ MonoBehaviour:
   indicatorBorder: {fileID: 21300000, guid: e0af763439e54d24da433ec3bf29e5a8, type: 3}
   symbol: {fileID: 21300000, guid: 358d4492de2a66e4db00f1f49c479da3, type: 3}
   texture: {fileID: 21300000, guid: 358d4492de2a66e4db00f1f49c479da3, type: 3}
-  indicatorBackgroundColor: {r: 0.5176471, g: 0.38431373, b: 0.4862745, a: 1}
+  indicatorBackgroundColor: {r: 0.40784314, g: 0.3137255, b: 0.21568628, a: 1}
   indicatorBorderColor: {r: 0, g: 0, b: 0, a: 1}
-  symbolColor: {r: 0.89411765, g: 0.7882353, b: 0.79607844, a: 1}
-  textureColor: {r: 0.8666667, g: 0.73333335, b: 0.7411765, a: 0.101960786}
+  symbolColor: {r: 0.8392157, g: 0.8156863, b: 0.78431374, a: 1}
+  textureColor: {r: 0.8392157, g: 0.8156863, b: 0.78431374, a: 0.101960786}
   initial: 69
   initialColor: {r: 0, g: 0, b: 0, a: 0}
   textureOffeset: {x: 0, y: 0}
-  cardColor: {r: 0.5176471, g: 0.38431373, b: 0.4862745, a: 1}
+  cardColor: {r: 0.40784314, g: 0.3137255, b: 0.21568628, a: 1}

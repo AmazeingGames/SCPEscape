@@ -16,6 +16,8 @@ public class Choice : ScriptableObject
 
      */
 
+    //Choice should probably be changed to only use resource types rather than resource refernces
+
     [SerializeField] Resource[] resourceRequirements = new Resource[6];
     [SerializeField] Resource[] resourceRewards = new Resource[6];
     [SerializeField] List<EncounterCard> cardsToAdd = new List<EncounterCard>();
