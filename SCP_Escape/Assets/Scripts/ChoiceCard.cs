@@ -25,6 +25,12 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] TextMeshProUGUI rewardText;
     [SerializeField] GameObject requirementsHolder;
     [SerializeField] GameObject rewardsHolder;
+    
+    [SerializeField] Color regularColor;
+    [SerializeField] Color readyColor;
+    [SerializeField] Color hoveringColor;
+
+    List<Resource> iconResourceRequirements = new List<Resource>();
 
     public bool isReady;
     public Choice _Choice { get => choice; private set => choice = value; }
@@ -46,7 +52,7 @@ public class ChoiceCard : MonoBehaviour
     bool IsReady()
     {
         var consumerTypes = GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
-        var requirementTypes = GameManager.ConvertResourceCardListToResourceType(choice.ResourceRequirements.ToList());
+        var requirementTypes = choice.ResourceRequirements.ToList();
 
         if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
         {
@@ -54,13 +60,18 @@ public class ChoiceCard : MonoBehaviour
             return false;
         }
 
-        var overlappingElements = consumerTypes.Where(requirementTypes.Contains).ToList();
+        List<Resource.ECardType> overlappingElements = consumerTypes.Where(requirementTypes.Contains).ToList();
 
         int overlappingElementsCount = overlappingElements.Count();
 
         Debug.Log($"There is {overlappingElementsCount} items in overlappingElementsCount");
         
         return (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
+    }
+
+    void ReadyIcons(List<Resource.ECardType> overlappingElements)
+    {
+
     }
 
     void DataMatchChoice()
@@ -87,7 +98,7 @@ public class ChoiceCard : MonoBehaviour
         {
             var reward = choice.ResourceRewards[i];
 
-            if (reward != null)
+            if (IsEnumValueValid(reward))
                 actualValues++;
         }
 
@@ -106,25 +117,40 @@ public class ChoiceCard : MonoBehaviour
     void SetAllIcons()
     {
         Debug.Log($"Is choice null? : {choice == null}. Is requirementsHolder null? : {requirementsHolder == null}. Is choice.ResourceRequirements array null? : {choice.ResourceRequirements == null}");
-        SetIcons(choice.ResourceRequirements, requirementsHolder.transform);
-        SetIcons(choice.ResourceRewards, rewardsHolder.transform);
+
+        SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
+        SetIcons(choice.ResourceRewards, rewardsHolder.transform, null);
     }
 
-    void SetIcons(Resource[] listRefernce, Transform parent)
+    void SetIcons(Resource.ECardType[] listRefernce, Transform parent, List<Resource> listToAdd)
     {
         for (int i = 0; i < listRefernce.Length; i++)
         { 
-            var currentResource = listRefernce[i];
-            if (currentResource == null)
+            var currentResourceType = listRefernce[i];
+
+            if (!IsEnumValueValid(currentResourceType))
             {
                 Debug.Log($"Left loop at i = {i}");
                 break;
             }
-            var setIcon = GameManager.Instance.GetFromIconPool(currentResource);
+
+            var setIcon = GameManager.Instance.GetFromIconPool(currentResourceType);
 
             setIcon.gameObject.SetActive(true);
             setIcon.transform.SetParent(parent);
+
+            if (listToAdd != null)
+                listToAdd.Add(setIcon.IconResource);
         }
+    }
+
+    static bool IsEnumValueValid(Enum enumeration)
+    {
+        bool returnValue = Enum.IsDefined(enumeration.GetType(), enumeration);
+
+        Debug.Log($"IsEnumValueValid? : {returnValue}");
+
+        return returnValue;
     }
 
     string GetRewardText()

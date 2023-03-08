@@ -43,10 +43,4 @@ public class Icon : MonoBehaviour
         //initial.color = resourceRefernce.CardColor;
     }
 
-    void BecomeSet()
-    {
-        
-    }
-
-    
 }

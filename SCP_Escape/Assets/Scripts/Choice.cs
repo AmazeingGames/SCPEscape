@@ -18,15 +18,15 @@ public class Choice : ScriptableObject
 
     //Choice should probably be changed to only use resource types rather than resource refernces
 
-    [SerializeField] Resource[] resourceRequirements = new Resource[6];
-    [SerializeField] Resource[] resourceRewards = new Resource[6];
+    [SerializeField] Resource.ECardType[] resourceRequirements = new Resource.ECardType[6];
+    [SerializeField] Resource.ECardType[] resourceRewards = new Resource.ECardType[6];
     [SerializeField] List<EncounterCard> cardsToAdd = new List<EncounterCard>();
     [SerializeField] bool shouldWinGame;
     [SerializeField] bool shouldLoseGame;
     [SerializeField] string flavorText;
 
-    public Resource[] ResourceRequirements { get => resourceRequirements; private set => resourceRequirements = value; }
-    public Resource[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
+    public Resource.ECardType[] ResourceRequirements { get => resourceRequirements; private set => resourceRequirements = value; }
+    public Resource.ECardType[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
     public List<EncounterCard> CardsToAdd { get => cardsToAdd; private set => cardsToAdd = value; }
     public bool ShouldWinGame { get => shouldWinGame; private set => shouldWinGame = value; }
     public bool ShouldLoseGame { get => shouldLoseGame; private set => shouldLoseGame = value; }

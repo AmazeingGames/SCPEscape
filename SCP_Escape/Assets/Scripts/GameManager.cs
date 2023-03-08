@@ -427,6 +427,27 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    public Icon GetFromIconPool(Resource.ECardType resourceType)
+    {
+        if (!(iconPool.transform.childCount > 0))
+            return null;
+
+        for (int i = 0; i < iconPool.transform.childCount; i++)
+        {
+            Debug.Log($"Is gameobject null? : {iconPool.transform.GetChild(i) == null}");
+            Icon returnIcon = iconPool.transform.GetChild(i).GetComponent<Icon>();
+            Debug.Log($"Is Icon component null? : {returnIcon == null}");
+
+            if (returnIcon.gameObject.activeSelf == false)
+            {
+                if (returnIcon.IconResource.CardType == resourceType)
+                    return returnIcon;
+            }
+        }
+
+        return null;
+    }
+
     public Icon GetFromIconPool(Resource resource)
     {
         if (!(iconPool.transform.childCount > 0))
