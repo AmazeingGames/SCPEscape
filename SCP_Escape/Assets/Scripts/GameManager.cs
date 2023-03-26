@@ -101,10 +101,10 @@ public class GameManager : MonoBehaviour
         for(int i = 0; i < resources.Count; i++)
         {
             //Debug.Log(resources[i].name);
-            AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
+            //AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
         }
 
-        Debug.Log($"Getting anomaly from Icon Pool: {GetFromIconPool(anomaly)}");
+        //Debug.Log($"Getting anomaly from Icon Pool: {GetFromIconPool(anomaly)}");
     }
 
     public void AddIcon(Icon iconToAdd)
@@ -429,39 +429,26 @@ public class GameManager : MonoBehaviour
 
     public Icon GetFromIconPool(Resource.ECardType resourceType)
     {
-        if (!(iconPool.transform.childCount > 0))
-            return null;
-
-        for (int i = 0; i < iconPool.transform.childCount; i++)
-        {
-            Debug.Log($"Is gameobject null? : {iconPool.transform.GetChild(i) == null}");
-            Icon returnIcon = iconPool.transform.GetChild(i).GetComponent<Icon>();
-            Debug.Log($"Is Icon component null? : {returnIcon == null}");
-
-            if (returnIcon.gameObject.activeSelf == false)
-            {
-                if (returnIcon.IconResource.CardType == resourceType)
-                    return returnIcon;
-            }
-        }
-
-        return null;
+        return GetIconFromPool(icon => icon.IconResource.CardType == resourceType);
     }
 
     public Icon GetFromIconPool(Resource resource)
+    {
+        return GetIconFromPool(icon => icon.IconResource == resource);
+    }
+
+    private Icon GetIconFromPool(Func<Icon, bool> condition)
     {
         if (!(iconPool.transform.childCount > 0))
             return null;
 
         for (int i = 0; i < iconPool.transform.childCount; i++)
         {
-            Debug.Log($"Is gameobject null? : {iconPool.transform.GetChild(i) == null}");
             Icon returnIcon = iconPool.transform.GetChild(i).GetComponent<Icon>();
-            Debug.Log($"Is Icon component null? : {returnIcon == null}");
 
             if (returnIcon.gameObject.activeSelf == false)
             {
-                if(returnIcon.IconResource == resource)
+                if (condition(returnIcon))
                     return returnIcon;
             }
         }

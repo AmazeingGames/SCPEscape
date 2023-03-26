@@ -30,9 +30,12 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] Color readyColor;
     [SerializeField] Color hoveringColor;
 
-    List<Resource> iconResourceRequirements = new List<Resource>();
+    List<Resource.ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
 
-    public bool isReady;
+    List<Resource.ECardType> overlappingConsumerTypes;
+
+    readonly List<Icon> iconResourceRequirements = new();
+
     public Choice _Choice { get => choice; private set => choice = value; }
 
     void Start()
@@ -42,36 +45,111 @@ public class ChoiceCard : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            Debug.Log($"Is Ready? : {IsReady()}");
-        }
+        IsReady();
+        ReadyIcons();
     }
 
-    //Works. Now I need to translate this logic to set icons to be ready
+    //Checks if the consumer contains the correct resources based on the choice's required resources
+    //Returns a bool true if all the resources are met and the exact amount of resources are contained
     bool IsReady()
     {
-        var consumerTypes = GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
+        var consumerTypes = CardTypesInConsumer;
         var requirementTypes = choice.ResourceRequirements.ToList();
 
         if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
         {
-            Debug.Log("Lists are empty");
+            //Debug.Log("Lists are empty");
             return false;
         }
 
-        List<Resource.ECardType> overlappingElements = consumerTypes.Where(requirementTypes.Contains).ToList();
+        overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
 
-        int overlappingElementsCount = overlappingElements.Count();
+        int overlappingElementsCount = overlappingConsumerTypes.Count();
 
-        Debug.Log($"There is {overlappingElementsCount} items in overlappingElementsCount");
+        //Debug.Log($"There is {overlappingElementsCount} items in overlappingElementsCount");
         
         return (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
     }
 
-    void ReadyIcons(List<Resource.ECardType> overlappingElements)
+    //Sets the value of 'isReady' for each of the icon requirements based on the cards in the consumer
+    //This essentially changes just changes the color of the icons and gives visual feedback for placing cards in the consumer
+    //Hinges on the idea that repeated items will appear next to one another
+    void ReadyIcons()
     {
+        int amountOfMatchingResourceInConsumer = 0;
+        int amountOfMatchingIconsAhead;
+        int typeLoopStartNum = 0;
 
+        for (int i = 0; i < iconResourceRequirements.Count; i++)
+        {
+            Icon currentIcon = iconResourceRequirements[i];
+
+            var currentIconResourceType = currentIcon.ResourceType;
+
+            int nextNum = 1 + i;
+            if (nextNum < iconResourceRequirements.Count && i != 0)
+            {
+                var nextIconResourceType = iconResourceRequirements[nextNum].ResourceType;
+
+                if (currentIconResourceType != nextIconResourceType)
+                    typeLoopStartNum = nextNum;
+            }
+
+            if (overlappingConsumerTypes == null || CardTypesInConsumer.Count() == 0)
+            {
+                Debug.Log("Set false here 1");
+
+                iconResourceRequirements[i].SetReady(false);
+            }
+            else
+                foreach (Resource.ECardType currentConsumerResourceType in overlappingConsumerTypes)
+                {
+                    if (currentIconResourceType == currentConsumerResourceType)
+                    {
+                        amountOfMatchingResourceInConsumer++;
+                    }
+                }
+
+            if (amountOfMatchingResourceInConsumer == 0 && i < iconResourceRequirements.Count)
+            {
+                Debug.Log("Set false here 2");
+                iconResourceRequirements[i].SetReady(false);
+            }
+
+            if (typeLoopStartNum > amountOfMatchingResourceInConsumer)
+            {
+                //Debug.Log("Set false here 3");
+                //iconResourceRequirements[i].SetReady(false);
+            }
+
+            amountOfMatchingIconsAhead = 0;
+            for (int a = i + 1; a < iconResourceRequirements.Count; a++)
+            {
+                var next = iconResourceRequirements[a].ResourceType;
+
+                if (currentIconResourceType == next)
+                    amountOfMatchingIconsAhead++;
+            }
+            while (amountOfMatchingResourceInConsumer > 0)
+            {
+                
+
+                Debug.Log($"Set true here. i is {i}");
+                iconResourceRequirements[i].SetReady(true);
+
+                amountOfMatchingResourceInConsumer--;
+
+                if (amountOfMatchingIconsAhead > 0)
+                {
+                    i++;
+                    Debug.Log("bumped i");
+                }
+                else
+                    Debug.Log("Didn't bump i");
+            }
+
+            
+        }
     }
 
     void DataMatchChoice()
@@ -108,7 +186,7 @@ public class ChoiceCard : MonoBehaviour
         }
         else
         {
-            rewardsHolder.gameObject.SetActive(false);
+            rewardsHolder.SetActive(false);
         }
 
 
@@ -116,17 +194,17 @@ public class ChoiceCard : MonoBehaviour
 
     void SetAllIcons()
     {
-        Debug.Log($"Is choice null? : {choice == null}. Is requirementsHolder null? : {requirementsHolder == null}. Is choice.ResourceRequirements array null? : {choice.ResourceRequirements == null}");
+        //Debug.Log($"Is choice null? : {choice == null}. Is requirementsHolder null? : {requirementsHolder == null}. Is choice.ResourceRequirements array null? : {choice.ResourceRequirements == null}");
 
         SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
         SetIcons(choice.ResourceRewards, rewardsHolder.transform, null);
     }
 
-    void SetIcons(Resource.ECardType[] listRefernce, Transform parent, List<Resource> listToAdd)
+    void SetIcons(Resource.ECardType[] listRefernce, Transform parent, List<Icon> listToAdd)
     {
         for (int i = 0; i < listRefernce.Length; i++)
-        { 
-            var currentResourceType = listRefernce[i];
+        {
+            Resource.ECardType currentResourceType = listRefernce[i];
 
             if (!IsEnumValueValid(currentResourceType))
             {
@@ -139,8 +217,7 @@ public class ChoiceCard : MonoBehaviour
             setIcon.gameObject.SetActive(true);
             setIcon.transform.SetParent(parent);
 
-            if (listToAdd != null)
-                listToAdd.Add(setIcon.IconResource);
+            listToAdd?.Add(setIcon);
         }
     }
 
@@ -148,7 +225,7 @@ public class ChoiceCard : MonoBehaviour
     {
         bool returnValue = Enum.IsDefined(enumeration.GetType(), enumeration);
 
-        Debug.Log($"IsEnumValueValid? : {returnValue}");
+        //Debug.Log($"IsEnumValueValid? : {returnValue}");
 
         return returnValue;
     }

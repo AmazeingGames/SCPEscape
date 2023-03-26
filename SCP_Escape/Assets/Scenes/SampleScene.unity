@@ -445,6 +445,10 @@ PrefabInstance:
       propertyPath: choice
       value: 
       objectReference: {fileID: 11400000, guid: b253bffad4517514c954186ae7d6087f, type: 2}
+    - target: {fileID: 2747229927738076562, guid: 3b35ecfb087e5574b878c1d21d74cb36, type: 3}
+      propertyPath: isReady
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4474592852377414404, guid: 3b35ecfb087e5574b878c1d21d74cb36, type: 3}
       propertyPath: m_Name
       value: ChoiceCard

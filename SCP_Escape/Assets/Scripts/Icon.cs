@@ -10,9 +10,10 @@ public class Icon : MonoBehaviour
     [SerializeField] Image symbol;
     [SerializeField] TextMeshProUGUI initial;
 
-    public bool isReady;
+    public bool IsReady { get; private set; }
 
     public Resource IconResource { get; private set; } = null;
+    public Resource.ECardType ResourceType => IconResource.CardType;
 
     void Start()
     {
@@ -21,14 +22,17 @@ public class Icon : MonoBehaviour
 
     void Update()
     {
+        //This is called every frame in order make sure that if parts of the resource ever change, say its color, it would sync up to that change instantly
         SetResource(IconResource);
     }
 
+    //Given a resourceRef as a parameter, sets all the data of the icon to the referenced resource
+    //Serializes the resource, text, and color based on the input paramater
     public void SetResource(Resource resourceRefernce)
     {
         Color backgroundColor;
 
-        if (isReady)
+        if (IsReady)
             backgroundColor = resourceRefernce.CardColor;
         else
             backgroundColor = resourceRefernce.SymbolColor;
@@ -43,4 +47,10 @@ public class Icon : MonoBehaviour
         //initial.color = resourceRefernce.CardColor;
     }
 
+
+    public void SetReady(bool isReady)
+    {
+        //Debug.Log($"SetReady : {isReady}");
+        IsReady = isReady;
+    }
 }
