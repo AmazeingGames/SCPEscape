@@ -50,6 +50,8 @@ public class GameManager : MonoBehaviour
 
     public bool hasAddedResources = false;
 
+    public Action<Resource.ECardType, bool> onCardChangeInConsumer;
+
     public List<GameObject> deckDiscard = new List<GameObject>();
     public List<GameObject> deck = new List<GameObject>();
     public List<ResourceCard> hand = new List<ResourceCard>();
@@ -461,8 +463,10 @@ public class GameManager : MonoBehaviour
         holdingResourceCard = resourceCard;
 
         resourceCard.transform.SetParent(null);
+
         hand.Remove(resourceCard);
-        consumer.Remove(resourceCard);
+
+        RemoveFromConsumer(resourceCard);
     }
 
     void AddCardToHand(ResourceCard resourceCard)
@@ -473,7 +477,15 @@ public class GameManager : MonoBehaviour
 
         hand.Add(resourceCard);
 
-        consumer.Remove(resourceCard);
+        RemoveFromConsumer(resourceCard);
+    }
+
+    void RemoveFromConsumer(ResourceCard resourceCard)
+    {
+        if (consumer.Remove(resourceCard))
+        {
+            onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
+        }
     }
 
     void AddCardToConsumer(ResourceCard resourceCard)
@@ -488,6 +500,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType}");
         */
+
         resourceCard.IndicatorBackground.gameObject.SetActive(true);
 
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
@@ -496,6 +509,8 @@ public class GameManager : MonoBehaviour
 
         consumer.Add(resourceCard);
         var indicatorNum = UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
+
+        onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
 
         hand.Remove(resourceCard);
 
@@ -533,9 +548,10 @@ public class GameManager : MonoBehaviour
         return indicatorNum;
     }
 
-    List<ResourceCard> GetResourcesFromConsumer(Resource.ECardType resourceType)
+    public List<ResourceCard> GetResourcesFromConsumer(Resource.ECardType resourceType)
     {
-        List<ResourceCard> resourceCards = new List<ResourceCard>();
+        List<ResourceCard> resourceCards = new();
+
         for (int i = 0; i < consumer.Count; i++)
         {
             var card = consumer[i];
