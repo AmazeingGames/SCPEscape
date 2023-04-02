@@ -63,14 +63,12 @@ public class GameManager : MonoBehaviour
     List<Icon> allIcons = new List<Icon>();
 
     public List<Sprite> indicators;
-    //public List<bool> availableHandSlots = new List<bool>();
 
     ResourceCard holdingResourceCard = null;
     Vector3 grabbedPosition;
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
 
-    //NOTE TO SELF: In order to create cool card overlap effect, create slots that hold the cards and make sure to have worldPosition stay true when setting the parent
 
     void Awake()
     {
@@ -86,8 +84,6 @@ public class GameManager : MonoBehaviour
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
         resources1 = new List<Resource> { ration1, escapee1, scientist1, insanity1, munition1, anomaly1 };
-
-        //indicators = new List<Sprite> { oneIndicator, twoIndicator, threeIndicator, fourIndicator, fiveIndicator };
 
         CreateResourcePool();
         CreateIconPool();
@@ -108,8 +104,6 @@ public class GameManager : MonoBehaviour
 
         SwapResources(resources1);
         SwapIcons(resources1);
-
-        //Debug.Log($"Getting anomaly from Icon Pool: {GetFromIconPool(anomaly)}");
     }
 
     public void AddIcon(Icon iconToAdd)
@@ -119,17 +113,11 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log($"Is over card? : {IsOverCard()}");
-
         GrabCard();
         DragCard();
         DropCard();
 
         CheckCardSizes();
-
-        //Debug.Log($"Is over card? : {(IsOverCard() == true)}");
-        //Debug.Log($"Is over hand? : {(IsOverHandHolder() == true)}");
-        //Debug.Log($"Is over consumer? : {(IsOverResourceConsumer() == true)}");
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -504,8 +492,6 @@ public class GameManager : MonoBehaviour
         onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
 
         hand.Remove(resourceCard);
-
-        //Debug.Log($"Is numberSymbol null? : {(resourceCard.ResourceSymbol == null)}");
     }
 
     void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
@@ -522,7 +508,6 @@ public class GameManager : MonoBehaviour
 
     int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
     {
-        //Debug.Log("Updated Indicators");
         List<ResourceCard> resourceCards = GetResourcesFromConsumer(resourceType);
 
         indicatorNum += resourceCards.Count;
@@ -574,8 +559,6 @@ public class GameManager : MonoBehaviour
 
         if (isOverCard && Input.GetMouseButtonDown(0))
         {
-            //Debug.Log("Grabbing card");
-
             var resourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
             AddToHolding(resourceCard);
@@ -595,8 +578,6 @@ public class GameManager : MonoBehaviour
     {
         if (holdingResourceCard != null && Input.GetMouseButtonUp(0))
         {
-            //Debug.Log("Dropping card");
-
             holdingResourceCard.transform.localScale = regularScale;
             holdingResourceCard._CanvasComponent.sortingOrder = regularSortingOrder;
 
@@ -610,12 +591,10 @@ public class GameManager : MonoBehaviour
             
             if (IsOverResourceConsumer() && resources.Count < 5)
             {
-               //Debug.Log("Dropped card in consumer");
                 AddCardToConsumer(holdingResourceCard);
             }
             else
             {
-                //Debug.Log("Dropped card in hand");
                 AddCardToHand(holdingResourceCard);
             }
 

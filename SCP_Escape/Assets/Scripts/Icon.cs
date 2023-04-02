@@ -22,7 +22,6 @@ public class Icon : MonoBehaviour
 
     void Update()
     {
-        //This is called every frame in order make sure that if parts of the resource ever change, say its color, it would sync up to that change instantly
         SetResource(IconResource);
     }
 
@@ -50,7 +49,6 @@ public class Icon : MonoBehaviour
 
     public void SetReady(bool isReady)
     {
-        //Debug.Log($"SetReady : {isReady}");
         IsReady = isReady;
     }
 }

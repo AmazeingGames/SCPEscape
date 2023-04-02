@@ -164,8 +164,6 @@ public class ChoiceCard : MonoBehaviour
             int resourceTypeCountInRequirements = GetIconsOfTypeFromRequirements(resourceType).Count;
             int resourceTypeCountInConsumer = GameManager.Instance.GetResourcesFromConsumer(resourceType).Count;
 
-            //Debug.Log($"ResourceTypeCountInConsumer : {resourceTypeCountInConsumer}  ResourceTypeCountInRequirements : {resourceTypeCountInRequirements}");
-
             if (resourceTypeCountInConsumer >= resourceTypeCountInRequirements)
             {
                 return;
@@ -261,8 +259,6 @@ public class ChoiceCard : MonoBehaviour
 
     void SetAllIcons()
     {
-        //Debug.Log($"Is choice null? : {choice == null}. Is requirementsHolder null? : {requirementsHolder == null}. Is choice.ResourceRequirements array null? : {choice.ResourceRequirements == null}");
-
         SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
         SetIcons(choice.ResourceRewards, rewardsHolder.transform, null);
     }
@@ -291,8 +287,6 @@ public class ChoiceCard : MonoBehaviour
     static bool IsEnumValueValid(Enum enumeration)
     {
         bool returnValue = Enum.IsDefined(enumeration.GetType(), enumeration);
-
-        //Debug.Log($"IsEnumValueValid? : {returnValue}");
 
         return returnValue;
     }

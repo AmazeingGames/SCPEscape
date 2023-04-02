@@ -49,7 +49,6 @@ public class ResourceCard : MonoBehaviour
         }
         else
         {
-            //PrintCard();
             DataMatchResource();
         }
         
