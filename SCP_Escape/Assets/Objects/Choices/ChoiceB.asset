@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
   m_Name: ChoiceB
   m_EditorClassIdentifier: 
-  resourceRequirements: 0000000000000000000000000100000001000000
+  resourceRequirements: 0000000000000000
   resourceRewards: 0500000005000000050000000500000005000000
   cardsToAdd: []
   shouldWinGame: 0

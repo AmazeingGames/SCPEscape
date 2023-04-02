@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using Mono.Cecil;
 using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class ChoiceCard : MonoBehaviour
 {
@@ -21,22 +22,28 @@ public class ChoiceCard : MonoBehaviour
      * 8. Choice Object - Holds the card data to data match
      *  a. Highlight - Highlights the card when the player hovers over it 
      */
+    
+    public enum EChoiceState { Ready, Unready, Unavailable }
 
     [SerializeField] Choice choice;
     [SerializeField] TextMeshProUGUI flavorText;
     [SerializeField] TextMeshProUGUI rewardText;
     [SerializeField] GameObject requirementsHolder;
     [SerializeField] GameObject rewardsHolder;
-    
-    [SerializeField] Color regularColor;
-    [SerializeField] Color readyColor;
-    [SerializeField] Color hoveringColor;
 
+    [SerializeField] Color unavailableColor; //Even less colored (Dark-Greyed Out) 
+    [SerializeField] Color unreadyColor; //Uncolored (Greyed Out)
+    [SerializeField] Color readyColor; //Colored (Yellow)
+    //Colored (Yellow) transparent filter that appears when over the card
+    [SerializeField] Image cardColorOverlay;
+    [SerializeField] Image borderColorOverlay;
     List<Resource.ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
 
     List<Resource.ECardType> overlappingConsumerTypes;
 
     readonly List<Icon> iconResourceRequirements = new();
+
+    public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
 
     public Choice _Choice { get => choice; private set => choice = value; }
 
@@ -47,10 +54,60 @@ public class ChoiceCard : MonoBehaviour
 
     void Update()
     {
-        IsReady();
+        SetState();
+        SetChoiceColor();
         GameManager.Instance.onCardChangeInConsumer -= ReadyIcon;
         GameManager.Instance.onCardChangeInConsumer += ReadyIcon;
     }
+
+    private void OnMouseOver()
+    {
+        
+    }
+
+    private void OnMouseDown()
+    {
+        
+    }
+
+    private void OnMouseExit()
+    {
+        
+    }
+
+    void SetChoiceColor()
+    {
+        cardColorOverlay.gameObject.SetActive(true);
+
+        switch (ChoiceState)
+        {
+            case EChoiceState.Unready:
+                cardColorOverlay.color = unreadyColor;
+                break;
+            case EChoiceState.Ready:
+                cardColorOverlay.color = readyColor;
+                break;
+            case EChoiceState.Unavailable:
+                cardColorOverlay.color = unavailableColor;
+                break;
+        }
+    }
+
+    //Sets the enum 'ChoiceState', based on whether the requirements have been fulfilled, and determines if it is ready to be selected
+    void SetState()
+    {
+        bool isReady = IsReady();
+
+        if (isReady)
+        {
+            ChoiceState = EChoiceState.Ready;
+        }
+        else
+        {
+            ChoiceState = EChoiceState.Unready;
+        }
+    }
+
 
     //Checks if the consumer contains the correct resources based on the choice's required resources
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
@@ -68,8 +125,6 @@ public class ChoiceCard : MonoBehaviour
         overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
 
         int overlappingElementsCount = overlappingConsumerTypes.Count();
-
-        //Debug.Log($"There is {overlappingElementsCount} items in overlappingElementsCount");
         
         return (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
     }
