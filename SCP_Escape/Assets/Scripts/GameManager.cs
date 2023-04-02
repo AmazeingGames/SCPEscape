@@ -490,17 +490,6 @@ public class GameManager : MonoBehaviour
 
     void AddCardToConsumer(ResourceCard resourceCard)
     {
-        /*
-        if (resourceCard._Resource == null)
-            Debug.LogWarning("Resource ResouceCard is null");
-        if (resourceConsumer == null)
-            Debug.LogWarning("ResourceConsumer is null");
-        if (resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString()) == null)
-            Debug.Log("Warning, cannot find resource consumer card holder");
-
-        Debug.Log($"Resource Card Type: {resourceCard._Resource.CardType}");
-        */
-
         resourceCard.IndicatorBackground.gameObject.SetActive(true);
 
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
