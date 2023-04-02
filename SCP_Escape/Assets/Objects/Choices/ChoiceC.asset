@@ -17,5 +17,5 @@ MonoBehaviour:
   cardsToAdd: []
   shouldWinGame: 0
   shouldLoseGame: 0
-  flavorText: We jave too many people for our own good. Perhaps a sacrifice is in
+  flavorText: We have too many people for our own good. Perhaps a sacrifice is in
     order?

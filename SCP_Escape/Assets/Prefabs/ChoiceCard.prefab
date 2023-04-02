@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 242349906}
   - component: {fileID: 242349905}
   - component: {fileID: 755362299913820811}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: RequirementsHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ GameObject:
   - component: {fileID: 6390148283774749834}
   - component: {fileID: 4841968421851692371}
   - component: {fileID: 2077553337616166860}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: RewardText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 107999492718997161}
   - component: {fileID: 196398166850749881}
   - component: {fileID: 7325569283948988681}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: RewardsHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -352,7 +352,7 @@ GameObject:
   - component: {fileID: 4276760458419510681}
   - component: {fileID: 8587210518320370186}
   - component: {fileID: 4620007420011227402}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: FlavorText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -492,7 +492,7 @@ GameObject:
   - component: {fileID: 4376074862606872624}
   - component: {fileID: 629044059927503409}
   - component: {fileID: 4880740052463531749}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: ChoiceCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -563,13 +563,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b8e00252c2ab44e9f77b3f6314987e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  choiceCardLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   choice: {fileID: 11400000, guid: 252fd37bc8a53844fb2a4bdaa7091d37, type: 2}
   flavorText: {fileID: 4620007420011227402}
   rewardText: {fileID: 2077553337616166860}
   requirementsHolder: {fileID: 242349903}
   rewardsHolder: {fileID: 3208194012009056134}
+  regularBorderColor: {r: 0.23137255, g: 0.07058824, b: 0.42745098, a: 1}
+  highlightedBorderColor: {r: 0.36324385, g: 0.16803133, b: 0.6037736, a: 1}
+  highlightedColor: {r: 1, g: 0.9372549, b: 0.4117647, a: 1}
   unavailableColor: {r: 0.36078432, g: 0.3529412, b: 0.2901961, a: 1}
-  unreadyColor: {r: 0.7764706, g: 0.7764706, b: 0.7764706, a: 1}
+  unreadyColor: {r: 0.9647059, g: 0.9607843, b: 0.9607843, a: 1}
   readyColor: {r: 0.8784314, g: 0.78039217, b: 0, a: 1}
   cardColorOverlay: {fileID: 708618599130566332}
   borderColorOverlay: {fileID: 7881219317317479078}
@@ -674,7 +680,7 @@ GameObject:
   - component: {fileID: 5389947977610978210}
   - component: {fileID: 3183441203190287959}
   - component: {fileID: 989736388}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: SafeArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -770,7 +776,7 @@ GameObject:
   - component: {fileID: 7381654143324583789}
   - component: {fileID: 7318912430174110179}
   - component: {fileID: 1698730272739199534}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: CardWhite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -860,13 +866,13 @@ GameObject:
   - component: {fileID: 7123987959574855416}
   - component: {fileID: 8511260143610796894}
   - component: {fileID: 7881219317317479078}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: BorderColorOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7123987959574855416
 RectTransform:
   m_ObjectHideFlags: 0
@@ -908,7 +914,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.43798104, g: 0.21693665, b: 0.7075472, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -936,7 +942,7 @@ GameObject:
   - component: {fileID: 6968233872883995902}
   - component: {fileID: 598250381041880169}
   - component: {fileID: 708618599130566332}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: CardColorOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -984,7 +990,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7764706, g: 0.7764706, b: 0.7764706, a: 1}
+  m_Color: {r: 0.9622642, g: 0.9577252, b: 0.9577252, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -25,18 +25,27 @@ public class ChoiceCard : MonoBehaviour
     
     public enum EChoiceState { Ready, Unready, Unavailable }
 
+    [SerializeField] LayerMask choiceCardLayer;
+
+    [Header("Card Properties")]
     [SerializeField] Choice choice;
     [SerializeField] TextMeshProUGUI flavorText;
     [SerializeField] TextMeshProUGUI rewardText;
     [SerializeField] GameObject requirementsHolder;
     [SerializeField] GameObject rewardsHolder;
 
+
+    [Header("Card Color")]
+    [SerializeField] Color regularBorderColor;
+    [SerializeField] Color highlightedBorderColor;
+    [SerializeField] Color highlightedColor; //Bright pale color (Light-Yellow)
     [SerializeField] Color unavailableColor; //Even less colored (Dark-Greyed Out) 
     [SerializeField] Color unreadyColor; //Uncolored (Greyed Out)
     [SerializeField] Color readyColor; //Colored (Yellow)
     //Colored (Yellow) transparent filter that appears when over the card
     [SerializeField] Image cardColorOverlay;
     [SerializeField] Image borderColorOverlay;
+
     List<Resource.ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
 
     List<Resource.ECardType> overlappingConsumerTypes;
@@ -60,37 +69,53 @@ public class ChoiceCard : MonoBehaviour
         GameManager.Instance.onCardChangeInConsumer += ReadyIcon;
     }
 
-    private void OnMouseOver()
+    void SetColor(Color cardColor, Color borderColor)
     {
-        
+        SetColor(cardColor);
+
+        borderColorOverlay.color = borderColor;
     }
 
-    private void OnMouseDown()
+    void SetColor(Color cardColor)
     {
-        
-    }
-
-    private void OnMouseExit()
-    {
-        
+        cardColorOverlay.color = cardColor;
     }
 
     void SetChoiceColor()
     {
         cardColorOverlay.gameObject.SetActive(true);
 
+        if (IsMouseOver())
+        {
+            SetColor(highlightedColor, highlightedBorderColor);
+            return;
+        }
+
         switch (ChoiceState)
         {
             case EChoiceState.Unready:
-                cardColorOverlay.color = unreadyColor;
+                SetColor(unreadyColor, regularBorderColor);
                 break;
             case EChoiceState.Ready:
-                cardColorOverlay.color = readyColor;
+                SetColor(readyColor, regularBorderColor);
                 break;
             case EChoiceState.Unavailable:
-                cardColorOverlay.color = unavailableColor;
+                SetColor(unavailableColor, regularBorderColor);
                 break;
         }
+    }
+
+    bool IsMouseOver()
+    {
+        var hit = GameManager.IsOver(choiceCardLayer);
+
+        if (hit.transform == transform)
+        {
+            Debug.Log("Mouse is over this");
+            return true;
+        }
+        return false;
+
     }
 
     //Sets the enum 'ChoiceState', based on whether the requirements have been fulfilled, and determines if it is ready to be selected

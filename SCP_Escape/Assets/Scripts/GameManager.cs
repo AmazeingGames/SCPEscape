@@ -106,6 +106,9 @@ public class GameManager : MonoBehaviour
             //AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
         }
 
+        SwapResources(resources1);
+        SwapIcons(resources1);
+
         //Debug.Log($"Getting anomaly from Icon Pool: {GetFromIconPool(anomaly)}");
     }
 
@@ -167,7 +170,6 @@ public class GameManager : MonoBehaviour
         {
             SwapResources(resources1);
             SwapIcons(resources1);
-
         }
     }
 
@@ -255,7 +257,7 @@ public class GameManager : MonoBehaviour
         return IsOver(resourceConsumerLayer);
     }
 
-    RaycastHit2D IsOver(LayerMask layer)
+    public static RaycastHit2D IsOver(LayerMask layer)
     {
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, layer);
 
