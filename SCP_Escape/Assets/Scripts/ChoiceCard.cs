@@ -56,6 +56,13 @@ public class ChoiceCard : MonoBehaviour
 
     public Choice _Choice { get => choice; private set => choice = value; }
 
+    public bool _IsReady { get; private set; } = false;
+    public bool _IsMouseOver { get; private set; } = false;
+
+    public Action<List<Icon>> onChoiceSelection;
+
+    bool isMouseHolding = false;
+
     void Start()
     {
         DataMatchChoice();
@@ -63,34 +70,48 @@ public class ChoiceCard : MonoBehaviour
 
     void Update()
     {
+        //Sets important variables
+        IsMouseOver();
+        IsMouseHolding();
+        IsReady();
+
+        //Updates based on those variables
         SetState();
         SetChoiceColor();
+        UpdateIcon();
+
+        //-__(-_-)__-
+        SelectChoice();
+    }
+
+    //Calls the ReadyIcon func whenever a card is changed in the GameManager
+    void UpdateIcon()
+    {
         GameManager.Instance.onCardChangeInConsumer -= ReadyIcon;
         GameManager.Instance.onCardChangeInConsumer += ReadyIcon;
     }
 
-    void SetColor(Color cardColor, Color borderColor)
+    //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
+    void SelectChoice()
     {
-        SetColor(cardColor);
-
-        borderColorOverlay.color = borderColor;
+        if (_IsMouseOver && Input.GetMouseButtonUp(0) && _IsReady)
+        {
+            Debug.Log($"Selected Choice {flavorText.text}");
+            onChoiceSelection?.Invoke(iconResourceRequirements);
+        }
     }
 
-    void SetColor(Color cardColor)
-    {
-        cardColorOverlay.color = cardColor;
-    }
-
+    //Sets the color of the card based on cards in the consumer and whether it's being clicked
     void SetChoiceColor()
     {
         cardColorOverlay.gameObject.SetActive(true);
 
-        if (IsMouseOver())
+        if (isMouseHolding)
         {
             SetColor(highlightedColor, highlightedBorderColor);
             return;
         }
-
+        
         switch (ChoiceState)
         {
             case EChoiceState.Unready:
@@ -105,25 +126,54 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-    bool IsMouseOver()
+    //Sets the color of the 'ChoiceCard' to the arguements
+    //First sets the cardWhite then the cardBorder
+    void SetColor(Color cardColor, Color borderColor)
+    {
+        SetColor(cardColor);
+
+        borderColorOverlay.color = borderColor;
+    }
+
+    void SetColor(Color cardColor)
+    {
+        cardColorOverlay.color = cardColor;
+    }
+
+    
+    //Sets true if mouse is over this choice
+    void IsMouseOver()
     {
         var hit = GameManager.IsOver(choiceCardLayer);
 
         if (hit.transform == transform)
         {
-            Debug.Log("Mouse is over this");
-            return true;
+            _IsMouseOver = true;
+            return;
         }
-        return false;
+        _IsMouseOver = false;
+    }
 
+    //Sets true if mouse is pressed while hovering
+    //Sets false if mouse leaves or lets up
+    void IsMouseHolding()
+    {
+        if (!_IsMouseOver || Input.GetMouseButtonUp(0))
+        {
+            isMouseHolding = false;
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            isMouseHolding = true;
+        }
     }
 
     //Sets the enum 'ChoiceState', based on whether the requirements have been fulfilled, and determines if it is ready to be selected
     void SetState()
     {
-        bool isReady = IsReady();
-
-        if (isReady)
+        if (_IsReady)
         {
             ChoiceState = EChoiceState.Ready;
         }
@@ -136,7 +186,7 @@ public class ChoiceCard : MonoBehaviour
 
     //Checks if the consumer contains the correct resources based on the choice's required resources
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
-    bool IsReady()
+    void IsReady()
     {
         var consumerTypes = CardTypesInConsumer;
         var requirementTypes = choice.ResourceRequirements.ToList();
@@ -144,21 +194,22 @@ public class ChoiceCard : MonoBehaviour
         if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
         {
             //Debug.Log("Lists are empty");
-            return false;
+            _IsReady = false;
+            return;
         }
 
         overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
 
         int overlappingElementsCount = overlappingConsumerTypes.Count();
         
-        return (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
+        _IsReady = (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
     }
 
     //Sets the value of 'isReady' for one of the icon requirements based on the given paramates
     //Called whenever a state change occurs in the consumer via an event
     void ReadyIcon(Resource.ECardType resourceType, bool setReady)
     {
-        //Makes sure if there are more cards than requirements in the consumer, removing one won't change any of the icons
+        //Makes sure if there are more cards than requirements, removing one won't change any of the icons' status
         if (!setReady)
         {
             int resourceTypeCountInRequirements = GetIconsOfTypeFromRequirements(resourceType).Count;
@@ -170,6 +221,7 @@ public class ChoiceCard : MonoBehaviour
             }
         }
 
+        //Responsible for setting the value of the Icon
         Debug.Log($"Set readied icon.");
         for (int i = 0; i < iconResourceRequirements.Count; i++)
         {
@@ -217,6 +269,7 @@ public class ChoiceCard : MonoBehaviour
         return IconResources;
     }
 
+    //Reads the data of the 'choice' scriptable object and sets the 'choiceCard' variables to match
     void DataMatchChoice()
     {
         if (choice == null)
@@ -233,6 +286,7 @@ public class ChoiceCard : MonoBehaviour
         SetAllIcons();
     }
 
+    //
     void ActivateAndDeactivateRewards()
     {
         int actualValues = 0;
@@ -257,12 +311,14 @@ public class ChoiceCard : MonoBehaviour
 
     }
 
+    //
     void SetAllIcons()
     {
         SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
         SetIcons(choice.ResourceRewards, rewardsHolder.transform, null);
     }
 
+    //
     void SetIcons(Resource.ECardType[] listRefernce, Transform parent, List<Icon> listToAdd)
     {
         for (int i = 0; i < listRefernce.Length; i++)
@@ -284,6 +340,7 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
+    //
     static bool IsEnumValueValid(Enum enumeration)
     {
         bool returnValue = Enum.IsDefined(enumeration.GetType(), enumeration);
@@ -291,6 +348,7 @@ public class ChoiceCard : MonoBehaviour
         return returnValue;
     }
 
+    //
     string GetRewardText()
     {
         if (choice.ResourceRewards.Count() > 0)
