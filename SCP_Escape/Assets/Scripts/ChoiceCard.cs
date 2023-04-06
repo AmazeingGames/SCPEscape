@@ -59,8 +59,6 @@ public class ChoiceCard : MonoBehaviour
     public bool _IsReady { get; private set; } = false;
     public bool _IsMouseOver { get; private set; } = false;
 
-    public Action<List<Icon>> onChoiceSelection;
-
     bool isMouseHolding = false;
 
     void Start()
@@ -79,8 +77,8 @@ public class ChoiceCard : MonoBehaviour
         SetState();
         SetChoiceColor();
         UpdateIcon();
-
-        //-__(-_-)__-
+        
+        //
         SelectChoice();
     }
 
@@ -96,8 +94,8 @@ public class ChoiceCard : MonoBehaviour
     {
         if (_IsMouseOver && Input.GetMouseButtonUp(0) && _IsReady)
         {
-            Debug.Log($"Selected Choice {flavorText.text}");
-            onChoiceSelection?.Invoke(iconResourceRequirements);
+            Debug.Log($"Invoked Choice {flavorText.text}");
+            GameManager.Instance.onChoiceSelection?.Invoke(choice.ResourceRewards);
         }
     }
 

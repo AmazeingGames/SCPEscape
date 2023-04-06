@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     public bool hasAddedResources = false;
 
     public Action<Resource.ECardType, bool> onCardChangeInConsumer;
+    public Action<Resource.ECardType[]> onChoiceSelection;
 
     public List<GameObject> deckDiscard = new List<GameObject>();
     public List<GameObject> deck = new List<GameObject>();
@@ -118,7 +119,14 @@ public class GameManager : MonoBehaviour
         DropCard();
 
         CheckCardSizes();
+        DeveloperCommands();
 
+        onChoiceSelection -= ChoiceSelection;
+        onChoiceSelection += ChoiceSelection;
+    }
+
+    void DeveloperCommands()
+    {
         if (Input.GetKeyDown(KeyCode.Return))
         {
             DataMatchResources();
@@ -159,11 +167,10 @@ public class GameManager : MonoBehaviour
             SwapResources(resources1);
             SwapIcons(resources1);
         }
-    }
-
-    void ReadyChoices()
-    {
-
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            
+        }
     }
 
     public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards)
@@ -195,8 +202,6 @@ public class GameManager : MonoBehaviour
         }
         return returnList;
     }
-
-    
 
     void SwapResources(List<Resource> resources)
     {
@@ -470,6 +475,38 @@ public class GameManager : MonoBehaviour
         RemoveFromConsumer(resourceCard);
     }
 
+    //To all consumer cards: Deactives them, removes from 'consumer', sets 'resourcePool' as parent
+    void ConsumeAllCards()
+    {
+        Debug.Log("CONSUME!");
+        while (consumer.Count > 0)
+        {
+            var currentCard = consumer[0];
+
+            currentCard.gameObject.SetActive(false);
+
+            currentCard.transform.SetParent(resourcePool.transform);
+
+            RemoveFromConsumer(currentCard);
+        }
+    }
+
+    //Invoked when a choice is selected:
+    //Consumes all cards in the consumer
+    //Adds 'rewards' to the player's hand
+    //TO DO : Adds 'rewards' to the player's deck
+    void ChoiceSelection(Resource.ECardType[] choiceRewards)
+    {
+        ConsumeAllCards();
+
+        for (int i = 0; i < choiceRewards.Length; i++)
+        {
+            var currentResourceType = choiceRewards[i];
+
+            AddPoolResourceToHand(currentResourceType);
+        }
+    }
+
     void RemoveFromConsumer(ResourceCard resourceCard)
     {
         if (consumer.Remove(resourceCard))
@@ -494,16 +531,16 @@ public class GameManager : MonoBehaviour
         hand.Remove(resourceCard);
     }
 
-    void AddTo(ResourceCard resourceCard, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
+    void AddTo(ResourceCard resourceCardToAdd, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
     {
-        if (!resourceCard.isActiveAndEnabled)
-            resourceCard.gameObject.SetActive(true);
+        if (!resourceCardToAdd.isActiveAndEnabled)
+            resourceCardToAdd.gameObject.SetActive(true);
 
-        resourceCard.transform.SetParent(transformParent, keepWorldPosition);
+        resourceCardToAdd.transform.SetParent(transformParent, keepWorldPosition);
 
-        resourceCard.transform.localPosition = Vector3.zero;
+        resourceCardToAdd.transform.localPosition = Vector3.zero;
 
-        resourceCard.transform.localScale = newLocalScale;
+        resourceCardToAdd.transform.localScale = newLocalScale;
     }
 
     int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
