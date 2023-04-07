@@ -57,7 +57,7 @@ public class ChoiceCard : MonoBehaviour
     public Choice _Choice { get => choice; private set => choice = value; }
 
     public bool _IsReady { get; private set; } = false;
-    public bool _IsMouseOver { get; private set; } = false;
+    bool isMouseOver = false;
 
     bool isMouseHolding = false;
 
@@ -92,7 +92,7 @@ public class ChoiceCard : MonoBehaviour
     //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
     void SelectChoice()
     {
-        if (_IsMouseOver && Input.GetMouseButtonUp(0) && _IsReady)
+        if (isMouseOver && Input.GetMouseButtonUp(0) && _IsReady)
         {
             Debug.Log($"Invoked Choice {flavorText.text}");
             GameManager.Instance.onChoiceSelection?.Invoke(choice.ResourceRewards);
@@ -146,17 +146,17 @@ public class ChoiceCard : MonoBehaviour
 
         if (hit.transform == transform)
         {
-            _IsMouseOver = true;
+            isMouseOver = true;
             return;
         }
-        _IsMouseOver = false;
+        isMouseOver = false;
     }
 
     //Sets true if mouse is pressed while hovering
     //Sets false if mouse leaves or lets up
     void IsMouseHolding()
     {
-        if (!_IsMouseOver || Input.GetMouseButtonUp(0))
+        if (!isMouseOver || Input.GetMouseButtonUp(0))
         {
             isMouseHolding = false;
             return;

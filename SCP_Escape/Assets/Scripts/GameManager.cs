@@ -53,8 +53,9 @@ public class GameManager : MonoBehaviour
     public Action<Resource.ECardType, bool> onCardChangeInConsumer;
     public Action<Resource.ECardType[]> onChoiceSelection;
 
-    public List<GameObject> deckDiscard = new List<GameObject>();
-    public List<GameObject> deck = new List<GameObject>();
+    //public List<GameObject> deckDiscard = new List<GameObject>();
+    //public List<GameObject> deck = new List<GameObject>();
+
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
     public List<Resource> resources;
@@ -121,8 +122,7 @@ public class GameManager : MonoBehaviour
         CheckCardSizes();
         DeveloperCommands();
 
-        onChoiceSelection -= ChoiceSelection;
-        onChoiceSelection += ChoiceSelection;
+        SelectChoice();
     }
 
     void DeveloperCommands()
@@ -475,7 +475,7 @@ public class GameManager : MonoBehaviour
         RemoveFromConsumer(resourceCard);
     }
 
-    //To all consumer cards: Deactives them, removes from 'consumer', sets 'resourcePool' as parent
+    //Removes all cards from the consumer and moves them to the resource pool
     void ConsumeAllCards()
     {
         Debug.Log("CONSUME!");
@@ -505,6 +505,13 @@ public class GameManager : MonoBehaviour
 
             AddPoolResourceToHand(currentResourceType);
         }
+    }
+
+    //Responsible for subscribing to subscribing and calling the 'ChoiceSelection' function
+    void SelectChoice()
+    {
+        onChoiceSelection -= ChoiceSelection;
+        onChoiceSelection += ChoiceSelection;
     }
 
     void RemoveFromConsumer(ResourceCard resourceCard)
