@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[CreateAssetMenu(menuName = "Cards/Encounters")]
 public class Encounter : ScriptableObject
 {
     /* The data that is required for each Encounter Card:

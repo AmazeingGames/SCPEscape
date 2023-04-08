@@ -17,6 +17,7 @@ public class EncounterCard : MonoBehaviour
     bool areChoicesRevealed;
     bool isMouseOver = false;
     bool isClicked = false;
+    bool isChoiceSelected = false;
 
     void Start()
     {
@@ -29,12 +30,16 @@ public class EncounterCard : MonoBehaviour
         IsClicked();
 
         MoveChoices();
+
+        GameManager.Instance.onChoiceSelection -= OnChoiceSelection;
+        GameManager.Instance.onChoiceSelection += OnChoiceSelection;
     }
 
     //Sets true if mouse is over this choice
     void IsMouseOver()
     {
         var hit = GameManager.IsOver(encounterCardLayer);
+
 
         if (hit.transform == transform)
         {
@@ -62,6 +67,9 @@ public class EncounterCard : MonoBehaviour
     //Choices will be initially hidden from the player, clicking the encounter reveals them and hides the encounter. Clicking the encounter again, hides the choices, and repeat.
     void MoveChoices()
     {
+        if (isChoiceSelected)
+            return;
+
         if (isClicked)
         {
             if (areChoicesRevealed)
@@ -91,5 +99,13 @@ public class EncounterCard : MonoBehaviour
     void HideChoices()
     {
         Debug.Log("Hid Choices");
+    }
+
+    //Purpose of this is to hide the choices on selection
+    void OnChoiceSelection(Resource.ECardType[] nothing)
+    {
+        isChoiceSelected = true;
+
+        HideChoices();
     }
 }

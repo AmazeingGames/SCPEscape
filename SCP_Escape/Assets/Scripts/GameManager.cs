@@ -478,7 +478,6 @@ public class GameManager : MonoBehaviour
     //Removes all cards from the consumer and moves them to the resource pool
     void ConsumeAllCards()
     {
-        Debug.Log("CONSUME!");
         while (consumer.Count > 0)
         {
             var currentCard = consumer[0];

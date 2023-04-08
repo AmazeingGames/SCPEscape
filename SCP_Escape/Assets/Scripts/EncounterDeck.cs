@@ -9,6 +9,8 @@ public class EncounterDeck : MonoBehaviour
     List<EncounterCard> discardPile = new();
     List<EncounterCard> outOfPlay = new();
 
+    EncounterCard activeEncounter;
+
     void Start()
     {
         
@@ -18,6 +20,12 @@ public class EncounterDeck : MonoBehaviour
     void Update()
     {
         
+    }
+
+    //The purpose of this is to draw a card from the deck and make it the activeEncounter the player must resolve
+    void DrawCard()
+    {
+
     }
 
     //Purpose it to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
@@ -45,14 +53,16 @@ public class EncounterDeck : MonoBehaviour
 
     }
 
-    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're going to likely need an 'EncounterPool' to store cards like 'Greed' or 'Questlines' when they're somewhere other than potential play
+    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're going to likely need an 'EncounterPool' to store cards like 'Greed' or 'Questlines' when they're somewhere other than potential play, meaning the purpose of this is to send an encounterCard to the encounterPool
     void MoveCardToPool(EncounterCard encounterToMove)
     {
         
     }
 
+    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're likely to need an 'EncounterPool' to store encounters out of play, meaning the purpose of this is to get a reference to a specific card in the encounterPool
     EncounterCard GetCardFromPool(EncounterCard encounterToGet)
     {
         return null;
     }
+
 }
