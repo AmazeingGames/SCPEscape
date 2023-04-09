@@ -16,7 +16,7 @@ public class Encounter : ScriptableObject
      * Choices need to be able to add/remove encounter cards to the deck
      */
 
-    [SerializeField] List<ChoiceCard> choices = new();
+    [SerializeField] List<Choice> choices = new();
     [SerializeField] bool isQuestline;
     [SerializeField] bool isConstantEncounter;
 

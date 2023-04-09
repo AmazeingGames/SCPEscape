@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 25388
+  controlID: 44068
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_isFullscreen: 0
   m_suppressRenderingForFullscreen: 0
   m_VSyncEnabled: 0
-  m_PlayFocused: 0
+  m_PlayFocused: 1
   m_Gizmos: 0
   m_Stats: 0
   m_SelectedSizes: 02000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 25389
+  controlID: 44069
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 25390
+  controlID: 44070
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -231,23 +231,23 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: d0f1feff
-      m_LastClickedID: -69168
-      m_ExpandedIDs: faf9ffff04faffff52faffff5cfaffff74faffffaafaffffb4faffff02fbffff0cfbffff28fbffff1c5f0000545f0000
+      m_SelectedIDs: 26fbffff
+      m_LastClickedID: -1242
+      m_ExpandedIDs: f0d2fefffaf9ffff04faffff52faffff5cfaffffaafaffffb4faffff02fbffff0cfbffff28fbffffe65e00001c5f00003a5f0000545f0000625f0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: EncounterDeck
+        m_OriginalName: EncounterDeck
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 0
+        m_UserData: 24362
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_ClientGUIView: {fileID: 5}
       m_SearchString: 
@@ -566,7 +566,7 @@ MonoBehaviour:
       index: 2
       layout: 0
   m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
-  m_Gizmos: 0
+  m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
   m_SceneIsLit: 1
   m_SceneLighting: 1
@@ -575,9 +575,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -3.2533026, y: 0.30834764, z: 0.084805205}
+    m_Target: {x: 4.842784, y: -0.62581694, z: -0.12629518}
     speed: 2
-    m_Value: {x: -3.2533026, y: 0.30834764, z: 0.084805205}
+    m_Value: {x: 4.500087, y: -0.50609744, z: -0.12231452}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -627,9 +627,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 4.774788
+    m_Target: 9.244018
     speed: 2
-    m_Value: 4.774788
+    m_Value: 8.84595
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -722,22 +722,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Sprites/Icons/_CardBack
+    - Assets/Prefabs
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Sprites/Icons/_CardBack
+  - Assets/Prefabs
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\pasad\OneDrive\Desktop\All\Programming\Github\SCPEscape\SCP_Escape
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 93}
-    m_SelectedIDs: c6610000
-    m_LastClickedID: 25030
-    m_ExpandedIDs: 00000000a0610000a2610000a4610000a6610000a8610000aa610000ac61000000ca9a3b
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: be610000
+    m_LastClickedID: 25022
+    m_ExpandedIDs: 00000000a0610000a2610000a4610000a6610000a8610000aa610000ac610000bc61000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -765,7 +765,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000a0610000a2610000a4610000a6610000a8610000aa610000ac61000000ca9a3b
+    m_ExpandedIDs: 00000000a0610000a2610000a4610000a6610000a8610000aa610000ac610000bc61000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -790,8 +790,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: d0f1feff
-    m_LastClickedInstanceID: -69168
+    m_SelectedInstanceIDs: 26fbffff
+    m_LastClickedInstanceID: -1242
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000be5e0000ba5e0000686d0000c65f000096890000a28900009c8900002660000044600000
     m_RenameOverlay:

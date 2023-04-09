@@ -25,10 +25,10 @@ public class ChoiceCard : MonoBehaviour
     
     public enum EChoiceState { Ready, Unready, Unavailable }
 
-    [SerializeField] LayerMask choiceCardLayer;
 
-    [Header("Card Properties")]
     [SerializeField] Choice choice;
+    [Header("Card Properties")]
+    [SerializeField] LayerMask choiceCardLayer;
     [SerializeField] TextMeshProUGUI flavorText;
     [SerializeField] TextMeshProUGUI rewardText;
     [SerializeField] GameObject requirementsHolder;
@@ -38,11 +38,10 @@ public class ChoiceCard : MonoBehaviour
     [Header("Card Color")]
     [SerializeField] Color regularBorderColor;
     [SerializeField] Color highlightedBorderColor;
-    [SerializeField] Color highlightedColor; //Bright pale color (Light-Yellow)
-    [SerializeField] Color unavailableColor; //Even less colored (Dark-Greyed Out) 
-    [SerializeField] Color unreadyColor; //Uncolored (Greyed Out)
-    [SerializeField] Color readyColor; //Colored (Yellow)
-    //Colored (Yellow) transparent filter that appears when over the card
+    [SerializeField] Color highlightedColor;
+    [SerializeField] Color unavailableColor;
+    [SerializeField] Color unreadyColor;
+    [SerializeField] Color readyColor; 
     [SerializeField] Image cardColorOverlay;
     [SerializeField] Image borderColorOverlay;
 
