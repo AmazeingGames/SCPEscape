@@ -428,10 +428,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b8e00252c2ab44e9f77b3f6314987e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  choice: {fileID: 0}
   choiceCardLayer:
     serializedVersion: 2
     m_Bits: 1024
-  choice: {fileID: 11400000, guid: 252fd37bc8a53844fb2a4bdaa7091d37, type: 2}
   flavorText: {fileID: 7290427540273313359}
   rewardText: {fileID: 8992838286927491024}
   requirementsHolder: {fileID: 242349903}

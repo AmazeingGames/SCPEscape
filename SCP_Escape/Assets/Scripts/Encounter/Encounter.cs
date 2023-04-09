@@ -21,4 +21,6 @@ public class Encounter : ScriptableObject
     [SerializeField] bool isConstantEncounter;
 
     [SerializeField] Image cardArt;
+
+    public List<Choice> Choices { get => choices; private set => choices = value; }
 }

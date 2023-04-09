@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d85f5b122be858f43b6cb1114e2e7919, type: 3}
   m_Name: EncounterA
   m_EditorClassIdentifier: 
-  choices: []
+  choices:
+  - {fileID: 11400000, guid: 252fd37bc8a53844fb2a4bdaa7091d37, type: 2}
+  - {fileID: 11400000, guid: b253bffad4517514c954186ae7d6087f, type: 2}
+  - {fileID: 11400000, guid: aad91e394e0f2be4aafaf29cf72c7dd6, type: 2}
   isQuestline: 0
-  isConstantEncounter: 0
+  isConstantEncounter: 1
   cardArt: {fileID: 0}

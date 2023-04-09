@@ -14,15 +14,26 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    GameObject encounterPool;
     GameObject resourcePool;
     GameObject handHolder;
     GameObject resourceConsumer;
     GameObject iconPool;
+    public GameObject ChoicePool { get; private set; }
+    public GameObject GameCanvas { get; private set; }
+
+    public GameObject Choices { get; private set; }
 
     [SerializeField] int holdingCardLayer;
     [SerializeField] int newestCardLayer;
     [SerializeField] int defaultLayer;
 
+    [SerializeField] ChoiceCard choiceCard;
+
+    [SerializeField] int encounterPoolSize;
+    [SerializeField] EncounterCard encounterCard;
+
+    [SerializeField] int choicePoolSize;
     [SerializeField] int iconPoolSize;
     [SerializeField] Icon icon;
 
@@ -53,8 +64,6 @@ public class GameManager : MonoBehaviour
     public Action<Resource.ECardType, bool> onCardChangeInConsumer;
     public Action<Resource.ECardType[]> onChoiceSelection;
 
-    //public List<GameObject> deckDiscard = new List<GameObject>();
-    //public List<GameObject> deck = new List<GameObject>();
 
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
@@ -71,6 +80,10 @@ public class GameManager : MonoBehaviour
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
 
+    //Encounter Deck:
+    EncounterCard currentEncounter;
+    public List<Encounter> encounterDiscard = new();
+    public List<Encounter> encounterDeck = new();
 
     void Awake()
     {
@@ -82,13 +95,19 @@ public class GameManager : MonoBehaviour
         handHolder = GameObject.Find("HandHolder");
         resourcePool = GameObject.Find("ResourcePool");
         resourceConsumer = GameObject.Find("ResourceConsumer");
+        ChoicePool = GameObject.Find("ChoicePool");
         iconPool = GameObject.Find("IconPool");
+        encounterPool = GameObject.Find("EncounterPool");
+        Choices = GameObject.Find("Choices");
+        GameCanvas = GameObject.Find("GameCanvas");
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
         resources1 = new List<Resource> { ration1, escapee1, scientist1, insanity1, munition1, anomaly1 };
 
+        CreateEncounterPool();
         CreateResourcePool();
         CreateIconPool();
+        CreateChoicePool();
     }
 
     void Start()
@@ -106,11 +125,6 @@ public class GameManager : MonoBehaviour
 
         SwapResources(resources1);
         SwapIcons(resources1);
-    }
-
-    public void AddIcon(Icon iconToAdd)
-    {
-        allIcons.Add(iconToAdd);
     }
 
     void Update()
@@ -171,6 +185,11 @@ public class GameManager : MonoBehaviour
         {
             
         }
+    }
+
+    public void AddIcon(Icon iconToAdd)
+    {
+        allIcons.Add(iconToAdd);
     }
 
     public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards)
@@ -265,6 +284,24 @@ public class GameManager : MonoBehaviour
         mousePos.z += Camera.main.nearClipPlane;
 
         return mousePos;
+    }
+    
+    void CreateChoicePool()
+    {
+        for (int i = 0; i < choicePoolSize; i++)
+        {
+            ChoiceCard choice = Instantiate(choiceCard, ChoicePool.transform);
+            choice.gameObject.SetActive(false);
+        }
+    }
+
+    void CreateEncounterPool()
+    {
+        for (int i = 0; i < encounterPoolSize; i++)
+        {
+            EncounterCard encounterCard = Instantiate(this.encounterCard, encounterPool.transform);
+            encounterCard.gameObject.SetActive(false);
+        }
     }
 
     void CreateResourcePool()
@@ -475,7 +512,7 @@ public class GameManager : MonoBehaviour
         RemoveFromConsumer(resourceCard);
     }
 
-    //Removes all cards from the consumer and moves them to the resource pool
+    //Purpose is to remove all cards in the consumer; moves them to resource pool.
     void ConsumeAllCards()
     {
         while (consumer.Count > 0)

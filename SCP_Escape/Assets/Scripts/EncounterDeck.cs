@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
 public class EncounterDeck : MonoBehaviour
 {
     List<EncounterCard> drawPile = new();
@@ -23,9 +24,11 @@ public class EncounterDeck : MonoBehaviour
     }
 
     //The purpose of this is to draw a card from the deck and make it the activeEncounter the player must resolve
-    void DrawCard()
+    EncounterCard DrawCard()
     {
 
+
+        return null;
     }
 
     //Purpose it to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
@@ -59,7 +62,7 @@ public class EncounterDeck : MonoBehaviour
         
     }
 
-    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're likely to need an 'EncounterPool' to store encounters out of play, meaning the purpose of this is to get a reference to a specific card in the encounterPool
+    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're likely to need an 'EncounterPool' to store encounters out of play, meaning the purpose of this is to get a reference to a specific card in the encounterPool. When we pull cards from the encounterPool we can just assign them a scriptableObject that will determine what kind of card it is.
     EncounterCard GetCardFromPool(EncounterCard encounterToGet)
     {
         return null;

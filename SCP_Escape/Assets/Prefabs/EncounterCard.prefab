@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4415899088840631918}
   - component: {fileID: 2993490348586812360}
   - component: {fileID: 3659920901726073392}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: BorderColorOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 4172011969813524475}
   - component: {fileID: 4181330084352186741}
   - component: {fileID: 5189848487828509368}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: CardWhite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 4548972438902738024}
   - component: {fileID: 6329941288002065663}
   - component: {fileID: 6215131594905540138}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: CardColorOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -255,7 +255,7 @@ GameObject:
   - component: {fileID: 6887430571790610372}
   - component: {fileID: 6887430571790610375}
   - component: {fileID: 6192035656057389597}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: RequirementsHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -362,7 +362,7 @@ GameObject:
   - component: {fileID: 7147179055697995942}
   - component: {fileID: 6282452900103010983}
   - component: {fileID: 2030787714832625267}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: EncounterCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -384,7 +384,7 @@ RectTransform:
   - {fileID: 4415899088840631918}
   - {fileID: 1273676296493550832}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -403,10 +403,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b11c14565344cb469f4b1a11e69a26d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  encounter: {fileID: 0}
+  lerpSpeed: 4
+  encounter: {fileID: 11400000, guid: 1fc4e85a772b31c4a9eeb6227d038884, type: 2}
   encounterCardLayer:
     serializedVersion: 2
     m_Bits: 512
+  hiddenPosition: {x: 0, y: 6.4}
+  revealedPosition: {x: 0, y: 2.829}
 --- !u!114 &2016379984666449119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -538,7 +541,7 @@ GameObject:
   - component: {fileID: 1538507853492992820}
   - component: {fileID: 8338638415456147137}
   - component: {fileID: 6887430571445810514}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: SafeArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -633,7 +636,7 @@ GameObject:
   - component: {fileID: 7264037262613497103}
   - component: {fileID: 2936056570065488540}
   - component: {fileID: 2272208778361270684}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: FlavorText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -688,7 +691,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Buy a tincture of Duplication. Buy a draught of vitality
+  m_text: This is an encounter Card
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -715,7 +718,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.85
+  m_fontSize: 1.1
   m_fontSizeBase: 0.8
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -769,7 +772,7 @@ GameObject:
   - component: {fileID: 6839456462092072511}
   - component: {fileID: 6713933055207284015}
   - component: {fileID: 4196431188510216607}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: RewardsHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -871,7 +874,7 @@ GameObject:
   - component: {fileID: 521097717027968028}
   - component: {fileID: 2064673092754449861}
   - component: {fileID: 4846403567286138714}
-  m_Layer: 10
+  m_Layer: 9
   m_Name: RewardText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -926,7 +929,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Insert a "Rod of Legends" into the encounter deck
+  m_text: This is the rewards text; it's quite small
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -958,7 +961,7 @@ MonoBehaviour:
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0.5
-  m_fontSizeMax: 72
+  m_fontSizeMax: 100
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 1024
