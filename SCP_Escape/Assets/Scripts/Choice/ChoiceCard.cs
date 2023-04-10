@@ -266,6 +266,11 @@ public class ChoiceCard : MonoBehaviour
         return IconResources;
     }
 
+    public void SetChoice(Choice choice)
+    {
+        this.choice = choice;
+    }
+
     //Reads the data of the 'choice' scriptable object and sets the 'choiceCard' variables to match
     void DataMatchChoice()
     {

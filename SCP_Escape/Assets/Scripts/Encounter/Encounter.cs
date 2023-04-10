@@ -15,12 +15,17 @@ public class Encounter : ScriptableObject
      * Functionality of the encounter:
      * Choices need to be able to add/remove encounter cards to the deck
      */
-
+    [SerializeField] string encounterName;
+    [SerializeField] string flavorText;
     [SerializeField] List<Choice> choices = new();
-    [SerializeField] bool isQuestline;
+    [SerializeField] Image cardArt;
     [SerializeField] bool isConstantEncounter;
 
-    [SerializeField] Image cardArt;
 
     public List<Choice> Choices { get => choices; private set => choices = value; }
+    public string EncounterName { get => encounterName; private set => encounterName = value; }
+    public string FlavorText { get => flavorText; private set => flavorText = value; }
+    public Image CardArt { get => cardArt; private set => cardArt = value; }
+    public bool IsConstantEncounter { get => isConstantEncounter; private set => isConstantEncounter = value; }
+
 }

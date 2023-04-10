@@ -403,13 +403,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b11c14565344cb469f4b1a11e69a26d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lerpSpeed: 4
+  encounterName: {fileID: 2272208778361270684}
+  flavorText: {fileID: 4846403567286138714}
+  lerpSpeed: 3.5
   encounter: {fileID: 11400000, guid: 1fc4e85a772b31c4a9eeb6227d038884, type: 2}
   encounterCardLayer:
     serializedVersion: 2
     m_Bits: 512
   hiddenPosition: {x: 0, y: 6.4}
   revealedPosition: {x: 0, y: 2.829}
+  curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &2016379984666449119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,7 +663,7 @@ GameObject:
   - component: {fileID: 2936056570065488540}
   - component: {fileID: 2272208778361270684}
   m_Layer: 9
-  m_Name: FlavorText
+  m_Name: EncounterName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -875,7 +901,7 @@ GameObject:
   - component: {fileID: 2064673092754449861}
   - component: {fileID: 4846403567286138714}
   m_Layer: 9
-  m_Name: RewardText
+  m_Name: FlavorText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -898,8 +924,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6.4199, y: -302}
-  m_SizeDelta: {x: 7.3, y: 4.2}
+  m_AnchoredPosition: {x: 6.4199, y: -283.98}
+  m_SizeDelta: {x: 7.3, y: 4.5605}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2064673092754449861
 CanvasRenderer:
@@ -956,11 +982,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.5
+  m_fontSize: 0.8
   m_fontSizeBase: 0.8
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 0.5
+  m_fontSizeMin: 0.1
   m_fontSizeMax: 100
   m_fontStyle: 0
   m_HorizontalAlignment: 2

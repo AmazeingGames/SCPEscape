@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
-  m_Name: ChoiceC
+  m_Name: AnomaliesToScientists
   m_EditorClassIdentifier: 
-  resourceRequirements: 0500000005000000010000000100000001000000
-  resourceRewards: 0000000000000000
+  resourceRequirements: 0000000000000000
+  resourceRewards: 0500000005000000050000000500000005000000
   cardsToAdd: []
   shouldWinGame: 0
   shouldLoseGame: 0
-  flavorText: We have too many people for our own good. Perhaps a sacrifice is in
-    order?
+  flavorText: '"Where there are anomalies, there are scientists!"'

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
-  m_Name: ChoiceA
+  m_Name: DuplicatingPotion
   m_EditorClassIdentifier: 
   resourceRequirements: 0100000003000000
   resourceRewards: 0100000001000000

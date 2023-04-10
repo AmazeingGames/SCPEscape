@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,11 +7,19 @@ using UnityEngine;
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
 public class EncounterDeck : MonoBehaviour
 {
-    List<EncounterCard> drawPile = new();
-    List<EncounterCard> discardPile = new();
-    List<EncounterCard> outOfPlay = new();
+    public static EncounterDeck Instance { get; private set; }
 
-    EncounterCard activeEncounter;
+    GameObject EncounterPool => GameManager.Instance.EncounterPool;
+
+    List<Encounter> _EncounterDeck => GameManager.Instance.EncounterDeck;
+
+    void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(Instance);
+    }
 
     void Start()
     {
@@ -23,11 +32,26 @@ public class EncounterDeck : MonoBehaviour
         
     }
 
-    //The purpose of this is to draw a card from the deck and make it the activeEncounter the player must resolve
-    EncounterCard DrawCard()
+    //The purpose of this is to grab the first inactive encounter from the resourcePool and return it
+    EncounterCard DrawNextEncounter()
     {
+        if (EncounterPool.transform.childCount <= 0)
+            return null;
 
+        if (GameManager.Instance.EncounterDeck.Count <= 0)
+            return null;
 
+        for (int i = 0; i < EncounterPool.transform.childCount; i++)
+        {
+            EncounterCard nextEncounter = EncounterPool.transform.GetChild(i).GetComponent<EncounterCard>();
+
+            if (nextEncounter.gameObject.activeSelf == false)
+            {
+                nextEncounter.SetAndMatchEncounter(_EncounterDeck[0]);
+
+                return nextEncounter;
+            }
+        }
         return null;
     }
 

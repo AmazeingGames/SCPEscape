@@ -14,14 +14,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    GameObject encounterPool;
     GameObject resourcePool;
     GameObject handHolder;
     GameObject resourceConsumer;
     GameObject iconPool;
+
     public GameObject ChoicePool { get; private set; }
     public GameObject GameCanvas { get; private set; }
-
+    public GameObject EncounterPool { get; private set; }
     public GameObject Choices { get; private set; }
 
     [SerializeField] int holdingCardLayer;
@@ -80,10 +80,13 @@ public class GameManager : MonoBehaviour
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
 
-    //Encounter Deck:
+    EncounterDeck encounterDeck;
     EncounterCard currentEncounter;
-    public List<Encounter> encounterDiscard = new();
-    public List<Encounter> encounterDeck = new();
+
+    public List<Encounter> EncounterDeck { get; private set; } = new();
+    public List<Encounter> DiscardPile { get; private set; } = new();
+
+    public EncounterCard ActiveEncounter { get; private set; }
 
     void Awake()
     {
@@ -97,7 +100,7 @@ public class GameManager : MonoBehaviour
         resourceConsumer = GameObject.Find("ResourceConsumer");
         ChoicePool = GameObject.Find("ChoicePool");
         iconPool = GameObject.Find("IconPool");
-        encounterPool = GameObject.Find("EncounterPool");
+        EncounterPool = GameObject.Find("EncounterPool");
         Choices = GameObject.Find("Choices");
         GameCanvas = GameObject.Find("GameCanvas");
 
@@ -299,7 +302,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < encounterPoolSize; i++)
         {
-            EncounterCard encounterCard = Instantiate(this.encounterCard, encounterPool.transform);
+            EncounterCard encounterCard = Instantiate(this.encounterCard, EncounterPool.transform);
             encounterCard.gameObject.SetActive(false);
         }
     }
@@ -439,6 +442,23 @@ public class GameManager : MonoBehaviour
                 currentCard.transform.localScale = mandatoryHandSize;
             }
         }
+    }
+
+    public ChoiceCard GetFromChoicePool()
+    {
+        if (ChoicePool.transform.childCount <= 0)
+            return null;
+
+        for (int i = 0; i < ChoicePool.transform.childCount; i++)
+        {
+            ChoiceCard choiceCard = ChoicePool.transform.GetChild(i).GetComponent<ChoiceCard>();
+
+            if (choiceCard.gameObject.activeSelf == false)
+            {
+                return choiceCard;
+            }
+        }
+        return null;
     }
 
     ResourceCard GetFromResourcePool(Resource.ECardType resourceType)
