@@ -17,6 +17,7 @@ public class EncounterCard : MonoBehaviour
 
     [Header("Encounter Lerping")]
     [SerializeField] float lerpSpeed = .5f;
+    //Replace these Vector2's with nodes and use their transform.position instead.
     [SerializeField] Vector2 hiddenPosition;
     [SerializeField] Vector2 revealedPosition;
     [SerializeField] AnimationCurve curve;
@@ -126,8 +127,6 @@ public class EncounterCard : MonoBehaviour
         HideEncounter();
     }
 
-    
-
     //Purpose is to hide the choices and remove them from play, not allowing them to be selected.
     //This would also move the encounter to the forefront.
     void ObscureChoices()
@@ -196,6 +195,9 @@ public class EncounterCard : MonoBehaviour
         }
     }
 
+    //The animation in my head for this is the choices come down in a single pile, then slide over to both sides from the center until all cards are in place.
+    //This could be done by placing node locations, which, come to think of it, I should have done with the 'hidden' and 'revealed' location, instead of figuring it out manually.
+    //Note to Self: Use nodes
     void MoveChoices(bool setActive)
     {
         for (int i = 0; i < choiceCards.Count; i++)
