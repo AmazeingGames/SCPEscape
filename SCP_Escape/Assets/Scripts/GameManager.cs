@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     GameObject resourceConsumer;
     GameObject iconPool;
 
+    public GameObject Nodes { get; private set; }
     public GameObject ChoicePool { get; private set; }
     public GameObject GameCanvas { get; private set; }
     public GameObject EncounterPool { get; private set; }
@@ -103,6 +104,7 @@ public class GameManager : MonoBehaviour
         EncounterPool = GameObject.Find("EncounterPool");
         Choices = GameObject.Find("Choices");
         GameCanvas = GameObject.Find("GameCanvas");
+        Nodes = GameObject.Find("Nodes");
 
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
         resources1 = new List<Resource> { ration1, escapee1, scientist1, insanity1, munition1, anomaly1 };
