@@ -127,8 +127,8 @@ public class EncounterCard : MonoBehaviour
     {
         Debug.Log("Revealed Choices, hid encounter");
 
-        MoveChoices(true);
         HideEncounter();
+        MoveChoices(setActive : true);
     }
 
     //Purpose is to hide the choices and remove them from play, not allowing them to be selected.
@@ -136,20 +136,21 @@ public class EncounterCard : MonoBehaviour
     void ObscureChoices()
     {
         Debug.Log("Hid Choices, revealed encounter");
-        MoveChoices(false);
+
         RevealEncounter();
+        MoveChoices(setActive : false);
     }
 
     //Purpose is to start the lerp and move the encounter out of the way to make room for the choices when they're revealed
     void HideEncounter()
     {
-        StartLerp(true, hiddenPosition.position, GameManager.Instance.GameCanvas.transform);
+        StartLerp(isHiding : true, lerpTo : hiddenPosition.position, newParent : GameManager.Instance.GameCanvas.transform);
     }
 
     //Purpose is to start the lerp and move the encounter front and center
     void RevealEncounter()
     {
-        StartLerp(false, revealedPosition.position, null);
+        StartLerp(isHiding : false, lerpTo : revealedPosition.position, newParent : null);
     }
 
     //Responsible for setting the variables needed to actually lerp
@@ -181,17 +182,17 @@ public class EncounterCard : MonoBehaviour
             if (current == 1)
             {
                 Debug.Log("Finished Lerp");
+
                 canBeClicked = true;
                 shouldLerp = false;
 
                 if (isHiding)
                 {
-                    //ShowChoices();
+                    //MoveChoices(setActive: true);
                     transform.SetParent(GameManager.Instance.GameCanvas.transform, false);
                 }
                 else
                 {
-
                     transform.SetParent(GameManager.Instance.Choices.transform, false);
                 }
             }
@@ -200,7 +201,7 @@ public class EncounterCard : MonoBehaviour
 
     //The animation in my head for this is the choices come down in a single pile, then slide over to both sides from the center until all cards are in place.
     //This could be done by placing node locations, which, come to think of it, I should have done with the 'hidden' and 'revealed' location, instead of figuring it out manually.
-    //Note to Self: Use nodes
+    //System of nodes : Create a second horizontal layout group and organize the nodes that way, turning them on and off and get a perfect adaptable and scalable system for figuring out positions. The only problem I can think of is how to tell which node is which, but that shouldn't be a hard fix.
 
     //Purpose is to hide/reveal the children choice cards
     void MoveChoices(bool setActive)
