@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.UIElements;
 using UnityEngine;
+using static Resource;
 using static UnityEditor.Progress;
 
 public class GameManager : MonoBehaviour
@@ -46,6 +47,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] LayerMask cardLayer;
     [SerializeField] int resourcePoolSize;
     [SerializeField] ResourceCard resourceCard;
+
     [SerializeField] Resource ration;
     [SerializeField] Resource escapee;
     [SerializeField] Resource scientist;
@@ -68,6 +70,7 @@ public class GameManager : MonoBehaviour
 
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
+
     public List<Resource> resources;
     public List<Resource> resources1;
 
@@ -117,12 +120,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < 1; i++)
-        {
-            AddPoolResourcesToHand(1, 1, 1, 1, 1, 1);
-        }
+        AddStartingResources();
 
-        for(int i = 0; i < resources.Count; i++)
+        //Not sure what this code is for
+        for (int i = 0; i < resources.Count; i++)
         {
             //Debug.Log(resources[i].name);
             //AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
@@ -144,6 +145,16 @@ public class GameManager : MonoBehaviour
         SelectChoice();
     }
 
+    void AddStartingResources()
+    {
+        //For loop can be removed
+        for (int i = 0; i < 1; i++)
+        {
+            AddPoolResourcesToHand(1, 1, 1, 1, 1, 1);
+        }
+    }
+
+    //Adds resources to hand correlated to the nums 0 - 9
     void DeveloperCommands()
     {
         if (Input.GetKeyDown(KeyCode.Return))
@@ -197,61 +208,67 @@ public class GameManager : MonoBehaviour
         allIcons.Add(iconToAdd);
     }
 
+
+    //Given a list of Resource Cards, returns a list of their resource types 
     public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards)
     {
-        List<Resource.ECardType> returnList = new List<Resource.ECardType>();
-
-        for (int i = 0; i < resourceCards.Count; i++)
-        {
-            var card = resourceCards[i];
-
-            var cardType = card._Resource.CardType;
-
-            returnList.Add(cardType);
-        }
-        return returnList;
+        return ListToResourceTypeList(resourceCards, t => t._Resource.CardType);
     }
 
+    //Given a list of Resource Objects, returns a list of their resource type
     public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<Resource> resourceCards)
+    {      
+        return ListToResourceTypeList(resourceCards, t => t.CardType);
+    }
+
+    //Given a list of T, returns a list of resource types | Brush up on : 
+    //Generics              (pg 222)
+    //Delegates             (pg 282)
+    //Lambda Expressions    (pg 294)
+    static List<Resource.ECardType> ListToResourceTypeList<T>(List<T> listToConvert, Func<T, Resource.ECardType> conversionMethod)
     {
-        List<Resource.ECardType> returnList = new List<Resource.ECardType>();
+        List<Resource.ECardType> returnList = new();
 
-        for (int i = 0; i < resourceCards.Count; i++)
+        for (int i = 0; i < listToConvert.Count; i++)
         {
-            var card = resourceCards[i];
+            var current = listToConvert[i];
 
-            var cardType = card.CardType;
+            Resource.ECardType cardType = conversionMethod(current);
 
             returnList.Add(cardType);
         }
         return returnList;
     }
 
+    //Sets the resource object of all resources cards
     void SwapResources(List<Resource> resources)
     {
-        for(int i = 0; i < allCards.Count; i++)
-        {
-            var card = allCards[i];
-
-            card.SetResource(ReturnResourceMatch(resources, card._Resource.CardType));
-        }
+        SetResourceObject(allCards, c => c.SetResource(ReturnResourceMatch(resources, c._Resource.CardType)));
     }
 
+    //Sets the resource object of all resource icons
     void SwapIcons(List<Resource> resources)
     {
-        for (int i = 0; i < allIcons.Count; i++)
-        {
-            var icon = allIcons[i];
+        SetResourceObject(allIcons, i => i.SetResource(ReturnResourceMatch(resources, i.IconResource.CardType)));
+    }
 
-            icon.SetResource(ReturnResourceMatch(resources, icon.IconResource.CardType));
+    //Given a list of values, performs a method to that value*
+    void SetResourceObject<T>(List<T> valuesToSet, Action<T> setSomething)
+    {
+        for (int i = 0; i < valuesToSet.Count; i++)
+        {
+            var current = valuesToSet[i];
+
+            setSomething(current);
         }
     }
 
-    Resource ReturnResourceMatch(List<Resource> resources, Resource.ECardType resourceTypeToMatch)
+    //Given a list of Resources, returns the first resource in that list that matches a given resourceType 
+    Resource ReturnResourceMatch(List<Resource> resources, ECardType resourceTypeToMatch)
     {
         for(int i = 0; i < resources.Count; i++)
         {
-            var card = resources[i];
+            Resource card = resources[i];
 
             if (card.CardType == resourceTypeToMatch)
                 return card;
@@ -259,21 +276,25 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    //Checks if the player's mouse is over a resourceCard
     RaycastHit2D IsOverCard()
     {
         return IsOver(cardLayer);
     }
 
+    //Checks if the player's mouse is over the hand
     RaycastHit2D IsOverHandHolder()
     {
         return IsOver(handHolderLayer);
     }
 
+    //Checks if the player's mouse is over the consumer
     RaycastHit2D IsOverResourceConsumer()
     {
         return IsOver(resourceConsumerLayer);
     }
 
+    //Checks if the player's mouse is over a certain layer
     public static RaycastHit2D IsOver(LayerMask layer)
     {
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, layer);
@@ -281,6 +302,7 @@ public class GameManager : MonoBehaviour
         return hit;
     }
 
+    //Returns a vector3 of the player's mouse position
     static public Vector3 GetMousePosition()
     {
         Vector3 mousePos;
@@ -291,121 +313,125 @@ public class GameManager : MonoBehaviour
         return mousePos;
     }
     
+    //Creates the object pool for choice cards
     void CreateChoicePool()
     {
-        for (int i = 0; i < choicePoolSize; i++)
-        {
-            ChoiceCard choice = Instantiate(choiceCard, ChoicePool.transform);
-            choice.gameObject.SetActive(false);
-        }
+        CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
     }
 
+    //Creates the object pool for encounter cards
     void CreateEncounterPool()
     {
-        for (int i = 0; i < encounterPoolSize; i++)
-        {
-            EncounterCard encounterCard = Instantiate(this.encounterCard, EncounterPool.transform);
-            encounterCard.gameObject.SetActive(false);
-        }
+        CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
     }
 
+    //Creates the object pool for resource cards
     void CreateResourcePool()
     {
         for (int i = 0; i < resources.Count; i++)
         {
             for (int n = 0; n < resourcePoolSize; n++)
             {
-                var card = Instantiate(resourceCard, resourcePool.transform);
-                card.SetResource(resources[i]);
-                card.gameObject.SetActive(false);
-
-                allCards.Add(card);
+                CreateObject(obj: resourceCard, parent: resourcePool, setReady: card => card.SetResource(resources[i]), list: allCards);
             }
         }
     }
 
+    //Creates the object pool for resource icons
     void CreateIconPool()
     {
         for (int i = 0; i < resources.Count; i++)
         {
             for (int n = 0; n < iconPoolSize; n++)
             {
-                var icon = Instantiate(this.icon, iconPool.transform);
-                icon.SetResource(resources[i]);
-                icon.gameObject.SetActive(false);
-
-                allIcons.Add(icon);
+                CreateObject(obj: icon, parent: iconPool, setReady: icon => icon.SetResource(resources[i]), list: allIcons);
             }
         }
     }
 
+    //Instantiates an inactive pool of objects, of a given size, under a given parent
+    void CreateObjectPool<T>(T obj, Transform parent, int size) where T : MonoBehaviour
+    {
+        for (int i = 0; i < size; i++)
+        {
+            CreateObject(obj, parent);
+        }
+    }
+
+    //Instantiates an inactive pool of objects, of a given size, under a given parent
+    void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour
+    {
+        CreateObjectPool(obj, parent.transform, size);
+    }
+
+    //Instantiates and returns an inactive object, under a given parent, stored in a given list, and readied with a given method
+    T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour
+    {
+        return CreateObject(obj, parent.transform, setReady, list);
+    }
+
+    //Instantiates and returns an inactive object, under a given parent, stored in a given list, and readied with a given method
+    T CreateObject<T>(T obj, Transform parent, Action<T> setReady = null, List<T> list = null) where T : MonoBehaviour
+    {
+        var createdObj = Instantiate(obj, parent);
+        createdObj.gameObject.SetActive(false);
+
+        setReady?.Invoke(createdObj);
+        list?.Add(createdObj);
+
+        return createdObj;
+    }
+
+    //Retrieves a number of resource cards from the resource pool and adds them to the player's hand
     void AddPoolResourcesToHand(int anomalies, int escapees, int insanities, int munitions, int rations, int scientists)
     {
         List<ResourceCard> resourcesToAdd = new List<ResourceCard>();
 
-        for(int i = 0; i < resourcePool.transform.childCount; i++)
+        for (int i = 0; i < resourcePool.transform.childCount; i++)
         {
             ResourceCard card = resourcePool.transform.GetChild(i).GetComponent<ResourceCard>();
+
+            void AddResourceIfAvailable(ref int resource)
+            {
+                if (resource > 0)
+                {
+                    resource--;
+                    resourcesToAdd.Add(card);
+                }
+            }
 
             if (card.gameObject.activeSelf == false)
             {
                 switch (card._Resource.CardType)
                 {
-                    case Resource.ECardType.Anomaly:
-                        if(anomalies > 0)
-                        {
-                            anomalies--;
-                            resourcesToAdd.Add(card);
-                        }
+                    case ECardType.Anomaly:
+                        AddResourceIfAvailable(ref anomalies);
                         break;
-                    case Resource.ECardType.Escapee:
-                        if(escapees > 0)
-                        {
-                            escapees--;
-                            resourcesToAdd.Add(card);
-                        }
+                    case ECardType.Escapee:
+                        AddResourceIfAvailable(ref escapees);
                         break;
-                    case Resource.ECardType.Insanity:
-                        if(insanities > 0)
-                        {
-                            insanities--;
-                            resourcesToAdd.Add(card);
-                        }
+                    case ECardType.Insanity:
+                        AddResourceIfAvailable(ref insanities);
                         break;
-                    case Resource.ECardType.Munition:
-                        if(munitions > 0)
-                        {
-                            munitions--;
-                            resourcesToAdd.Add(card);
-                        }
+                    case ECardType.Munition:
+                        AddResourceIfAvailable(ref munitions);
                         break;
-                    case Resource.ECardType.Ration: 
-                        if(rations > 0)
-                        {
-                            rations--;
-                            resourcesToAdd.Add(card);
-                        }
+                    case ECardType.Ration:
+                        AddResourceIfAvailable(ref rations);
                         break;
-                    case Resource.ECardType.Scientist:
-                        if(scientists > 0)
-                        {
-                            scientists--;
-                            resourcesToAdd.Add(card);
-                        }
-                        break;  
+                    case ECardType.Scientist:
+                        AddResourceIfAvailable(ref scientists);
+                        break;
                 }
             }
         }
 
-        for(int i = 0; i < resourcesToAdd.Count; i++)
-        {
-            var currentCard = resourcesToAdd[i];
-
-            AddCardToHand(currentCard);
-        }
+        foreach (ResourceCard resourceCard in resourcesToAdd)
+            AddCardToHand(resourceCard);
     }
 
-    void AddPoolResourceToHand(Resource.ECardType resourceType)
+    //Retrieves a resource card from the resource pool and adds it to the player's hand
+    void AddPoolResourceToHand(ECardType resourceType)
     {
         ResourceCard cardTypeToAdd = GetFromResourcePool(resourceType);
 
@@ -417,98 +443,62 @@ public class GameManager : MonoBehaviour
         AddCardToHand(cardTypeToAdd);
     }
 
+    //Makes sure every resource card in the games has their data is matched to the scriptable object
     void DataMatchResources()
     {
         var handAndConsumerResources = hand.Concat(consumer);
 
-        foreach(ResourceCard resource in handAndConsumerResources)
-        {
-            resource.DataMatchResource();
-        }
+        foreach(ResourceCard resourceCard in handAndConsumerResources)
+            resourceCard.DataMatchResource();
     }
 
+    //Makes sure resource cards in the consumer and hand are size appropriate for their zone
     void CheckCardSizes()
     {
         CheckCardSize(hand, handHolderCardScale);
         CheckCardSize(consumer, resourceConsumerCardScale);
     }
 
-    void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatoryHandSize)
+    //Makes sure all the cards in a given list are of a given size
+    void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
     {
         for(int i = 0; i < listToCheck.Count; i++)
         {
             var currentCard = listToCheck[i];
 
-            if (currentCard.transform.localScale != mandatoryHandSize)
+            if (currentCard.transform.localScale != mandatorySize)
             {
-                currentCard.transform.localScale = mandatoryHandSize;
+                currentCard.transform.localScale = mandatorySize;
             }
         }
     }
 
-    public ChoiceCard GetFromChoicePool()
+    //Returns the first inactive choice from the choice pool
+    public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
+
+    //Returns the first inactive resource, matching a given resource type, from the resource pool
+    ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c._Resource.CardType == resourceType);
+
+    //Returns the first inactive icon, matching a given resource type, from the icon pool
+    public Icon GetFromIconPool(ECardType resourceType) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource.CardType == resourceType);
+
+    //Returns the first inactive icon, matching a given resource object, from the icon pool
+    public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource == resource);
+
+    //Returns the first inactive object from an object pool that matches a given condition
+    private T GetTypeFromPool<T>(GameObject parent, Func<T, bool> extraCondition = null) where T : MonoBehaviour
     {
-        if (ChoicePool.transform.childCount <= 0)
+        if (!(parent.transform.childCount > 0))
             return null;
 
-        for (int i = 0; i < ChoicePool.transform.childCount; i++)
+        for (int i = 0; i < parent.transform.childCount; i++)
         {
-            ChoiceCard choiceCard = ChoicePool.transform.GetChild(i).GetComponent<ChoiceCard>();
-
-            if (choiceCard.gameObject.activeSelf == false)
-            {
-                return choiceCard;
-            }
-        }
-        return null;
-    }
-
-    ResourceCard GetFromResourcePool(Resource.ECardType resourceType)
-    {
-        if (!(resourcePool.transform.childCount > 0))
-            return null;
-
-        for (int i = 0; i < resourcePool.transform.childCount; i++)
-        {
-            var cardToReturn = resourcePool.transform.GetChild(i).GetComponent<ResourceCard>();
-
-            if (cardToReturn.gameObject.activeSelf == false)
-            {
-                if (cardToReturn._Resource.CardType == resourceType)
-                {
-                    return cardToReturn;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Icon GetFromIconPool(Resource.ECardType resourceType)
-    {
-        return GetIconFromPool(icon => icon.IconResource.CardType == resourceType);
-    }
-
-    public Icon GetFromIconPool(Resource resource)
-    {
-        return GetIconFromPool(icon => icon.IconResource == resource);
-    }
-
-    private Icon GetIconFromPool(Func<Icon, bool> condition)
-    {
-        if (!(iconPool.transform.childCount > 0))
-            return null;
-
-        for (int i = 0; i < iconPool.transform.childCount; i++)
-        {
-            Icon returnIcon = iconPool.transform.GetChild(i).GetComponent<Icon>();
+            T returnIcon = parent.transform.GetChild(i).GetComponent<T>();
 
             if (returnIcon.gameObject.activeSelf == false)
-            {
-                if (condition(returnIcon))
+                if (extraCondition == null || extraCondition(returnIcon))
                     return returnIcon;
-            }
         }
-
         return null;
     }
 

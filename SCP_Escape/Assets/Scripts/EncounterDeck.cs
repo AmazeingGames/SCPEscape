@@ -21,16 +21,6 @@ public class EncounterDeck : MonoBehaviour
             Destroy(Instance);
     }
 
-    void Start()
-    {
-        
-    }
-
-    
-    void Update()
-    {
-        
-    }
 
     //The purpose of this is to grab the first inactive encounter from the resourcePool and return it
     EncounterCard DrawNextEncounter()
