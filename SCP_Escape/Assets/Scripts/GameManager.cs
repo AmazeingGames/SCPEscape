@@ -64,16 +64,16 @@ public class GameManager : MonoBehaviour
 
     public bool hasAddedResources = false;
 
-    public Action<Resource.ECardType, bool> onCardChangeInConsumer;
-    public Action<Resource.ECardType[]> onChoiceSelection;
-
+    public Action<ECardType, bool> onCardChangeInConsumer;
+    public Action<ECardType[]> onChoiceSelection;
 
     public List<ResourceCard> hand = new List<ResourceCard>();
     public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
+    public List<ResourceCard> holding = new(new ResourceCard[0]) ;
 
     public List<Resource> resources;
     public List<Resource> resources1;
-
+    
     List<ResourceCard> allCards = new List<ResourceCard>();
     List<Icon> allIcons = new List<Icon>();
 
@@ -165,27 +165,27 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            AddPoolResourceToHand(Resource.ECardType.Anomaly);
+            AddPoolResourceToHand(ECardType.Anomaly);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            AddPoolResourceToHand(Resource.ECardType.Escapee);
+            AddPoolResourceToHand(ECardType.Escapee);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            AddPoolResourceToHand(Resource.ECardType.Insanity);
+            AddPoolResourceToHand(ECardType.Insanity);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            AddPoolResourceToHand(Resource.ECardType.Munition);
+            AddPoolResourceToHand(ECardType.Munition);
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            AddPoolResourceToHand(Resource.ECardType.Ration);
+            AddPoolResourceToHand(ECardType.Ration);
         }
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            AddPoolResourceToHand(Resource.ECardType.Scientist);
+            AddPoolResourceToHand(ECardType.Scientist);
         }
         if (Input.GetKeyDown(KeyCode.Alpha7))
         {
@@ -199,41 +199,28 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            
         }
     }
 
-    public void AddIcon(Icon iconToAdd)
-    {
-        allIcons.Add(iconToAdd);
-    }
-
+    //Adds an icon instance to the icons list
+    public void AddIcon(Icon iconToAdd) => allIcons.Add(iconToAdd);
 
     //Given a list of Resource Cards, returns a list of their resource types 
-    public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards)
-    {
-        return ListToResourceTypeList(resourceCards, t => t._Resource.CardType);
-    }
+    public static List<ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards) => ListToResourceTypeList(resourceCards, t => t._Resource.CardType);
 
     //Given a list of Resource Objects, returns a list of their resource type
-    public static List<Resource.ECardType> ConvertResourceCardListToResourceType(List<Resource> resourceCards)
-    {      
-        return ListToResourceTypeList(resourceCards, t => t.CardType);
-    }
+    public static List<ECardType> ConvertResourceCardListToResourceType(List<Resource> resourceCards) => ListToResourceTypeList(resourceCards, t => t.CardType);
 
-    //Given a list of T, returns a list of resource types | Brush up on : 
-    //Generics              (pg 222)
-    //Delegates             (pg 282)
-    //Lambda Expressions    (pg 294)
-    static List<Resource.ECardType> ListToResourceTypeList<T>(List<T> listToConvert, Func<T, Resource.ECardType> conversionMethod)
+    //Given a list of T, returns a list of resource types
+    static List<ECardType> ListToResourceTypeList<T>(List<T> listToConvert, Func<T, ECardType> conversionMethod)
     {
-        List<Resource.ECardType> returnList = new();
+        List<ECardType> returnList = new();
 
         for (int i = 0; i < listToConvert.Count; i++)
         {
             var current = listToConvert[i];
 
-            Resource.ECardType cardType = conversionMethod(current);
+            ECardType cardType = conversionMethod(current);
 
             returnList.Add(cardType);
         }
@@ -241,16 +228,10 @@ public class GameManager : MonoBehaviour
     }
 
     //Sets the resource object of all resources cards
-    void SwapResources(List<Resource> resources)
-    {
-        SetResourceObject(allCards, c => c.SetResource(ReturnResourceMatch(resources, c._Resource.CardType)));
-    }
+    void SwapResources(List<Resource> resources) => SetResourceObject(allCards, c => c.SetResource(ReturnResourceMatch(resources, c._Resource.CardType)));
 
     //Sets the resource object of all resource icons
-    void SwapIcons(List<Resource> resources)
-    {
-        SetResourceObject(allIcons, i => i.SetResource(ReturnResourceMatch(resources, i.IconResource.CardType)));
-    }
+    void SwapIcons(List<Resource> resources) => SetResourceObject(allIcons, i => i.SetResource(ReturnResourceMatch(resources, i.IconResource.CardType)));
 
     //Given a list of values, performs a method to that value*
     void SetResourceObject<T>(List<T> valuesToSet, Action<T> setSomething)
@@ -277,16 +258,10 @@ public class GameManager : MonoBehaviour
     }
 
     //Checks if the player's mouse is over a resourceCard
-    RaycastHit2D IsOverCard()
-    {
-        return IsOver(cardLayer);
-    }
+    RaycastHit2D IsOverCard() => IsOver(cardLayer);
 
     //Checks if the player's mouse is over the hand
-    RaycastHit2D IsOverHandHolder()
-    {
-        return IsOver(handHolderLayer);
-    }
+    RaycastHit2D IsOverHandHolder() => IsOver(handHolderLayer);
 
     //Checks if the player's mouse is over the consumer
     RaycastHit2D IsOverResourceConsumer()
@@ -314,16 +289,10 @@ public class GameManager : MonoBehaviour
     }
     
     //Creates the object pool for choice cards
-    void CreateChoicePool()
-    {
-        CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
-    }
+    void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
 
     //Creates the object pool for encounter cards
-    void CreateEncounterPool()
-    {
-        CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
-    }
+    void CreateEncounterPool() => CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
 
     //Creates the object pool for resource cards
     void CreateResourcePool()
@@ -349,28 +318,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Instantiates an inactive pool of objects, of a given size, under a given parent
+    //Instantiates a given number of inactive objects, as a child of a given transform
     void CreateObjectPool<T>(T obj, Transform parent, int size) where T : MonoBehaviour
     {
         for (int i = 0; i < size; i++)
-        {
             CreateObject(obj, parent);
-        }
     }
 
-    //Instantiates an inactive pool of objects, of a given size, under a given parent
-    void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour
-    {
-        CreateObjectPool(obj, parent.transform, size);
-    }
+    //Instantiates a given number of inactive objects, as a child of a given gameObject
+    void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour => CreateObjectPool(obj, parent.transform, size);
 
-    //Instantiates and returns an inactive object, under a given parent, stored in a given list, and readied with a given method
-    T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour
-    {
-        return CreateObject(obj, parent.transform, setReady, list);
-    }
+    //Instantiates and returns an inactive object, as a child of a given [gameObject], stored in a given list, and readied with a given method
+    T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour => CreateObject(obj, parent.transform, setReady, list);
 
-    //Instantiates and returns an inactive object, under a given parent, stored in a given list, and readied with a given method
+    //Instantiates and returns an inactive object, as a child of a given [transform], stored in a given list, and readied with a given method
     T CreateObject<T>(T obj, Transform parent, Action<T> setReady = null, List<T> list = null) where T : MonoBehaviour
     {
         var createdObj = Instantiate(obj, parent);
@@ -385,7 +346,7 @@ public class GameManager : MonoBehaviour
     //Retrieves a number of resource cards from the resource pool and adds them to the player's hand
     void AddPoolResourcesToHand(int anomalies, int escapees, int insanities, int munitions, int rations, int scientists)
     {
-        List<ResourceCard> resourcesToAdd = new List<ResourceCard>();
+        List<ResourceCard> resourcesToAdd = new();
 
         for (int i = 0; i < resourcePool.transform.childCount; i++)
         {
@@ -400,6 +361,8 @@ public class GameManager : MonoBehaviour
                 }
             }
 
+            //This could be better written as a switch statement, but that requires some effort and ingenuity.
+            //Fine as is.
             if (card.gameObject.activeSelf == false)
             {
                 switch (card._Resource.CardType)
@@ -430,7 +393,7 @@ public class GameManager : MonoBehaviour
             AddCardToHand(resourceCard);
     }
 
-    //Retrieves a resource card from the resource pool and adds it to the player's hand
+    //Retrieves a resource card, matching a given type, from the resource pool, to the player's hand
     void AddPoolResourceToHand(ECardType resourceType)
     {
         ResourceCard cardTypeToAdd = GetFromResourcePool(resourceType);
@@ -443,7 +406,7 @@ public class GameManager : MonoBehaviour
         AddCardToHand(cardTypeToAdd);
     }
 
-    //Makes sure every resource card in the games has their data is matched to the scriptable object
+    //Ensures every active resource card's data matches their scriptable object
     void DataMatchResources()
     {
         var handAndConsumerResources = hand.Concat(consumer);
@@ -452,14 +415,14 @@ public class GameManager : MonoBehaviour
             resourceCard.DataMatchResource();
     }
 
-    //Makes sure resource cards in the consumer and hand are size appropriate for their zone
+    //Ensures resource cards in the consumer and hand are size appropriate for their current zone
     void CheckCardSizes()
     {
         CheckCardSize(hand, handHolderCardScale);
         CheckCardSize(consumer, resourceConsumerCardScale);
     }
 
-    //Makes sure all the cards in a given list are of a given size
+    //Ensures all cards in a given list are of a given size
     void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
     {
         for(int i = 0; i < listToCheck.Count; i++)
@@ -467,25 +430,25 @@ public class GameManager : MonoBehaviour
             var currentCard = listToCheck[i];
 
             if (currentCard.transform.localScale != mandatorySize)
-            {
                 currentCard.transform.localScale = mandatorySize;
-            }
         }
     }
+
+    //These comments all seem kind of redundant...
 
     //Returns the first inactive choice from the choice pool
     public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
 
-    //Returns the first inactive resource, matching a given resource type, from the resource pool
+    //Returns the first inactive resource matching a given resource type, from the resource pool
     ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c._Resource.CardType == resourceType);
 
-    //Returns the first inactive icon, matching a given resource type, from the icon pool
+    //Returns the first inactive icon matching a given resource type, from the icon pool
     public Icon GetFromIconPool(ECardType resourceType) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource.CardType == resourceType);
 
-    //Returns the first inactive icon, matching a given resource object, from the icon pool
+    //Returns the first inactive icon matching a given resource object, from the icon pool
     public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource == resource);
 
-    //Returns the first inactive object from an object pool that matches a given condition
+    //Returns the first inactive object from a given object pool that matches a given condition, if a condition is given
     private T GetTypeFromPool<T>(GameObject parent, Func<T, bool> extraCondition = null) where T : MonoBehaviour
     {
         if (!(parent.transform.childCount > 0))
@@ -502,29 +465,8 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    void AddToHolding(ResourceCard resourceCard)
-    {
-        holdingResourceCard = resourceCard;
-
-        resourceCard.transform.SetParent(null);
-
-        hand.Remove(resourceCard);
-
-        RemoveFromConsumer(resourceCard);
-    }
-
-    void AddCardToHand(ResourceCard resourceCard)
-    {
-        AddTo(resourceCard, handHolder.transform, false, handHolderCardScale);
-
-        resourceCard.IndicatorBackground.gameObject.SetActive(false);
-
-        hand.Add(resourceCard);
-
-        RemoveFromConsumer(resourceCard);
-    }
-
-    //Purpose is to remove all cards in the consumer; moves them to resource pool.
+    //Removes all cards in the consumer and moves them to the resource pool.
+    //To do : Make a method to move cards into a given pool
     void ConsumeAllCards()
     {
         while (consumer.Count > 0)
@@ -539,11 +481,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Invoked when a choice is selected:
-    //Consumes all cards in the consumer
-    //Adds 'rewards' to the player's hand
+    //Responsibility is to perform cleanup after a choice option is selected
+    //Adds rewards and consumes all cards
     //TO DO : Adds 'rewards' to the player's deck
-    void ChoiceSelection(Resource.ECardType[] choiceRewards)
+    void ChoiceSelection(ECardType[] choiceRewards)
     {
         ConsumeAllCards();
 
@@ -555,96 +496,118 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Responsible for subscribing to subscribing and calling the 'ChoiceSelection' function
+    //Ensures a choice is selected when the event is raised
     void SelectChoice()
     {
         onChoiceSelection -= ChoiceSelection;
         onChoiceSelection += ChoiceSelection;
     }
 
-    void RemoveFromConsumer(ResourceCard resourceCard)
+    void AddCardToHolding(ResourceCard resourceCard)
     {
-        if (consumer.Remove(resourceCard))
-        {
-            onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
-        }
+        holdingResourceCard = resourceCard;
+
+        AddTo(resourceCard, newParent: null, keepWorldPosition: true, hand, consumer);
+    }
+
+    void AddCardToHand(ResourceCard resourceCard)
+    {
+        AddTo(resourceCard, newParent: handHolder, keepWorldPosition: false, newLocalScale: handHolderCardScale, displayIndicator: false, addToList: hand, removeFromLists: consumer);
     }
 
     void AddCardToConsumer(ResourceCard resourceCard)
     {
-        resourceCard.IndicatorBackground.gameObject.SetActive(true);
-
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
 
-        AddTo(resourceCard, parent, false, resourceConsumerCardScale);
+        AddTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: consumer, displayIndicator: true, removeFromLists: hand);
 
-        consumer.Add(resourceCard);
-        var indicatorNum = UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
+        UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
 
         onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
-
-        hand.Remove(resourceCard);
     }
 
-    void AddTo(ResourceCard resourceCardToAdd, Transform transformParent, bool keepWorldPosition, Vector3 newLocalScale)
+    //Prepares a card to be added into a new zone
+    //Gives the card a new parent and removes it from a set of given lists
+    void AddTo(ResourceCard resourceCardToAdd, Transform newParent, bool keepWorldPosition, params List<ResourceCard>[] removeFromLists)
+    {
+        resourceCardToAdd.transform.SetParent(newParent, keepWorldPosition);
+
+        foreach (List<ResourceCard> list in removeFromLists)
+        {
+            if (list == consumer)
+                RemoveFromConsumer(resourceCardToAdd);
+
+            else if (list.Contains(resourceCardToAdd))
+                list.Remove(resourceCardToAdd);
+        }
+    }
+
+    //Prepares a card to be added into a new zone
+    //Given a resource card, sets it active, sets a new parent, sets its local position and scale, removes it from a given set of lists
+    void AddTo(ResourceCard resourceCardToAdd, GameObject newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists)
     {
         if (!resourceCardToAdd.isActiveAndEnabled)
             resourceCardToAdd.gameObject.SetActive(true);
 
-        resourceCardToAdd.transform.SetParent(transformParent, keepWorldPosition);
+        resourceCardToAdd.IndicatorBackground.gameObject.SetActive(displayIndicator);
+
+        Transform parentTransform = newParent?.transform;
+
+        AddTo(resourceCardToAdd, parentTransform, keepWorldPosition, removeFromLists);
 
         resourceCardToAdd.transform.localPosition = Vector3.zero;
 
         resourceCardToAdd.transform.localScale = newLocalScale;
-    }
 
-    int UpdateConsumerIndicators(Resource.ECardType resourceType, int indicatorNum)
-    {
-        List<ResourceCard> resourceCards = GetResourcesFromConsumer(resourceType);
-
-        indicatorNum += resourceCards.Count;
-
-        if (indicatorNum >= indicators.Count)
-            indicatorNum = indicators.Count - 1;
-
-        for (int i = 0; i < resourceCards.Count; i++)
+        foreach (List<ResourceCard> list in removeFromLists)
         {
-            var card = resourceCards[i];
-            card.IndicatorNumber.sprite = indicators[indicatorNum];
+            if (list == consumer)
+                RemoveFromConsumer(resourceCardToAdd);
+
+            else if (list.Contains(resourceCardToAdd))
+                list.Remove(resourceCardToAdd);
         }
 
-        return indicatorNum;
+        addToList?.Add(resourceCardToAdd);
     }
 
-    public List<ResourceCard> GetResourcesFromConsumer(Resource.ECardType resourceType)
+    //Same as the above, except this accepts a Transform instead of a gameObject
+    void AddTo(ResourceCard resourceCardToAdd, Transform newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists) 
+        => AddTo(resourceCardToAdd, newParent?.gameObject, keepWorldPosition, newLocalScale, addToList, displayIndicator, removeFromLists);
+
+    void RemoveFromConsumer(ResourceCard resourceCard)
+    {
+        if (consumer.Remove(resourceCard))
+            onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
+    }
+    
+    //Updates the consumer indicator of a given type, by a given amount
+    void UpdateConsumerIndicators(ECardType resourceType, int amountToAdd)
+    {
+        List<ResourceCard> typeCardsInConsumer = GetResourcesFromConsumer(resourceType);
+
+        amountToAdd += typeCardsInConsumer.Count;
+
+        if (amountToAdd >= indicators.Count)
+            amountToAdd = indicators.Count - 1;
+
+        foreach (ResourceCard card in typeCardsInConsumer)
+            card.IndicatorNumber.sprite = indicators[amountToAdd];
+    }
+
+    //Returns a list of all resource cards that match a given type in the consumer
+    public List<ResourceCard> GetResourcesFromConsumer(ECardType resourceType)
     {
         List<ResourceCard> resourceCards = new();
 
-        for (int i = 0; i < consumer.Count; i++)
-        {
-            var card = consumer[i];
-
+        foreach (ResourceCard card in consumer)
             if (card._Resource.CardType == resourceType)
-            {
                 resourceCards.Add(card);
-            }
-        }
 
         return resourceCards;
     }
 
-    void PrintHand()
-    {
-        string result = "List contents: ";
-        for(int i = 0; i < hand.Count; i++)
-        {
-            ResourceCard item = hand[i];
-
-            result += item._Resource.ToString() + ", ";
-        }
-        Debug.Log(result);
-    }
-
+    //Saves the data of the grabbed card to be used later, updates the consumer, and sets the card as the holding card
     public void GrabCard()
     {
         var isOverCard = IsOverCard();
@@ -653,9 +616,10 @@ public class GameManager : MonoBehaviour
         {
             var resourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
-            AddToHolding(resourceCard);
+            AddCardToHolding(resourceCard);
 
             regularScale = holdingResourceCard.transform.localScale;
+
             regularSortingOrder = holdingResourceCard._CanvasComponent.sortingOrder;
 
             holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
@@ -666,6 +630,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //Rewrites the data of the card to be the same as it was when grabbed, and sets it to the proper zone
     public void DropCard()
     {
         if (holdingResourceCard != null && Input.GetMouseButtonUp(0))
@@ -674,21 +639,14 @@ public class GameManager : MonoBehaviour
             holdingResourceCard._CanvasComponent.sortingOrder = regularSortingOrder;
 
             if (IsOverHandHolder() && IsOverResourceConsumer())
-            {
                 Debug.LogWarning("Mouse is over two colliders. Bug.");
-            }
 
             var resources = GetResourcesFromConsumer(holdingResourceCard._Resource.CardType);
-
             
             if (IsOverResourceConsumer() && resources.Count < 5)
-            {
                 AddCardToConsumer(holdingResourceCard);
-            }
             else
-            {
                 AddCardToHand(holdingResourceCard);
-            }
 
             holdingResourceCard = null;
         }
@@ -698,9 +656,7 @@ public class GameManager : MonoBehaviour
     public void DragCard()
     {
         if (holdingResourceCard != null)
-        {
             holdingResourceCard.transform.position = GetMousePosition();
-        }
     }
 
 
