@@ -23,6 +23,7 @@ public class EncounterDeck : MonoBehaviour
 
 
     //The purpose of this is to grab the first inactive encounter from the resourcePool and return it
+    //TO DO: I can use GameManager's [T GetTypeFromPool<T>] function instead
     EncounterCard DrawNextEncounter()
     {
         if (EncounterPool.transform.childCount <= 0)
@@ -71,12 +72,15 @@ public class EncounterDeck : MonoBehaviour
     }
 
     //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're going to likely need an 'EncounterPool' to store cards like 'Greed' or 'Questlines' when they're somewhere other than potential play, meaning the purpose of this is to send an encounterCard to the encounterPool
+    //TO DO: Create GameManager function to move to pool 
     void MoveCardToPool(EncounterCard encounterToMove)
     {
         
     }
 
     //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're likely to need an 'EncounterPool' to store encounters out of play, meaning the purpose of this is to get a reference to a specific card in the encounterPool. When we pull cards from the encounterPool we can just assign them a scriptableObject that will determine what kind of card it is.
+    //Doesn't [DrawNextEncounter] implement this already?
+    //Use GameManager's function instead
     EncounterCard GetCardFromPool(EncounterCard encounterToGet)
     {
         return null;

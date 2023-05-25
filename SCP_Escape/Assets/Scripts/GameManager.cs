@@ -11,6 +11,7 @@ using UnityEngine;
 using static Resource;
 using static UnityEditor.Progress;
 
+//TO DO: Refactor variables 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -67,9 +68,8 @@ public class GameManager : MonoBehaviour
     public Action<ECardType, bool> onCardChangeInConsumer;
     public Action<ECardType[]> onChoiceSelection;
 
-    public List<ResourceCard> hand = new List<ResourceCard>();
-    public List<ResourceCard> consumer { get; private set; } = new List<ResourceCard>();
-    public List<ResourceCard> holding = new(new ResourceCard[0]) ;
+    public List<ResourceCard> Hand { get; private set; } = new();
+    public List<ResourceCard> Consumer { get; private set; } = new List<ResourceCard>();
 
     public List<Resource> resources;
     public List<Resource> resources1;
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Adds resources to hand correlated to the nums 0 - 9
+    //Adds resources to hand correlated to the nums 1 - 9
     void DeveloperCommands()
     {
         if (Input.GetKeyDown(KeyCode.Return))
@@ -264,10 +264,7 @@ public class GameManager : MonoBehaviour
     RaycastHit2D IsOverHandHolder() => IsOver(handHolderLayer);
 
     //Checks if the player's mouse is over the consumer
-    RaycastHit2D IsOverResourceConsumer()
-    {
-        return IsOver(resourceConsumerLayer);
-    }
+    RaycastHit2D IsOverResourceConsumer() => IsOver(resourceConsumerLayer);
 
     //Checks if the player's mouse is over a certain layer
     public static RaycastHit2D IsOver(LayerMask layer)
@@ -275,6 +272,16 @@ public class GameManager : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, int.MaxValue, layer);
 
         return hit;
+    }
+
+    public static bool IsOver(LayerMask layer, Transform transformToCheck)
+    {
+        var hit = IsOver(layer);
+
+        if (hit.transform == transformToCheck)
+            return true;
+
+        return false;
     }
 
     //Returns a vector3 of the player's mouse position
@@ -288,13 +295,10 @@ public class GameManager : MonoBehaviour
         return mousePos;
     }
     
-    //Creates the object pool for choice cards
     void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
 
-    //Creates the object pool for encounter cards
     void CreateEncounterPool() => CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
 
-    //Creates the object pool for resource cards
     void CreateResourcePool()
     {
         for (int i = 0; i < resources.Count; i++)
@@ -306,7 +310,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //Creates the object pool for resource icons
     void CreateIconPool()
     {
         for (int i = 0; i < resources.Count; i++)
@@ -319,20 +322,20 @@ public class GameManager : MonoBehaviour
     }
 
     //Instantiates a given number of inactive objects, as a child of a given transform
-    void CreateObjectPool<T>(T obj, Transform parent, int size) where T : MonoBehaviour
+    public static void CreateObjectPool<T>(T obj, Transform parent, int size) where T : MonoBehaviour
     {
         for (int i = 0; i < size; i++)
             CreateObject(obj, parent);
     }
 
     //Instantiates a given number of inactive objects, as a child of a given gameObject
-    void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour => CreateObjectPool(obj, parent.transform, size);
+    public static void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour => CreateObjectPool(obj, parent.transform, size);
 
     //Instantiates and returns an inactive object, as a child of a given [gameObject], stored in a given list, and readied with a given method
-    T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour => CreateObject(obj, parent.transform, setReady, list);
+    public static T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour => CreateObject(obj, parent.transform, setReady, list);
 
     //Instantiates and returns an inactive object, as a child of a given [transform], stored in a given list, and readied with a given method
-    T CreateObject<T>(T obj, Transform parent, Action<T> setReady = null, List<T> list = null) where T : MonoBehaviour
+    public static T CreateObject<T>(T obj, Transform parent, Action<T> setReady = null, List<T> list = null) where T : MonoBehaviour
     {
         var createdObj = Instantiate(obj, parent);
         createdObj.gameObject.SetActive(false);
@@ -409,7 +412,7 @@ public class GameManager : MonoBehaviour
     //Ensures every active resource card's data matches their scriptable object
     void DataMatchResources()
     {
-        var handAndConsumerResources = hand.Concat(consumer);
+        var handAndConsumerResources = Hand.Concat(Consumer);
 
         foreach(ResourceCard resourceCard in handAndConsumerResources)
             resourceCard.DataMatchResource();
@@ -418,8 +421,8 @@ public class GameManager : MonoBehaviour
     //Ensures resource cards in the consumer and hand are size appropriate for their current zone
     void CheckCardSizes()
     {
-        CheckCardSize(hand, handHolderCardScale);
-        CheckCardSize(consumer, resourceConsumerCardScale);
+        CheckCardSize(Hand, handHolderCardScale);
+        CheckCardSize(Consumer, resourceConsumerCardScale);
     }
 
     //Ensures all cards in a given list are of a given size
@@ -449,7 +452,7 @@ public class GameManager : MonoBehaviour
     public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource == resource);
 
     //Returns the first inactive object from a given object pool that matches a given condition, if a condition is given
-    private T GetTypeFromPool<T>(GameObject parent, Func<T, bool> extraCondition = null) where T : MonoBehaviour
+    public static T GetTypeFromPool<T>(GameObject parent, Func<T, bool> extraCondition = null) where T : MonoBehaviour
     {
         if (!(parent.transform.childCount > 0))
             return null;
@@ -469,9 +472,9 @@ public class GameManager : MonoBehaviour
     //To do : Make a method to move cards into a given pool
     void ConsumeAllCards()
     {
-        while (consumer.Count > 0)
+        while (Consumer.Count > 0)
         {
-            var currentCard = consumer[0];
+            var currentCard = Consumer[0];
 
             currentCard.gameObject.SetActive(false);
 
@@ -507,19 +510,19 @@ public class GameManager : MonoBehaviour
     {
         holdingResourceCard = resourceCard;
 
-        AddTo(resourceCard, newParent: null, keepWorldPosition: true, hand, consumer);
+        AddTo(resourceCard, newParent: null, keepWorldPosition: true, Hand, Consumer);
     }
 
     void AddCardToHand(ResourceCard resourceCard)
     {
-        AddTo(resourceCard, newParent: handHolder, keepWorldPosition: false, newLocalScale: handHolderCardScale, displayIndicator: false, addToList: hand, removeFromLists: consumer);
+        AddTo(resourceCard, newParent: handHolder, keepWorldPosition: false, newLocalScale: handHolderCardScale, displayIndicator: false, addToList: Hand, removeFromLists: Consumer);
     }
 
     void AddCardToConsumer(ResourceCard resourceCard)
     {
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
 
-        AddTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: consumer, displayIndicator: true, removeFromLists: hand);
+        AddTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: Consumer, displayIndicator: true, removeFromLists: Hand);
 
         UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
 
@@ -534,7 +537,7 @@ public class GameManager : MonoBehaviour
 
         foreach (List<ResourceCard> list in removeFromLists)
         {
-            if (list == consumer)
+            if (list == Consumer)
                 RemoveFromConsumer(resourceCardToAdd);
 
             else if (list.Contains(resourceCardToAdd))
@@ -561,7 +564,7 @@ public class GameManager : MonoBehaviour
 
         foreach (List<ResourceCard> list in removeFromLists)
         {
-            if (list == consumer)
+            if (list == Consumer)
                 RemoveFromConsumer(resourceCardToAdd);
 
             else if (list.Contains(resourceCardToAdd))
@@ -577,7 +580,7 @@ public class GameManager : MonoBehaviour
 
     void RemoveFromConsumer(ResourceCard resourceCard)
     {
-        if (consumer.Remove(resourceCard))
+        if (Consumer.Remove(resourceCard))
             onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
     }
     
@@ -600,7 +603,7 @@ public class GameManager : MonoBehaviour
     {
         List<ResourceCard> resourceCards = new();
 
-        foreach (ResourceCard card in consumer)
+        foreach (ResourceCard card in Consumer)
             if (card._Resource.CardType == resourceType)
                 resourceCards.Add(card);
 
@@ -658,6 +661,9 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null)
             holdingResourceCard.transform.position = GetMousePosition();
     }
+
+
+
 
 
 }

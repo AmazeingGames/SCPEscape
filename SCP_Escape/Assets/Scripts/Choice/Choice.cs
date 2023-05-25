@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Resource;
 
 [CreateAssetMenu(menuName = "Cards/Choices")]
 public class Choice : ScriptableObject
@@ -16,15 +17,15 @@ public class Choice : ScriptableObject
 
      */
 
-    [SerializeField] Resource.ECardType[] resourceRequirements = new Resource.ECardType[6];
-    [SerializeField] Resource.ECardType[] resourceRewards = new Resource.ECardType[6];
-    [SerializeField] List<EncounterCard> cardsToAdd = new List<EncounterCard>();
+    [SerializeField] ECardType[] resourceRequirements = new ECardType[6];
+    [SerializeField] ECardType[] resourceRewards = new ECardType[6];
+    [SerializeField] List<EncounterCard> cardsToAdd = new();
     [SerializeField] bool shouldWinGame;
     [SerializeField] bool shouldLoseGame;
     [SerializeField] string flavorText;
 
-    public Resource.ECardType[] ResourceRequirements { get => resourceRequirements; private set => resourceRequirements = value; }
-    public Resource.ECardType[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
+    public ECardType[] ResourceRequirements { get => resourceRequirements; private set => resourceRequirements = value; }
+    public ECardType[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
     public List<EncounterCard> CardsToAdd { get => cardsToAdd; private set => cardsToAdd = value; }
     public bool ShouldWinGame { get => shouldWinGame; private set => shouldWinGame = value; }
     public bool ShouldLoseGame { get => shouldLoseGame; private set => shouldLoseGame = value; }

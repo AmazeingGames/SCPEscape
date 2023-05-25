@@ -58,7 +58,7 @@ public class EncounterCard : MonoBehaviour
     {
         SetAndMatchEncounter(encounter);
 
-        IsMouseOver();
+        CheckMouseOver();
         IsClicked();
 
         GetChoices();
@@ -70,33 +70,11 @@ public class EncounterCard : MonoBehaviour
         GameManager.Instance.onChoiceSelection += OnChoiceSelection;
     }
 
-    //Sets true if mouse is over this choice
-    void IsMouseOver()
-    {
-        var hit = GameManager.IsOver(encounterCardLayer);
+    //Checks if the mouse is over this card
+    void CheckMouseOver() => isMouseOver = GameManager.IsOver(encounterCardLayer, transform);
 
-
-        if (hit.transform == transform)
-        {
-            isMouseOver = true;
-            return;
-        }
-        isMouseOver = false;
-    }
-
-    //Sets true if mouse is pressed while hovering
-    //Sets false if mouse leaves or lets up
-    void IsClicked()
-    {
-        if (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0))
-        {
-            isClicked = true;
-        }
-        else
-        {
-            isClicked = false;
-        }
-    }
+    //Checks if the player is clicking on the card
+    void IsClicked() => isClicked = (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0));
 
     //Purpose is to reveal/hide choices when the encounter is clicked.
     //Choices will be initially hidden from the player, clicking the encounter reveals them and hides the encounter. Clicking the encounter again, hides the choices, and repeat.
@@ -108,13 +86,9 @@ public class EncounterCard : MonoBehaviour
         if (isClicked)
         {
             if (areChoicesRevealed)
-            {
                 ObscureChoices();
-            }
             else
-            {
                 RevealChoices();
-            }
 
             areChoicesRevealed = !areChoicesRevealed;
         }
@@ -142,16 +116,10 @@ public class EncounterCard : MonoBehaviour
     }
 
     //Purpose is to start the lerp and move the encounter out of the way to make room for the choices when they're revealed
-    void HideEncounter()
-    {
-        StartLerp(isHiding : true, lerpTo : hiddenPosition.position, newParent : GameManager.Instance.GameCanvas.transform);
-    }
+    void HideEncounter() => StartLerp(isHiding: true, lerpTo: hiddenPosition.position, newParent: GameManager.Instance.GameCanvas.transform);
 
     //Purpose is to start the lerp and move the encounter front and center
-    void RevealEncounter()
-    {
-        StartLerp(isHiding : false, lerpTo : revealedPosition.position, newParent : null);
-    }
+    void RevealEncounter() => StartLerp(isHiding : false, lerpTo : revealedPosition.position, newParent : null);
 
     //Responsible for setting the variables needed to actually lerp
     void StartLerp(bool isHiding, Vector2 lerpTo, Transform newParent)
@@ -186,15 +154,14 @@ public class EncounterCard : MonoBehaviour
                 canBeClicked = true;
                 shouldLerp = false;
 
+                Transform newParent;
+
                 if (isHiding)
-                {
-                    //MoveChoices(setActive: true);
-                    transform.SetParent(GameManager.Instance.GameCanvas.transform, false);
-                }
+                    newParent = GameManager.Instance.GameCanvas.transform;
                 else
-                {
-                    transform.SetParent(GameManager.Instance.Choices.transform, false);
-                }
+                    newParent = GameManager.Instance.Choices.transform;
+
+                transform.SetParent(newParent, false);
             }
         }
     }
@@ -215,29 +182,16 @@ public class EncounterCard : MonoBehaviour
         }
     }
 
-    //Grabs the empty choices from the GameManager'a pool and supplies them with choice data and puts them into a list.
+    //Grabs the empty choices from the GameManager's pool and supplies them with choice data and puts them into a list.
     void GetChoices()
     {
-        //if (IsActiveChoice && choiceCards.Count <= 0)
         if (choiceCards.Count <= 0)
         {
             for (int i = 0; i < encounter.Choices.Count; i++)
             {
                 ChoiceCard currentChoiceCard = GameManager.Instance.GetFromChoicePool();
 
-                if (currentChoiceCard == null)
-                {
-                    Debug.Log("null");
-                    break;
-                }
-
                 Choice currentChoice = encounter.Choices[i];
-
-                if (currentChoice == null)
-                {
-                    Debug.Log("null1");
-                    break;
-                }
 
                 choiceCards.Add(currentChoiceCard);
                 currentChoiceCard.SetChoice(currentChoice);

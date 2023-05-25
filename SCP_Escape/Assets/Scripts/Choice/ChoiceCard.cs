@@ -8,7 +8,9 @@ using System.Linq;
 using Mono.Cecil;
 using Unity.VisualScripting;
 using UnityEngine.UI;
+using static Resource;
 
+//TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
 public class ChoiceCard : MonoBehaviour
 {
     /* Things a Choice Card GameObject Needs:
@@ -45,17 +47,17 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] Image cardColorOverlay;
     [SerializeField] Image borderColorOverlay;
 
-    List<Resource.ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.consumer);
+    List<ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.Consumer);
 
-    List<Resource.ECardType> overlappingConsumerTypes;
+    List<ECardType> overlappingConsumerTypes;
 
     readonly List<Icon> iconResourceRequirements = new();
 
     public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
 
-    public Choice _Choice { get => choice; private set => choice = value; }
+    public Choice Choice { get => choice; private set => choice = value; }
 
-    public bool _IsReady { get; private set; } = false;
+    public bool IsReady { get; private set; } = false;
     bool isMouseOver = false;
 
     bool isMouseHolding = false;
@@ -70,7 +72,7 @@ public class ChoiceCard : MonoBehaviour
         //Sets important variables
         IsMouseOver();
         IsMouseHolding();
-        IsReady();
+        SetIsReady();
 
         //Updates based on those variables
         SetState();
@@ -91,7 +93,7 @@ public class ChoiceCard : MonoBehaviour
     //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
     void SelectChoice()
     {
-        if (isMouseOver && Input.GetMouseButtonUp(0) && _IsReady)
+        if (isMouseOver && Input.GetMouseButtonUp(0) && IsReady)
         {
             Debug.Log($"Invoked Choice {flavorText.text}");
             GameManager.Instance.onChoiceSelection?.Invoke(choice.ResourceRewards);
@@ -132,24 +134,11 @@ public class ChoiceCard : MonoBehaviour
         borderColorOverlay.color = borderColor;
     }
 
-    void SetColor(Color cardColor)
-    {
-        cardColorOverlay.color = cardColor;
-    }
+    void SetColor(Color cardColor) => cardColorOverlay.color = cardColor;
 
     
     //Sets true if mouse is over this choice
-    void IsMouseOver()
-    {
-        var hit = GameManager.IsOver(choiceCardLayer);
-
-        if (hit.transform == transform)
-        {
-            isMouseOver = true;
-            return;
-        }
-        isMouseOver = false;
-    }
+    void IsMouseOver() => isMouseOver = GameManager.IsOver(choiceCardLayer, transform);
 
     //Sets true if mouse is pressed while hovering
     //Sets false if mouse leaves or lets up
@@ -170,41 +159,36 @@ public class ChoiceCard : MonoBehaviour
     //Sets the enum 'ChoiceState', based on whether the requirements have been fulfilled, and determines if it is ready to be selected
     void SetState()
     {
-        if (_IsReady)
-        {
+        if (IsReady)
             ChoiceState = EChoiceState.Ready;
-        }
         else
-        {
             ChoiceState = EChoiceState.Unready;
-        }
     }
 
 
     //Checks if the consumer contains the correct resources based on the choice's required resources
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
-    void IsReady()
+    void SetIsReady()
     {
         var consumerTypes = CardTypesInConsumer;
         var requirementTypes = choice.ResourceRequirements.ToList();
 
         if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
         {
-            //Debug.Log("Lists are empty");
-            _IsReady = false;
+            IsReady = false;
             return;
         }
 
         overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
 
         int overlappingElementsCount = overlappingConsumerTypes.Count();
-        
-        _IsReady = (overlappingElementsCount == requirementTypes.Count() && consumerTypes.Count() == requirementTypes.Count());
+
+        IsReady = (consumerTypes.Count() == requirementTypes.Count() && overlappingElementsCount == requirementTypes.Count());
     }
 
     //Sets the value of 'isReady' for one of the icon requirements based on the given paramates
     //Called whenever a state change occurs in the consumer via an event
-    void ReadyIcon(Resource.ECardType resourceType, bool setReady)
+    void ReadyIcon(ECardType resourceType, bool setReady)
     {
         //Makes sure if there are more cards than requirements, removing one won't change any of the icons' status
         if (!setReady)
@@ -213,12 +197,11 @@ public class ChoiceCard : MonoBehaviour
             int resourceTypeCountInConsumer = GameManager.Instance.GetResourcesFromConsumer(resourceType).Count;
 
             if (resourceTypeCountInConsumer >= resourceTypeCountInRequirements)
-            {
                 return;
-            }
         }
 
         //Responsible for setting the value of the Icon
+        //TO DO: If possible, decrease code nesting
         Debug.Log($"Set readied icon.");
         for (int i = 0; i < iconResourceRequirements.Count; i++)
         {
@@ -233,9 +216,7 @@ public class ChoiceCard : MonoBehaviour
                     {
                         var nextIcon = iconResourceRequirements[i + 1];
                         if (!setReady && nextIcon.ResourceType == resourceType && nextIcon.IsReady != setReady)
-                        {
                             shouldSet = false;
-                        }
                     }
 
                     if (shouldSet)
@@ -248,7 +229,7 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-
+    //Gets a list of all icons from requirements that match the given type
     public List<Icon> GetIconsOfTypeFromRequirements(Resource.ECardType resourceType)
     {
         List<Icon> IconResources = new();
@@ -258,18 +239,13 @@ public class ChoiceCard : MonoBehaviour
             Icon icon = iconResourceRequirements[i];
 
             if (icon.ResourceType == resourceType)
-            {
                 IconResources.Add(icon);
-            }
         }
 
         return IconResources;
     }
 
-    public void SetChoice(Choice choice)
-    {
-        this.choice = choice;
-    }
+    public void SetChoice(Choice choice) => this.choice = choice;
 
     //Reads the data of the 'choice' scriptable object and sets the 'choiceCard' variables to match
     void DataMatchChoice()
@@ -293,24 +269,14 @@ public class ChoiceCard : MonoBehaviour
     {
         int actualValues = 0;
 
-        for (int i = 0; i < choice.ResourceRewards.Length; i++)
-        {
-            var reward = choice.ResourceRewards[i];
-
+        foreach (ECardType reward in choice.ResourceRewards)
             if (IsEnumValueValid(reward))
                 actualValues++;
-        }
 
         if (actualValues > 0)
-        {
             rewardText.gameObject.SetActive(false);
-        }
         else
-        {
             rewardsHolder.SetActive(false);
-        }
-
-
     }
 
     //
@@ -321,11 +287,11 @@ public class ChoiceCard : MonoBehaviour
     }
 
     //
-    void SetIcons(Resource.ECardType[] listRefernce, Transform parent, List<Icon> listToAdd)
+    void SetIcons(ECardType[] listRefernce, Transform parent, List<Icon> listToAdd)
     {
         for (int i = 0; i < listRefernce.Length; i++)
         {
-            Resource.ECardType currentResourceType = listRefernce[i];
+            ECardType currentResourceType = listRefernce[i];
 
             if (!IsEnumValueValid(currentResourceType))
             {
@@ -342,15 +308,23 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-    //
+    //I have no clue what this does or what it's for; but it's probably important
     static bool IsEnumValueValid(Enum enumeration)
     {
-        bool returnValue = Enum.IsDefined(enumeration.GetType(), enumeration);
+        bool isDefined = Enum.IsDefined(enumeration.GetType(), enumeration);
 
-        return returnValue;
+        Debug.Log($"Enumeration: {enumeration}. Enumeration.GetType() : {enumeration.GetType()}. IsDefined : {isDefined}");
+
+        //Enum.IsDefined checks if a value is contatined in an enumeration; but that still doesn't explain what this code is for
+        //Why would/wouldn't converting an Enum to a type make it no longer contained in the enumeration?
+        //What is the usefulness from this check??
+
+        return isDefined;
     }
+        
 
     //
+    //Consider using string builder class instead
     string GetRewardText()
     {
         if (choice.ResourceRewards.Count() > 0)
