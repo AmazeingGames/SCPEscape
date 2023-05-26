@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static GameManager;
 
 public class Icon : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Icon : MonoBehaviour
 
     void Start()
     {
-        GameManager.Instance.AddIcon(this);   
+        Manager.AddIcon(this);   
     }
 
     void Update()

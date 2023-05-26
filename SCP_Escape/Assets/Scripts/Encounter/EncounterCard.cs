@@ -5,6 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using static GameManager;
 
 public class EncounterCard : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class EncounterCard : MonoBehaviour
     Transform hiddenPosition;
     Transform revealedPosition;
 
-    GameObject Nodes => GameManager.Instance.Nodes;
+    GameObject Nodes => Manager.Nodes;
 
     /* Functionality of the Encounter Card:
      * Clicking on the card will slide the encounter to the side and reveal the associated choice cards
@@ -66,8 +67,8 @@ public class EncounterCard : MonoBehaviour
         MoveCards();
         LerpTo();
 
-        GameManager.Instance.onChoiceSelection -= OnChoiceSelection;
-        GameManager.Instance.onChoiceSelection += OnChoiceSelection;
+        Manager.onChoiceSelection -= OnChoiceSelection;
+        Manager.onChoiceSelection += OnChoiceSelection;
     }
 
     //Checks if the mouse is over this card
@@ -116,7 +117,7 @@ public class EncounterCard : MonoBehaviour
     }
 
     //Purpose is to start the lerp and move the encounter out of the way to make room for the choices when they're revealed
-    void HideEncounter() => StartLerp(isHiding: true, lerpTo: hiddenPosition.position, newParent: GameManager.Instance.GameCanvas.transform);
+    void HideEncounter() => StartLerp(isHiding: true, lerpTo: hiddenPosition.position, newParent: Manager.GameCanvas.transform);
 
     //Purpose is to start the lerp and move the encounter front and center
     void RevealEncounter() => StartLerp(isHiding : false, lerpTo : revealedPosition.position, newParent : null);
@@ -157,9 +158,9 @@ public class EncounterCard : MonoBehaviour
                 Transform newParent;
 
                 if (isHiding)
-                    newParent = GameManager.Instance.GameCanvas.transform;
+                    newParent = Manager.GameCanvas.transform;
                 else
-                    newParent = GameManager.Instance.Choices.transform;
+                    newParent = Manager.Choices.transform;
 
                 transform.SetParent(newParent, false);
             }
@@ -178,7 +179,7 @@ public class EncounterCard : MonoBehaviour
             ChoiceCard currentChoiceCard = choiceCards[i];
 
             currentChoiceCard.gameObject.SetActive(setActive);
-            currentChoiceCard.transform.SetParent(GameManager.Instance.Choices.transform);
+            currentChoiceCard.transform.SetParent(Manager.Choices.transform);
         }
     }
 
@@ -189,7 +190,7 @@ public class EncounterCard : MonoBehaviour
         {
             for (int i = 0; i < encounter.Choices.Count; i++)
             {
-                ChoiceCard currentChoiceCard = GameManager.Instance.GetFromChoicePool();
+                ChoiceCard currentChoiceCard = Manager.GetFromChoicePool();
 
                 Choice currentChoice = encounter.Choices[i];
 

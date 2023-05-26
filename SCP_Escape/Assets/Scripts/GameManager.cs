@@ -14,7 +14,7 @@ using static UnityEditor.Progress;
 //TO DO: Refactor variables 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static GameManager Manager;
 
     GameObject resourcePool;
     GameObject handHolder;
@@ -94,10 +94,10 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        if (Manager == null)
+            Manager = this;
         else
-            Destroy(Instance);
+            Destroy(Manager);
 
         handHolder = GameObject.Find("HandHolder");
         resourcePool = GameObject.Find("ResourcePool");
@@ -302,23 +302,15 @@ public class GameManager : MonoBehaviour
     void CreateResourcePool()
     {
         for (int i = 0; i < resources.Count; i++)
-        {
             for (int n = 0; n < resourcePoolSize; n++)
-            {
                 CreateObject(obj: resourceCard, parent: resourcePool, setReady: card => card.SetResource(resources[i]), list: allCards);
-            }
-        }
     }
 
     void CreateIconPool()
     {
         for (int i = 0; i < resources.Count; i++)
-        {
             for (int n = 0; n < iconPoolSize; n++)
-            {
                 CreateObject(obj: icon, parent: iconPool, setReady: icon => icon.SetResource(resources[i]), list: allIcons);
-            }
-        }
     }
 
     //Instantiates a given number of inactive objects, as a child of a given transform
@@ -347,7 +339,7 @@ public class GameManager : MonoBehaviour
     }
 
     //Retrieves a number of resource cards from the resource pool and adds them to the player's hand
-    void AddPoolResourcesToHand(int anomalies, int escapees, int insanities, int munitions, int rations, int scientists)
+    void AddPoolResourcesToHand(int anomalies = 0, int escapees = 0, int insanities = 0, int munitions = 0, int rations = 0, int scientists = 0)
     {
         List<ResourceCard> resourcesToAdd = new();
 
@@ -364,10 +356,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            //This could be better written as a switch statement, but that requires some effort and ingenuity.
-            //Fine as is.
             if (card.gameObject.activeSelf == false)
-            {
                 switch (card._Resource.CardType)
                 {
                     case ECardType.Anomaly:
@@ -389,11 +378,10 @@ public class GameManager : MonoBehaviour
                         AddResourceIfAvailable(ref scientists);
                         break;
                 }
-            }
         }
 
         foreach (ResourceCard resourceCard in resourcesToAdd)
-            AddCardToHand(resourceCard);
+            MoveCardToHand(resourceCard);
     }
 
     //Retrieves a resource card, matching a given type, from the resource pool, to the player's hand
@@ -406,7 +394,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Card to Add is null; no more cards in resource pool to add.");
             return;
         }
-        AddCardToHand(cardTypeToAdd);
+        MoveCardToHand(cardTypeToAdd);
     }
 
     //Ensures every active resource card's data matches their scriptable object
@@ -452,7 +440,7 @@ public class GameManager : MonoBehaviour
     public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource == resource);
 
     //Returns the first inactive object from a given object pool that matches a given condition, if a condition is given
-    public static T GetTypeFromPool<T>(GameObject parent, Func<T, bool> extraCondition = null) where T : MonoBehaviour
+    public static T GetTypeFromPool<T>(GameObject parent, Predicate<T> extraCondition = null) where T : MonoBehaviour
     {
         if (!(parent.transform.childCount > 0))
             return null;
@@ -476,11 +464,7 @@ public class GameManager : MonoBehaviour
         {
             var currentCard = Consumer[0];
 
-            currentCard.gameObject.SetActive(false);
-
-            currentCard.transform.SetParent(resourcePool.transform);
-
-            RemoveFromConsumer(currentCard);
+            MoveToPool(currentCard, newParent: resourcePool, cleanup: RemoveFromConsumer);
         }
     }
 
@@ -506,77 +490,82 @@ public class GameManager : MonoBehaviour
         onChoiceSelection += ChoiceSelection;
     }
 
-    void AddCardToHolding(ResourceCard resourceCard)
+    void MoveToPool<T>(T objectToMove, GameObject newParent, Action<T> cleanup = null) where T : MonoBehaviour
+    {
+        cleanup?.Invoke(objectToMove);
+
+        objectToMove.gameObject.SetActive(false);
+
+        objectToMove.transform.SetParent(newParent.transform);
+    }
+
+    void MoveCardToHolding(ResourceCard resourceCard)
     {
         holdingResourceCard = resourceCard;
 
-        AddTo(resourceCard, newParent: null, keepWorldPosition: true, Hand, Consumer);
+        MoveTo(resourceCard, newParent: null, keepWorldPosition: true, Hand, Consumer);
     }
 
-    void AddCardToHand(ResourceCard resourceCard)
+    void MoveCardToHand(ResourceCard resourceCard)
     {
-        AddTo(resourceCard, newParent: handHolder, keepWorldPosition: false, newLocalScale: handHolderCardScale, displayIndicator: false, addToList: Hand, removeFromLists: Consumer);
+        MoveTo(resourceCard, newParent: handHolder, keepWorldPosition: false, newLocalScale: handHolderCardScale, displayIndicator: false, addToList: Hand, removeFromLists: Consumer);
     }
 
-    void AddCardToConsumer(ResourceCard resourceCard)
+    void MoveCardToConsumer(ResourceCard resourceCard)
     {
         var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
 
-        AddTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: Consumer, displayIndicator: true, removeFromLists: Hand);
+        MoveTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: Consumer, displayIndicator: true, removeFromLists: Hand);
 
         UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
 
         onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
     }
 
+
     //Prepares a card to be added into a new zone
     //Gives the card a new parent and removes it from a set of given lists
-    void AddTo(ResourceCard resourceCardToAdd, Transform newParent, bool keepWorldPosition, params List<ResourceCard>[] removeFromLists)
+    void MoveTo(ResourceCard resourceCardToMove, Transform newParent, bool keepWorldPosition, params List<ResourceCard>[] removeFromLists)
     {
-        resourceCardToAdd.transform.SetParent(newParent, keepWorldPosition);
+        resourceCardToMove.transform.SetParent(newParent, keepWorldPosition);
 
         foreach (List<ResourceCard> list in removeFromLists)
         {
             if (list == Consumer)
-                RemoveFromConsumer(resourceCardToAdd);
+                RemoveFromConsumer(resourceCardToMove);
 
-            else if (list.Contains(resourceCardToAdd))
-                list.Remove(resourceCardToAdd);
+            else if (list.Contains(resourceCardToMove))
+                list.Remove(resourceCardToMove);
         }
     }
 
     //Prepares a card to be added into a new zone
     //Given a resource card, sets it active, sets a new parent, sets its local position and scale, removes it from a given set of lists
-    void AddTo(ResourceCard resourceCardToAdd, GameObject newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists)
+    void MoveTo(ResourceCard resourceCardToMove, GameObject newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists)
     {
-        if (!resourceCardToAdd.isActiveAndEnabled)
-            resourceCardToAdd.gameObject.SetActive(true);
+        if (!resourceCardToMove.isActiveAndEnabled)
+            resourceCardToMove.gameObject.SetActive(true);
 
-        resourceCardToAdd.IndicatorBackground.gameObject.SetActive(displayIndicator);
+        resourceCardToMove.IndicatorBackground.gameObject.SetActive(displayIndicator);
 
-        Transform parentTransform = newParent?.transform;
+        Transform transform = newParent == null ? null : newParent.transform;
 
-        AddTo(resourceCardToAdd, parentTransform, keepWorldPosition, removeFromLists);
+        MoveTo(resourceCardToMove, transform, keepWorldPosition, removeFromLists);
 
-        resourceCardToAdd.transform.localPosition = Vector3.zero;
+        resourceCardToMove.transform.localPosition = Vector3.zero;
 
-        resourceCardToAdd.transform.localScale = newLocalScale;
+        resourceCardToMove.transform.localScale = newLocalScale;
 
-        foreach (List<ResourceCard> list in removeFromLists)
-        {
-            if (list == Consumer)
-                RemoveFromConsumer(resourceCardToAdd);
-
-            else if (list.Contains(resourceCardToAdd))
-                list.Remove(resourceCardToAdd);
-        }
-
-        addToList?.Add(resourceCardToAdd);
+        addToList?.Add(resourceCardToMove);
     }
 
     //Same as the above, except this accepts a Transform instead of a gameObject
-    void AddTo(ResourceCard resourceCardToAdd, Transform newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists) 
-        => AddTo(resourceCardToAdd, newParent?.gameObject, keepWorldPosition, newLocalScale, addToList, displayIndicator, removeFromLists);
+    void MoveTo(ResourceCard resourceCardToMove, Transform newParent, bool keepWorldPosition, Vector3 newLocalScale, List<ResourceCard> addToList, bool displayIndicator, params List<ResourceCard>[] removeFromLists)
+    {
+        GameObject gameObject = newParent == null ? null : newParent.gameObject;
+
+        MoveTo(resourceCardToMove, gameObject, keepWorldPosition, newLocalScale, addToList, displayIndicator, removeFromLists);
+    }
 
     void RemoveFromConsumer(ResourceCard resourceCard)
     {
@@ -619,7 +608,7 @@ public class GameManager : MonoBehaviour
         {
             var resourceCard = isOverCard.transform.gameObject.GetComponent<ResourceCard>();
 
-            AddCardToHolding(resourceCard);
+            MoveCardToHolding(resourceCard);
 
             regularScale = holdingResourceCard.transform.localScale;
 
@@ -647,9 +636,9 @@ public class GameManager : MonoBehaviour
             var resources = GetResourcesFromConsumer(holdingResourceCard._Resource.CardType);
             
             if (IsOverResourceConsumer() && resources.Count < 5)
-                AddCardToConsumer(holdingResourceCard);
+                MoveCardToConsumer(holdingResourceCard);
             else
-                AddCardToHand(holdingResourceCard);
+                MoveCardToHand(holdingResourceCard);
 
             holdingResourceCard = null;
         }
@@ -661,9 +650,4 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null)
             holdingResourceCard.transform.position = GetMousePosition();
     }
-
-
-
-
-
 }

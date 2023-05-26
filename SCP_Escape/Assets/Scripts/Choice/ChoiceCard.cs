@@ -9,6 +9,7 @@ using Mono.Cecil;
 using Unity.VisualScripting;
 using UnityEngine.UI;
 using static Resource;
+using static GameManager;
 
 //TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
 public class ChoiceCard : MonoBehaviour
@@ -47,7 +48,7 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] Image cardColorOverlay;
     [SerializeField] Image borderColorOverlay;
 
-    List<ECardType> CardTypesInConsumer => GameManager.ConvertResourceCardListToResourceType(GameManager.Instance.Consumer);
+    List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
     List<ECardType> overlappingConsumerTypes;
 
@@ -86,8 +87,8 @@ public class ChoiceCard : MonoBehaviour
     //Calls the ReadyIcon func whenever a card is changed in the GameManager
     void UpdateIcon()
     {
-        GameManager.Instance.onCardChangeInConsumer -= ReadyIcon;
-        GameManager.Instance.onCardChangeInConsumer += ReadyIcon;
+        Manager.onCardChangeInConsumer -= ReadyIcon;
+        Manager.onCardChangeInConsumer += ReadyIcon;
     }
 
     //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
@@ -96,7 +97,7 @@ public class ChoiceCard : MonoBehaviour
         if (isMouseOver && Input.GetMouseButtonUp(0) && IsReady)
         {
             Debug.Log($"Invoked Choice {flavorText.text}");
-            GameManager.Instance.onChoiceSelection?.Invoke(choice.ResourceRewards);
+            Manager.onChoiceSelection?.Invoke(choice.ResourceRewards);
         }
     }
 
@@ -194,7 +195,7 @@ public class ChoiceCard : MonoBehaviour
         if (!setReady)
         {
             int resourceTypeCountInRequirements = GetIconsOfTypeFromRequirements(resourceType).Count;
-            int resourceTypeCountInConsumer = GameManager.Instance.GetResourcesFromConsumer(resourceType).Count;
+            int resourceTypeCountInConsumer = Manager.GetResourcesFromConsumer(resourceType).Count;
 
             if (resourceTypeCountInConsumer >= resourceTypeCountInRequirements)
                 return;
@@ -230,7 +231,7 @@ public class ChoiceCard : MonoBehaviour
     }
 
     //Gets a list of all icons from requirements that match the given type
-    public List<Icon> GetIconsOfTypeFromRequirements(Resource.ECardType resourceType)
+    public List<Icon> GetIconsOfTypeFromRequirements(ECardType resourceType)
     {
         List<Icon> IconResources = new();
 
@@ -299,7 +300,7 @@ public class ChoiceCard : MonoBehaviour
                 break;
             }
 
-            var setIcon = GameManager.Instance.GetFromIconPool(currentResourceType);
+            var setIcon = Manager.GetFromIconPool(currentResourceType);
 
             setIcon.gameObject.SetActive(true);
             setIcon.transform.SetParent(parent);

@@ -3,15 +3,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GameManager;
 
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
 public class EncounterDeck : MonoBehaviour
 {
     public static EncounterDeck Instance { get; private set; }
 
-    GameObject EncounterPool => GameManager.Instance.EncounterPool;
+    GameObject EncounterPool => Manager.EncounterPool;
 
-    List<Encounter> _EncounterDeck => GameManager.Instance.EncounterDeck;
+    List<Encounter> EncounterPile => Manager.EncounterDeck;
 
     void Awake()
     {
@@ -22,29 +23,21 @@ public class EncounterDeck : MonoBehaviour
     }
 
 
-    //The purpose of this is to grab the first inactive encounter from the resourcePool and return it
-    //TO DO: I can use GameManager's [T GetTypeFromPool<T>] function instead
+    //The purpose of this is to grab from the encounter pool and set it to an encounter
     EncounterCard DrawNextEncounter()
     {
-        if (EncounterPool.transform.childCount <= 0)
+        if (Manager.EncounterDeck.Count <= 0)
             return null;
 
-        if (GameManager.Instance.EncounterDeck.Count <= 0)
-            return null;
+        EncounterCard encounter = GetFromEncounterPool();
 
-        for (int i = 0; i < EncounterPool.transform.childCount; i++)
-        {
-            EncounterCard nextEncounter = EncounterPool.transform.GetChild(i).GetComponent<EncounterCard>();
+        if (encounter != null)
+            encounter.SetAndMatchEncounter(EncounterPile[0]);
 
-            if (nextEncounter.gameObject.activeSelf == false)
-            {
-                nextEncounter.SetAndMatchEncounter(_EncounterDeck[0]);
-
-                return nextEncounter;
-            }
-        }
-        return null;
+        return encounter;
     }
+
+    EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);
 
     //Purpose it to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
     //Creates the illusion we're discarding and drawing the same cards or altered cards
@@ -78,12 +71,6 @@ public class EncounterDeck : MonoBehaviour
         
     }
 
-    //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're likely to need an 'EncounterPool' to store encounters out of play, meaning the purpose of this is to get a reference to a specific card in the encounterPool. When we pull cards from the encounterPool we can just assign them a scriptableObject that will determine what kind of card it is.
-    //Doesn't [DrawNextEncounter] implement this already?
-    //Use GameManager's function instead
-    EncounterCard GetCardFromPool(EncounterCard encounterToGet)
-    {
-        return null;
-    }
+    
 
 }
