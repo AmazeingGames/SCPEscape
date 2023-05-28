@@ -5,11 +5,11 @@ using UnityEngine;
 using TMPro;
 using System.Runtime.CompilerServices;
 using System.Linq;
-using Mono.Cecil;
 using Unity.VisualScripting;
 using UnityEngine.UI;
 using static Resource;
 using static GameManager;
+using static System.Type;
 
 //TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
 public class ChoiceCard : MonoBehaviour
@@ -52,7 +52,7 @@ public class ChoiceCard : MonoBehaviour
 
     List<ECardType> overlappingConsumerTypes;
 
-    readonly List<Icon> iconResourceRequirements = new();
+    readonly List<IconHolder> iconResourceRequirements = new();
 
     public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
 
@@ -206,23 +206,25 @@ public class ChoiceCard : MonoBehaviour
         Debug.Log($"Set readied icon.");
         for (int i = 0; i < iconResourceRequirements.Count; i++)
         {
-            Icon currentIcon = iconResourceRequirements[i];
+            IconHolder currentIconHolder = iconResourceRequirements[i];
 
-            if (currentIcon.ResourceType == resourceType)
+            if (currentIconHolder.ContainsType(resourceType))
             {
                 bool shouldSet = true;
-                if (currentIcon.IsReady != setReady)
+
+                if (currentIconHolder.IsAnyIconReady != setReady)
                 {
                     if (i + 1 < iconResourceRequirements.Count)
                     {
-                        var nextIcon = iconResourceRequirements[i + 1];
-                        if (!setReady && nextIcon.ResourceType == resourceType && nextIcon.IsReady != setReady)
+                        var nextIconHolder = iconResourceRequirements[i + 1];
+
+                        if (!setReady && nextIconHolder.ContainsType(resourceType) && currentIconHolder.IsAnyIconReady != setReady)
                             shouldSet = false;
                     }
 
                     if (shouldSet)
                     {
-                        currentIcon.SetReady(setReady);
+                        currentIconHolder.SetReady(setReady);
                         break;
                     }
                 }
@@ -231,16 +233,16 @@ public class ChoiceCard : MonoBehaviour
     }
 
     //Gets a list of all icons from requirements that match the given type
-    public List<Icon> GetIconsOfTypeFromRequirements(ECardType resourceType)
+    public List<IconHolder> GetIconsOfTypeFromRequirements(ECardType resourceType)
     {
-        List<Icon> IconResources = new();
+        List<IconHolder> IconResources = new();
 
         for (int i = 0; i < iconResourceRequirements.Count; i++)
         {
-            Icon icon = iconResourceRequirements[i];
+            IconHolder iconHolder = iconResourceRequirements[i];
 
-            if (icon.ResourceType == resourceType)
-                IconResources.Add(icon);
+            if (iconHolder.ContainsType(resourceType))
+                IconResources.Add(iconHolder);
         }
 
         return IconResources;
@@ -288,10 +290,12 @@ public class ChoiceCard : MonoBehaviour
     }
 
     //
-    void SetIcons(ECardType[] listRefernce, Transform parent, List<Icon> listToAdd)
+    void SetIcons(ECardType[] listRefernce, Transform parent, List<IconHolder> listToAdd)
     {
+        Debug.Log("This code ran 1");
         for (int i = 0; i < listRefernce.Length; i++)
         {
+            Debug.Log("This code ran 2");
             ECardType currentResourceType = listRefernce[i];
 
             if (!IsEnumValueValid(currentResourceType))
@@ -299,13 +303,29 @@ public class ChoiceCard : MonoBehaviour
                 Debug.Log($"Left loop at i = {i}");
                 break;
             }
+            Debug.Log("This code ran 3");
 
-            var setIcon = Manager.GetFromIconPool(currentResourceType);
+            foreach (ECardType type in Enum.GetValues(typeof(ECardType)).Cast<ECardType>().ToList())
+            {
+                Debug.Log(type.ToString());
+                Debug.Log(Manager.TypeToResource[type]);
+            }
 
-            setIcon.gameObject.SetActive(true);
-            setIcon.transform.SetParent(parent);
+            Resource resource = Manager.TypeToResource[currentResourceType];
 
-            listToAdd?.Add(setIcon);
+            IconHolder setIconHolder = Manager.GetFromIconHolderPool(resource);
+
+            Debug.Log("This code ran 4");
+
+            setIconHolder.gameObject.SetActive(true);
+            setIconHolder.transform.SetParent(parent);
+
+            Debug.Log("This code ran 5");
+
+            listToAdd?.Add(setIconHolder);
+
+            Debug.Log("This code ran 6");
+
         }
     }
 

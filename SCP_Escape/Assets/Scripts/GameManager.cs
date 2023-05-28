@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     GameObject handHolder;
     GameObject resourceConsumer;
     GameObject iconPool;
+    GameObject iconHolderPool;
 
     public GameObject Nodes { get; private set; }
     public GameObject ChoicePool { get; private set; }
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] int choicePoolSize;
     [SerializeField] int iconPoolSize;
+    [SerializeField] int iconHolderPoolSize;
     [SerializeField] Icon icon;
 
     [SerializeField] float holdingCardScaleMultiplier;
@@ -48,6 +50,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] LayerMask cardLayer;
     [SerializeField] int resourcePoolSize;
     [SerializeField] ResourceCard resourceCard;
+    [SerializeField] IconHolder iconHolder;
 
     [SerializeField] Resource ration;
     [SerializeField] Resource escapee;
@@ -62,6 +65,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Resource insanity1;
     [SerializeField] Resource munition1;
     [SerializeField] Resource anomaly1;
+
+    public Dictionary<ECardType, Resource> TypeToResource { get; private set; } = new();
 
     public bool hasAddedResources = false;
 
@@ -99,11 +104,15 @@ public class GameManager : MonoBehaviour
         else
             Destroy(Manager);
 
+        TypeToResource = new Dictionary<ECardType, Resource>();
+
         handHolder = GameObject.Find("HandHolder");
         resourcePool = GameObject.Find("ResourcePool");
         resourceConsumer = GameObject.Find("ResourceConsumer");
         ChoicePool = GameObject.Find("ChoicePool");
         iconPool = GameObject.Find("IconPool");
+        iconHolderPool = GameObject.Find("IconHolderPool");
+
         EncounterPool = GameObject.Find("EncounterPool");
         Choices = GameObject.Find("Choices");
         GameCanvas = GameObject.Find("GameCanvas");
@@ -116,6 +125,17 @@ public class GameManager : MonoBehaviour
         CreateResourcePool();
         CreateIconPool();
         CreateChoicePool();
+        CreateIconHolderPool();
+
+        TypeToResource = new Dictionary<ECardType, Resource>()
+        {
+            { ECardType.Anomaly  ,  anomaly1    },
+            { ECardType.Escapee  ,  escapee1    },
+            { ECardType.Insanity ,  insanity1   },
+            { ECardType.Munition ,  munition1   },
+            { ECardType.Ration   ,  ration1     },
+            { ECardType.Scientist,  scientist1  },
+        };
     }
 
     void Start()
@@ -257,6 +277,8 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    #region Mouse Check
+
     //Checks if the player's mouse is over a resourceCard
     RaycastHit2D IsOverCard() => IsOver(cardLayer);
 
@@ -294,7 +316,10 @@ public class GameManager : MonoBehaviour
 
         return mousePos;
     }
-    
+
+    #endregion
+
+    #region Create Objects & Pools
     void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
 
     void CreateEncounterPool() => CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
@@ -305,6 +330,8 @@ public class GameManager : MonoBehaviour
             for (int n = 0; n < resourcePoolSize; n++)
                 CreateObject(obj: resourceCard, parent: resourcePool, setReady: card => card.SetResource(resources[i]), list: allCards);
     }
+
+    void CreateIconHolderPool() => CreateObjectPool(obj: iconHolder, parent: iconHolderPool, iconHolderPoolSize);
 
     void CreateIconPool()
     {
@@ -337,6 +364,7 @@ public class GameManager : MonoBehaviour
 
         return createdObj;
     }
+    #endregion
 
     //Retrieves a number of resource cards from the resource pool and adds them to the player's hand
     void AddPoolResourcesToHand(int anomalies = 0, int escapees = 0, int insanities = 0, int munitions = 0, int rations = 0, int scientists = 0)
@@ -411,27 +439,40 @@ public class GameManager : MonoBehaviour
     {
         CheckCardSize(Hand, handHolderCardScale);
         CheckCardSize(Consumer, resourceConsumerCardScale);
-    }
 
-    //Ensures all cards in a given list are of a given size
-    void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
-    {
-        for(int i = 0; i < listToCheck.Count; i++)
+        static void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
         {
-            var currentCard = listToCheck[i];
+            for (int i = 0; i < listToCheck.Count; i++)
+            {
+                var currentCard = listToCheck[i];
 
-            if (currentCard.transform.localScale != mandatorySize)
-                currentCard.transform.localScale = mandatorySize;
+                if (currentCard.transform.localScale != mandatorySize)
+                    currentCard.transform.localScale = mandatorySize;
+            }
         }
     }
 
-    //These comments all seem kind of redundant...
+    //This is super dumb and inconsistent
+    //We should be grabbing blank prefabs and setting their values before we return them
+    #region Get From Pool
+
 
     //Returns the first inactive choice from the choice pool
     public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
 
     //Returns the first inactive resource matching a given resource type, from the resource pool
     ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c._Resource.CardType == resourceType);
+
+    
+    //Grabs the first inactive Icon Holder, it grabs all the icons it needs, and then we return it
+    public IconHolder GetFromIconHolderPool(params Resource[] resources)
+    {
+        IconHolder iconHolder = GetTypeFromPool<IconHolder>(iconHolderPool);
+
+        iconHolder.GrabIcons(resources);
+
+        return iconHolder;
+    }
 
     //Returns the first inactive icon matching a given resource type, from the icon pool
     public Icon GetFromIconPool(ECardType resourceType) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource.CardType == resourceType);
@@ -455,6 +496,7 @@ public class GameManager : MonoBehaviour
         }
         return null;
     }
+    #endregion
 
     //Removes all cards in the consumer and moves them to the resource pool.
     //To do : Make a method to move cards into a given pool
@@ -490,6 +532,7 @@ public class GameManager : MonoBehaviour
         onChoiceSelection += ChoiceSelection;
     }
 
+    #region Move To
     void MoveToPool<T>(T objectToMove, GameObject newParent, Action<T> cleanup = null) where T : MonoBehaviour
     {
         cleanup?.Invoke(objectToMove);
@@ -572,7 +615,8 @@ public class GameManager : MonoBehaviour
         if (Consumer.Remove(resourceCard))
             onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
     }
-    
+    #endregion Move To
+
     //Updates the consumer indicator of a given type, by a given amount
     void UpdateConsumerIndicators(ECardType resourceType, int amountToAdd)
     {
@@ -599,6 +643,7 @@ public class GameManager : MonoBehaviour
         return resourceCards;
     }
 
+    #region Card Pickup
     //Saves the data of the grabbed card to be used later, updates the consumer, and sets the card as the holding card
     public void GrabCard()
     {
@@ -650,4 +695,5 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null)
             holdingResourceCard.transform.position = GetMousePosition();
     }
+    #endregion
 }
