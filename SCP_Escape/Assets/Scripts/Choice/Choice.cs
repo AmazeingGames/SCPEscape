@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,14 +18,20 @@ public class Choice : ScriptableObject
 
      */
 
-    [SerializeField] ECardType[] resourceRequirements = new ECardType[6];
+    [SerializeField] List<ECardType> resourceRequirement1 = new();
+    [SerializeField] List<ECardType> resourceRequirement2 = new();
+    [SerializeField] List<ECardType> resourceRequirement3 = new();
+    [SerializeField] List<ECardType> resourceRequirement4 = new();
+    [SerializeField] List<ECardType> resourceRequirement5 = new();
+    [SerializeField] List<ECardType> resourceRequirement6 = new();
+
     [SerializeField] ECardType[] resourceRewards = new ECardType[6];
     [SerializeField] List<EncounterCard> cardsToAdd = new();
     [SerializeField] bool shouldWinGame;
     [SerializeField] bool shouldLoseGame;
     [SerializeField] string flavorText;
 
-    public ECardType[] ResourceRequirements { get => resourceRequirements; private set => resourceRequirements = value; }
+    public List<ECardType>[] ResourceRequirements { get => new List<ECardType>[6] { resourceRequirement1, resourceRequirement2, resourceRequirement3, resourceRequirement4, resourceRequirement5, resourceRequirement6 }; }
     public ECardType[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
     public List<EncounterCard> CardsToAdd { get => cardsToAdd; private set => cardsToAdd = value; }
     public bool ShouldWinGame { get => shouldWinGame; private set => shouldWinGame = value; }

@@ -50,7 +50,7 @@ public class ChoiceCard : MonoBehaviour
 
     List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
-    List<ECardType> overlappingConsumerTypes;
+    List<ECardType> overlappingConsumerTypes = new();
 
     readonly List<IconHolder> iconResourceRequirements = new();
 
@@ -171,8 +171,8 @@ public class ChoiceCard : MonoBehaviour
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
     void SetIsReady()
     {
-        var consumerTypes = CardTypesInConsumer;
-        var requirementTypes = choice.ResourceRequirements.ToList();
+        List<ECardType> consumerTypes = CardTypesInConsumer;
+        List<List<ECardType>> requirementTypes = choice.ResourceRequirements.ToList();
 
         if (consumerTypes.Count() == 0 || requirementTypes.Count() == 0)
         {
@@ -180,11 +180,34 @@ public class ChoiceCard : MonoBehaviour
             return;
         }
 
-        overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
 
-        int overlappingElementsCount = overlappingConsumerTypes.Count();
+        //overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
+        //int overlappingElementsCount = overlappingConsumerTypes.Count();
 
-        IsReady = (consumerTypes.Count() == requirementTypes.Count() && overlappingElementsCount == requirementTypes.Count());
+
+        bool areAllIconsReadied = false;
+        int readyIcons = 0;
+
+        foreach (IconHolder iconHolder in iconResourceRequirements)
+        {
+            if (iconHolder.IsAnyIconReady)
+            {
+                readyIcons++;
+                Debug.Log($"{readyIcons} icon is ready out of {iconResourceRequirements.Count}");
+                continue;
+            }
+        }
+
+        if (readyIcons == iconResourceRequirements.Count)
+            areAllIconsReadied = true;
+
+
+        //IsReady = (consumerTypes.Count() == requirementTypes.Count() && overlappingElementsCount == requirementTypes.Count());
+
+        
+
+        IsReady = (consumerTypes.Count() == iconResourceRequirements.Count() && areAllIconsReadied);
+
     }
 
     //Sets the value of 'isReady' for one of the icon requirements based on the given paramates
@@ -286,11 +309,23 @@ public class ChoiceCard : MonoBehaviour
     void SetAllIcons()
     {
         SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
-        SetIcons(choice.ResourceRewards, rewardsHolder.transform, null);
+
+        SetIcons(choice.ResourceRewards, rewardsHolder.transform, null, false);
     }
 
-    //
-    void SetIcons(ECardType[] listRefernce, Transform parent, List<IconHolder> listToAdd)
+    //The problem with these two functions is that they still treat all the given icons as individual icons, creating a new icon holder for each icon and supplying every icon holder exactly 1 icon, instead of supplying every icon holder the amount given in the list
+    void SetIcons(List<ECardType>[] listRefernce, Transform parent, List<IconHolder> listToAdd)
+    {
+        foreach (List<ECardType> list in listRefernce)
+        {
+            if (list == null)
+                continue;
+
+            SetIcons(list.ToArray(), parent, listToAdd, true);
+        }
+    }
+
+    void SetIcons(ECardType[] listRefernce, Transform parent, List<IconHolder> listToAdd, bool shouldGroupIcons)
     {
         for (int i = 0; i < listRefernce.Length; i++)
         {
@@ -302,38 +337,43 @@ public class ChoiceCard : MonoBehaviour
                 break;
             }
 
-            foreach (ECardType type in Enum.GetValues(typeof(ECardType)).Cast<ECardType>().ToList())
+            IconHolder setIconHolder = null;
+
+            if (shouldGroupIcons)
             {
-                Debug.Log(type.ToString());
-                Debug.Log(Manager.TypeToResource[type]);
+                var resources = (from t in listRefernce select Manager.TypeToResource[t]);
+
+                resources.ToList();
+
+                setIconHolder = Manager.GetFromIconHolderPool(resources.ToArray());
             }
+            else
+            {
+                Resource resource = Manager.TypeToResource[currentResourceType];
 
-            Resource resource = Manager.TypeToResource[currentResourceType];
-
-            IconHolder setIconHolder = Manager.GetFromIconHolderPool(resource);
-
+                setIconHolder = Manager.GetFromIconHolderPool(resource);
+            }
+           
 
             setIconHolder.gameObject.SetActive(true);
             setIconHolder.transform.SetParent(parent);
 
-
             listToAdd?.Add(setIconHolder);
 
-            Debug.Log("This code ran 6");
-
+            if (shouldGroupIcons)
+                break;
         }
     }
 
-    //I have no clue what this does or what it's for; but it's probably important
+    //Enum.IsDefined checks if a value is contatined in an enumeration; but that still doesn't explain what this code is for
+    //Why would/wouldn't converting an Enum to a type make it no longer contained in the enumeration?
+    //What is the usefulness from this check??
+    //I'm still confused about this
     static bool IsEnumValueValid(Enum enumeration)
     {
         bool isDefined = Enum.IsDefined(enumeration.GetType(), enumeration);
 
-        Debug.Log($"Enumeration: {enumeration}. Enumeration.GetType() : {enumeration.GetType()}. IsDefined : {isDefined}");
-
-        //Enum.IsDefined checks if a value is contatined in an enumeration; but that still doesn't explain what this code is for
-        //Why would/wouldn't converting an Enum to a type make it no longer contained in the enumeration?
-        //What is the usefulness from this check??
+        //Debug.Log($"Enumeration: {enumeration}. Enumeration.GetType() : {enumeration.GetType()}. IsDefined : {isDefined}");
 
         return isDefined;
     }

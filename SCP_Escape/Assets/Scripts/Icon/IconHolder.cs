@@ -10,9 +10,11 @@ using System;
 
 public class IconHolder : MonoBehaviour
 {
-    public List<Icon> Icons { get; private set; } = new();
+    //public List<Icon> Icons { get; private set; } = new();
+    public List<Icon> Icons;
 
-    public bool IsAnyIconReady { get; private set; }
+    //public bool IsAnyIconReady { get; private set; }
+    public bool IsAnyIconReady;
 
     // Start is called before the first frame update
     void Start()
@@ -59,20 +61,34 @@ public class IconHolder : MonoBehaviour
     //Sets the radial fill for all icons
     void FillIcons()
     {
-        
+        List<float> amountToFill = new();
+
+        for (float i = 0; i < Icons.Count; i++)
+        {
+            var icon = Icons[(int)i];
+
+            amountToFill.Insert(0, (float)((i + 1f) / (float)Icons.Count));
+
+            Debug.Log($"Fill amount = {icon.Background.fillAmount}");
+
+            //Debug.Log($"Icon {icon.ResourceType} fill amount : {icon.Background.fillAmount}");
+        }
+
         for (int i = 0; i < Icons.Count; i++)
         {
             var icon = Icons[i];
 
-            icon.Background.fillAmount = (float)((float)i + 1 / (float)Icons.Count);
-
-            Debug.Log($"Fill amount = {i} / {Icons.Count} = {icon.Background.fillAmount}");
-
-            //Debug.Log($"Icon {icon.ResourceType} fill amount : {icon.Background.fillAmount}");
+            icon.Background.fillAmount = amountToFill[i];
         }
     }
 
-    public void SetReady(bool isReady) => IsAnyIconReady = isReady;
+    public void SetReady(bool isReady)
+    {
+        IsAnyIconReady = isReady;
+
+        foreach (Icon icon in Icons)
+            icon.SetReady(isReady);
+    }
 
     //Checks if Icons contains a cardType
     public bool ContainsType(ECardType cardType) => GetIconTypes().Contains(cardType);
