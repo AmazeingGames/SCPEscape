@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Linq;
 using static GameManager;
 using static Resource;
+using System;
 
 public class IconHolder : MonoBehaviour
 {
@@ -36,34 +37,38 @@ public class IconHolder : MonoBehaviour
         
         for (int i = 0; i < resources.Length; i++)
         {
-            Debug.Log("ran 10");
             Icon icon = Manager.GetFromIconPool(resources[i]);
 
-            Debug.Log("ran 11");
+            icon.gameObject.SetActive(true);
+
 
             icon.transform.SetParent(transform);
 
-            Debug.Log("ran 12");
+            icon.transform.localPosition = Vector3.zero;
+
 
             Icons.Add(icon);
 
-            Debug.Log("ran 13");
 
         }
 
         FillIcons();
-        Debug.Log("ran 00");
 
     }
 
     //Sets the radial fill for all icons
     void FillIcons()
     {
+        
         for (int i = 0; i < Icons.Count; i++)
         {
             var icon = Icons[i];
 
-            icon.Background.fillAmount = (i / Icons.Count);
+            icon.Background.fillAmount = (float)((float)i + 1 / (float)Icons.Count);
+
+            Debug.Log($"Fill amount = {i} / {Icons.Count} = {icon.Background.fillAmount}");
+
+            //Debug.Log($"Icon {icon.ResourceType} fill amount : {icon.Background.fillAmount}");
         }
     }
 

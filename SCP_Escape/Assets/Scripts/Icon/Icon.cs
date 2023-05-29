@@ -14,7 +14,8 @@ public class Icon : MonoBehaviour
     public Image Background { get => background; private set => background = value; }
     public bool IsReady { get; private set; }
 
-    public Resource IconResource { get; private set; } = null;
+    //public Resource IconResource { get; private set; } = null;
+    public Resource IconResource;
     public Resource.ECardType ResourceType => IconResource.CardType;
 
     void Start()

@@ -292,10 +292,8 @@ public class ChoiceCard : MonoBehaviour
     //
     void SetIcons(ECardType[] listRefernce, Transform parent, List<IconHolder> listToAdd)
     {
-        Debug.Log("This code ran 1");
         for (int i = 0; i < listRefernce.Length; i++)
         {
-            Debug.Log("This code ran 2");
             ECardType currentResourceType = listRefernce[i];
 
             if (!IsEnumValueValid(currentResourceType))
@@ -303,7 +301,6 @@ public class ChoiceCard : MonoBehaviour
                 Debug.Log($"Left loop at i = {i}");
                 break;
             }
-            Debug.Log("This code ran 3");
 
             foreach (ECardType type in Enum.GetValues(typeof(ECardType)).Cast<ECardType>().ToList())
             {
@@ -315,12 +312,10 @@ public class ChoiceCard : MonoBehaviour
 
             IconHolder setIconHolder = Manager.GetFromIconHolderPool(resource);
 
-            Debug.Log("This code ran 4");
 
             setIconHolder.gameObject.SetActive(true);
             setIconHolder.transform.SetParent(parent);
 
-            Debug.Log("This code ran 5");
 
             listToAdd?.Add(setIconHolder);
 
