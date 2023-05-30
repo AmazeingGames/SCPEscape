@@ -10,48 +10,24 @@ using System;
 
 public class IconHolder : MonoBehaviour
 {
-    //public List<Icon> Icons { get; private set; } = new();
-    public List<Icon> Icons;
+    public List<Icon> Icons { get; private set; } = new();
 
-    //public bool IsAnyIconReady { get; private set; }
-    public bool IsAnyIconReady;
+    public bool IsAnyIconReady { get; private set; }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    void CheckIfIconsReady()
-    {
-
-    }
-
-    //Grabs all the icons it needs from the gameManager and adds it to its list
+    //Grabs all the icons it needs from the gameManager as children
     public void GrabIcons(params Resource[] resources)
     {
-        
         for (int i = 0; i < resources.Length; i++)
         {
             Icon icon = Manager.GetFromIconPool(resources[i]);
 
             icon.gameObject.SetActive(true);
 
-
             icon.transform.SetParent(transform);
 
             icon.transform.localPosition = Vector3.zero;
 
-
             Icons.Add(icon);
-
-
         }
 
         FillIcons();
@@ -64,15 +40,7 @@ public class IconHolder : MonoBehaviour
         List<float> amountToFill = new();
 
         for (float i = 0; i < Icons.Count; i++)
-        {
-            var icon = Icons[(int)i];
-
             amountToFill.Insert(0, (float)((i + 1f) / (float)Icons.Count));
-
-            Debug.Log($"Fill amount = {icon.Background.fillAmount}");
-
-            //Debug.Log($"Icon {icon.ResourceType} fill amount : {icon.Background.fillAmount}");
-        }
 
         for (int i = 0; i < Icons.Count; i++)
         {
@@ -82,6 +50,7 @@ public class IconHolder : MonoBehaviour
         }
     }
 
+    //Sets this and all children icons ready
     public void SetReady(bool isReady)
     {
         IsAnyIconReady = isReady;

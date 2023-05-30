@@ -100,7 +100,7 @@ public class EncounterCard : MonoBehaviour
     //This would also move the encounter to the side to obscure it.
     void RevealChoices()
     {
-        Debug.Log("Revealed Choices, hid encounter");
+        //Debug.Log("Revealed Choices, hid encounter");
 
         HideEncounter();
         MoveChoices(setActive : true);
@@ -110,7 +110,7 @@ public class EncounterCard : MonoBehaviour
     //This would also move the encounter to the forefront.
     void ObscureChoices()
     {
-        Debug.Log("Hid Choices, revealed encounter");
+        //Debug.Log("Hid Choices, revealed encounter");
 
         RevealEncounter();
         MoveChoices(setActive : false);
@@ -150,7 +150,7 @@ public class EncounterCard : MonoBehaviour
 
             if (current == 1)
             {
-                Debug.Log("Finished Lerp");
+                //Debug.Log("Finished Lerp");
 
                 canBeClicked = true;
                 shouldLerp = false;
@@ -199,7 +199,7 @@ public class EncounterCard : MonoBehaviour
                 currentChoiceCard.transform.SetParent(transform);
 
                 //Debug.Log($"Grabbed {i} choices");
-                Debug.Log($"ChoiceCards.Count : {choiceCards.Count}");
+                //Debug.Log($"ChoiceCards.Count : {choiceCards.Count}");
             }
         }
 

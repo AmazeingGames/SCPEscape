@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
   m_Name: SacrificesMusBeMade
   m_EditorClassIdentifier: 
-  resourceRequirements: 0500000005000000010000000100000001000000
+  resourceRequirement1: 0100000005000000
+  resourceRequirement2: 0100000005000000
+  resourceRequirement3: 0100000005000000
+  resourceRequirement4: 0100000005000000
+  resourceRequirement5: 0100000005000000
+  resourceRequirement6: 
   resourceRewards: 0000000000000000
   cardsToAdd: []
   shouldWinGame: 0

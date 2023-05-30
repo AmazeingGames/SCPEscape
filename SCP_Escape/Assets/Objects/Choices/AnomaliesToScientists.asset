@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
   m_Name: AnomaliesToScientists
   m_EditorClassIdentifier: 
-  resourceRequirements: 0000000000000000
+  resourceRequirement1: 00000000
+  resourceRequirement2: 00000000
+  resourceRequirement3: 
+  resourceRequirement4: 
+  resourceRequirement5: 
+  resourceRequirement6: 
   resourceRewards: 0500000005000000050000000500000005000000
   cardsToAdd: []
   shouldWinGame: 0

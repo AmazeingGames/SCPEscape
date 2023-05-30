@@ -193,7 +193,7 @@ public class ChoiceCard : MonoBehaviour
             if (iconHolder.IsAnyIconReady)
             {
                 readyIcons++;
-                Debug.Log($"{readyIcons} icon is ready out of {iconResourceRequirements.Count}");
+                //Debug.Log($"{readyIcons} icon is ready out of {iconResourceRequirements.Count}");
                 continue;
             }
         }
@@ -204,18 +204,17 @@ public class ChoiceCard : MonoBehaviour
 
         //IsReady = (consumerTypes.Count() == requirementTypes.Count() && overlappingElementsCount == requirementTypes.Count());
 
-        
 
         IsReady = (consumerTypes.Count() == iconResourceRequirements.Count() && areAllIconsReadied);
 
     }
 
     //Sets the value of 'isReady' for one of the icon requirements based on the given paramates
-    //Called whenever a state change occurs in the consumer via an event
-    void ReadyIcon(ECardType resourceType, bool setReady)
+    //Called whenever a card is added or removed from/to the consumer
+    void ReadyIcon(ECardType resourceType, bool isReadyingIcon)
     {
         //Makes sure if there are more cards than requirements, removing one won't change any of the icons' status
-        if (!setReady)
+        if (!isReadyingIcon)
         {
             int resourceTypeCountInRequirements = GetIconsOfTypeFromRequirements(resourceType).Count;
             int resourceTypeCountInConsumer = Manager.GetResourcesFromConsumer(resourceType).Count;
@@ -224,9 +223,8 @@ public class ChoiceCard : MonoBehaviour
                 return;
         }
 
-        //Responsible for setting the value of the Icon
+        //Responsible for deciding whether or not the icon holder is ready
         //TO DO: If possible, decrease code nesting
-        Debug.Log($"Set readied icon.");
         for (int i = 0; i < iconResourceRequirements.Count; i++)
         {
             IconHolder currentIconHolder = iconResourceRequirements[i];
@@ -235,19 +233,19 @@ public class ChoiceCard : MonoBehaviour
             {
                 bool shouldSet = true;
 
-                if (currentIconHolder.IsAnyIconReady != setReady)
+                if (currentIconHolder.IsAnyIconReady != isReadyingIcon)
                 {
                     if (i + 1 < iconResourceRequirements.Count)
                     {
                         var nextIconHolder = iconResourceRequirements[i + 1];
 
-                        if (!setReady && nextIconHolder.ContainsType(resourceType) && currentIconHolder.IsAnyIconReady != setReady)
+                        if (!isReadyingIcon && nextIconHolder.ContainsType(resourceType) && nextIconHolder.IsAnyIconReady != isReadyingIcon)
                             shouldSet = false;
                     }
 
                     if (shouldSet)
                     {
-                        currentIconHolder.SetReady(setReady);
+                        currentIconHolder.SetReady(isReadyingIcon);
                         break;
                     }
                 }

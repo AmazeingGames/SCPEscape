@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 951e7c52303341548a2b78ed0af2b7a3, type: 3}
   m_Name: DuplicatingPotion
   m_EditorClassIdentifier: 
-  resourceRequirements: 0100000003000000
+  resourceRequirement1: 01000000
+  resourceRequirement2: 03000000
+  resourceRequirement3: 
+  resourceRequirement4: 
+  resourceRequirement5: 
+  resourceRequirement6: 
   resourceRewards: 0100000001000000
   cardsToAdd: []
   shouldWinGame: 0
