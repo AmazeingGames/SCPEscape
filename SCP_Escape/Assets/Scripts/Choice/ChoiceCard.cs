@@ -180,11 +180,6 @@ public class ChoiceCard : MonoBehaviour
             return;
         }
 
-
-        //overlappingConsumerTypes = consumerTypes.Where(requirementTypes.Contains).ToList();
-        //int overlappingElementsCount = overlappingConsumerTypes.Count();
-
-
         bool areAllIconsReadied = false;
         int readyIcons = 0;
 
@@ -193,17 +188,12 @@ public class ChoiceCard : MonoBehaviour
             if (iconHolder.IsAnyIconReady)
             {
                 readyIcons++;
-                //Debug.Log($"{readyIcons} icon is ready out of {iconResourceRequirements.Count}");
                 continue;
             }
         }
 
         if (readyIcons == iconResourceRequirements.Count)
             areAllIconsReadied = true;
-
-
-        //IsReady = (consumerTypes.Count() == requirementTypes.Count() && overlappingElementsCount == requirementTypes.Count());
-
 
         IsReady = (consumerTypes.Count() == iconResourceRequirements.Count() && areAllIconsReadied);
 

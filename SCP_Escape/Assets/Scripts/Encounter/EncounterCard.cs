@@ -18,7 +18,6 @@ public class EncounterCard : MonoBehaviour
 
     [Header("Encounter Lerping")]
     [SerializeField] float lerpSpeed = .5f;
-    //Replace these Vector2's with nodes and use their transform.position instead.
     [SerializeField] AnimationCurve curve;
 
     Transform hiddenPosition;
@@ -33,7 +32,7 @@ public class EncounterCard : MonoBehaviour
      * Selecting a choice will fold up all the cards. This is read via the GameManager; an action delegate is invoked by the selected choice that the encounter will read
      */
 
-    List<ChoiceCard> choiceCards = new();
+    readonly List<ChoiceCard> choiceCards = new();
 
     public bool IsActiveChoice;
 
@@ -197,9 +196,6 @@ public class EncounterCard : MonoBehaviour
                 choiceCards.Add(currentChoiceCard);
                 currentChoiceCard.SetChoice(currentChoice);
                 currentChoiceCard.transform.SetParent(transform);
-
-                //Debug.Log($"Grabbed {i} choices");
-                //Debug.Log($"ChoiceCards.Count : {choiceCards.Count}");
             }
         }
 

@@ -452,18 +452,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //This is super dumb and inconsistent
-    //We should be grabbing blank prefabs and setting their values before we return them
+    //We should instead set blanks rather than grab specific value types
     #region Get From Pool
-
-
     //Returns the first inactive choice from the choice pool
     public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
 
     //Returns the first inactive resource matching a given resource type, from the resource pool
     ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c._Resource.CardType == resourceType);
 
-    
     //Grabs the first inactive Icon Holder, it grabs all the icons it needs, and then we return it
     public IconHolder GetFromIconHolderPool(params Resource[] resources)
     {
