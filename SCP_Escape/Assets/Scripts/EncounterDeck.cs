@@ -8,46 +8,47 @@ using static GameManager;
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
 public class EncounterDeck : MonoBehaviour
 {
-    public static EncounterDeck Instance { get; private set; }
+    //So I can either create an event for the card to be sent to the discard, and the event is raised whenever the card finishes lerping, or I can subscribe to the onChoiceSelection event and wait for the animation to finish before discarding the card.
+
+    public static EncounterDeck Deck { get; private set; }
 
     GameObject EncounterPool => Manager.EncounterPool;
-
-    List<Encounter> EncounterPile => Manager.EncounterDeck;
+    List<Encounter> DrawPile => Manager.EncounterDeck;
 
     void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        if (Deck == null)
+            Deck = this;
         else
-            Destroy(Instance);
+            Destroy(Deck);
     }
 
 
     //The purpose of this is to grab from the encounter pool and set it to an encounter
     EncounterCard DrawNextEncounter()
     {
-        if (Manager.EncounterDeck.Count <= 0)
+        if (DrawPile.Count <= 0)
             return null;
 
         EncounterCard encounter = GetFromEncounterPool();
 
         if (encounter != null)
-            encounter.SetAndMatchEncounter(EncounterPile[0]);
+            encounter.SetAndMatchEncounter(DrawPile[0]);
 
         return encounter;
     }
 
     EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);
 
-    //Purpose it to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
-    //Creates the illusion we're discarding and drawing the same cards or altered cards
-    public void AddCardToDiscard()
+    //Purpose is to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
+    //This will be done with events
+    void AddCardToDiscard(EncounterCard cardToDiscard)
     {
 
     }
 
     //Purpose is to have a function that can be called by the gameManager that will add cards directly to the draw pile that we can draw in the immediate future. Examples are: 'greed', 'famine', and 'raids' in the original game when you have too many total resources, too little of a specific resource, and too much of a specific resource.
-    public void AddCardToDraw()
+    void AddCardToDraw()
     {
 
     }

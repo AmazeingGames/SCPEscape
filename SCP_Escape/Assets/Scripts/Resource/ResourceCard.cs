@@ -41,7 +41,7 @@ public class ResourceCard : MonoBehaviour
 
     void Start()
     {
-        //Debug.Log($"Is GameManager.Instance null? : {GameManager.Instance == null}");
+        //Debug.Log($"Is GameManager.Deck null? : {GameManager.Deck == null}");
 
         if (resource == null)
         {

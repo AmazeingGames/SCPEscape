@@ -29,9 +29,7 @@ public class IconHolder : MonoBehaviour
 
             Icons.Add(icon);
         }
-
         FillIcons();
-
     }
 
     //Sets the radial fill for all icons
@@ -43,11 +41,7 @@ public class IconHolder : MonoBehaviour
             amountToFill.Insert(0, (float)((i + 1f) / (float)Icons.Count));
 
         for (int i = 0; i < Icons.Count; i++)
-        {
-            var icon = Icons[i];
-
-            icon.Background.fillAmount = amountToFill[i];
-        }
+            Icons[i].Background.fillAmount = amountToFill[i];
     }
 
     //Sets this and all children icons ready

@@ -26,14 +26,14 @@ public class Choice : ScriptableObject
     [SerializeField] List<ECardType> resourceRequirement6 = new();
 
     [SerializeField] ECardType[] resourceRewards = new ECardType[6];
-    [SerializeField] List<EncounterCard> cardsToAdd = new();
+    [SerializeField] List<EncounterCard> encounterRewards = new();
     [SerializeField] bool shouldWinGame;
     [SerializeField] bool shouldLoseGame;
     [SerializeField] string flavorText;
 
     public List<ECardType>[] ResourceRequirements { get => new List<ECardType>[6] { resourceRequirement1, resourceRequirement2, resourceRequirement3, resourceRequirement4, resourceRequirement5, resourceRequirement6 }; }
     public ECardType[] ResourceRewards { get => resourceRewards; private set => resourceRewards = value; }
-    public List<EncounterCard> CardsToAdd { get => cardsToAdd; private set => cardsToAdd = value; }
+    public List<EncounterCard> EncounterRewards { get => encounterRewards; private set => encounterRewards = value; }
     public bool ShouldWinGame { get => shouldWinGame; private set => shouldWinGame = value; }
     public bool ShouldLoseGame { get => shouldLoseGame; private set => shouldLoseGame = value; }
     public string FlavorText { get => flavorText; private set => flavorText = value; }

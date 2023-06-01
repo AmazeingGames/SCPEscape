@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine.UI;
 using static Resource;
 using static GameManager;
+using static EncounterDeck;
 using static System.Type;
 
 //TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
@@ -26,8 +27,6 @@ public class ChoiceCard : MonoBehaviour
      *  a. Highlight - Highlights the card when the player hovers over it 
      */
     
-    public enum EChoiceState { Ready, Unready, Unavailable }
-
 
     [SerializeField] Choice choice;
     [Header("Card Properties")]
@@ -48,6 +47,10 @@ public class ChoiceCard : MonoBehaviour
     [SerializeField] Image cardColorOverlay;
     [SerializeField] Image borderColorOverlay;
 
+    public enum EChoiceState { Ready, Unready, Unavailable }
+
+    public event EventHandler<CardSelectionEventArgs> ChoiceSelection;
+
     List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
     List<ECardType> overlappingConsumerTypes = new();
@@ -59,9 +62,16 @@ public class ChoiceCard : MonoBehaviour
     public Choice Choice { get => choice; private set => choice = value; }
 
     public bool IsReady { get; private set; } = false;
-    bool isMouseOver = false;
 
+
+    bool isMouseOver = false;
     bool isMouseHolding = false;
+    bool isClicked = false;
+
+    //true if the player has clicked in the past .1 second
+    bool isClickedDelay = false;
+    const float delayLength = .1f;
+    float timer;
 
     void Start()
     {
@@ -72,21 +82,27 @@ public class ChoiceCard : MonoBehaviour
     {
         //Sets important variables
         IsMouseOver();
+        IsClicked();
         IsMouseHolding();
+        SetIsClickedDelay();
         SetIsReady();
 
         //Updates based on those variables
-        SetState();
         SetChoiceColor();
         UpdateIcon();
         
         //
         SelectChoice();
+
+        Debug.Log($"IsClickedDelay : {isClickedDelay}");
+        
+        
     }
 
     //Calls the ReadyIcon func whenever a card is changed in the GameManager
     void UpdateIcon()
     {
+        //TO DO : Change to events
         Manager.onCardChangeInConsumer -= ReadyIcon;
         Manager.onCardChangeInConsumer += ReadyIcon;
     }
@@ -94,10 +110,11 @@ public class ChoiceCard : MonoBehaviour
     //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
     void SelectChoice()
     {
-        if (isMouseOver && Input.GetMouseButtonUp(0) && IsReady)
+        if (isClickedDelay && Input.GetMouseButtonUp(0) && IsReady)
         {
             Debug.Log($"Invoked Choice {flavorText.text}");
-            Manager.onChoiceSelection?.Invoke(choice.ResourceRewards);
+
+            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));
         }
     }
 
@@ -136,10 +153,27 @@ public class ChoiceCard : MonoBehaviour
     }
 
     void SetColor(Color cardColor) => cardColorOverlay.color = cardColor;
-
     
     //Sets true if mouse is over this choice
-    void IsMouseOver() => isMouseOver = GameManager.IsOver(choiceCardLayer, transform);
+    void IsMouseOver() => isMouseOver = IsOver(choiceCardLayer, transform);
+
+    void IsClicked() => isClicked = (isMouseOver && Input.GetMouseButtonDown(0));
+
+    //Purpose of this is to fix an issue where clicking the encounter would auto select the choice under if the requirements were in the consumer
+    void SetIsClickedDelay()
+    {
+        if (isClicked)
+        {
+            isClickedDelay = true;
+
+            timer = 0;
+        }
+        else if (!isMouseHolding)
+            timer += Time.deltaTime;
+
+        if (timer >= delayLength)
+            isClickedDelay = false;
+    }
 
     //Sets true if mouse is pressed while hovering
     //Sets false if mouse leaves or lets up
@@ -151,10 +185,8 @@ public class ChoiceCard : MonoBehaviour
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
+        if (isClicked)
             isMouseHolding = true;
-        }
     }
 
     //Sets the enum 'ChoiceState', based on whether the requirements have been fulfilled, and determines if it is ready to be selected
@@ -375,14 +407,14 @@ public class ChoiceCard : MonoBehaviour
         {
             string text = "Add";
 
-            for (int i = 0; i < choice.CardsToAdd.Count; i++)
+            for (int i = 0; i < choice.EncounterRewards.Count; i++)
             {
-                var current = choice.CardsToAdd[i];
+                var current = choice.EncounterRewards[i];
                 text += $" \"{current.name}\"";
 
-                if (i + 1 < choice.CardsToAdd.Count)
+                if (i + 1 < choice.EncounterRewards.Count)
                 {
-                    if (i + 2 == choice.CardsToAdd.Count)
+                    if (i + 2 == choice.EncounterRewards.Count)
                         text += " and";
                     else
                         text += ",";

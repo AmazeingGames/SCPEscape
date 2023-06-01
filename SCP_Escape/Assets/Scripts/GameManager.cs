@@ -14,6 +14,18 @@ using static UnityEditor.Progress;
 //TO DO: Refactor variables 
 public class GameManager : MonoBehaviour
 {
+    public class CardSelectionEventArgs : EventArgs
+    {
+        public ECardType[] ResourceRewards { get; }
+        public List<EncounterCard> EncounterRewards { get; }
+
+        public CardSelectionEventArgs(ECardType[] resourceRewards, List<EncounterCard> encounterRewards)
+        {
+            ResourceRewards = resourceRewards;
+            EncounterRewards = encounterRewards;
+        }
+    }
+
     public static GameManager Manager;
 
     GameObject resourcePool;
@@ -70,8 +82,9 @@ public class GameManager : MonoBehaviour
 
     public bool hasAddedResources = false;
 
+
+    //proably use an event instead
     public Action<ECardType, bool> onCardChangeInConsumer;
-    public Action<ECardType[]> onChoiceSelection;
 
     public List<ResourceCard> Hand { get; private set; } = new();
     public List<ResourceCard> Consumer { get; private set; } = new List<ResourceCard>();
@@ -79,8 +92,8 @@ public class GameManager : MonoBehaviour
     public List<Resource> resources;
     public List<Resource> resources1;
     
-    List<ResourceCard> allCards = new List<ResourceCard>();
-    List<Icon> allIcons = new List<Icon>();
+    readonly List<ResourceCard> allCards = new();
+    readonly List<Icon> allIcons = new();
 
     public List<Sprite> indicators;
 
@@ -142,13 +155,6 @@ public class GameManager : MonoBehaviour
     {
         AddStartingResources();
 
-        //Not sure what this code is for
-        for (int i = 0; i < resources.Count; i++)
-        {
-            //Debug.Log(resources[i].name);
-            //AddCardToConsumer(GetFromResourcePool(resources[i].CardType));
-        }
-
         SwapResources(resources1);
         SwapIcons(resources1);
     }
@@ -161,17 +167,11 @@ public class GameManager : MonoBehaviour
 
         CheckCardSizes();
         DeveloperCommands();
-
-        SelectChoice();
     }
 
     void AddStartingResources()
     {
-        //For loop can be removed
-        for (int i = 0; i < 1; i++)
-        {
-            AddPoolResourcesToHand(1, 1, 1, 1, 1, 1);
-        }
+        AddPoolResourcesToHand(1, 1, 1, 1, 1, 1);
     }
 
     //Adds resources to hand correlated to the nums 1 - 9
@@ -320,7 +320,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Create Objects & Pools
-    void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize);
+    void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize, setReady: c => c.ChoiceSelection += OnChoiceSelection);
 
     void CreateEncounterPool() => CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);
 
@@ -331,7 +331,7 @@ public class GameManager : MonoBehaviour
                 CreateObject(obj: resourceCard, parent: resourcePool, setReady: card => card.SetResource(resources[i]), list: allCards);
     }
 
-    void CreateIconHolderPool() => CreateObjectPool(obj: iconHolder, parent: iconHolderPool, iconHolderPoolSize);
+    void CreateIconHolderPool() => CreateObjectPool(obj: iconHolder, parent: iconHolderPool, size: iconHolderPoolSize);
 
     void CreateIconPool()
     {
@@ -340,15 +340,27 @@ public class GameManager : MonoBehaviour
                 CreateObject(obj: icon, parent: iconPool, setReady: icon => icon.SetResource(resources[i]), list: allIcons);
     }
 
+
     //Instantiates a given number of inactive objects, as a child of a given transform
-    public static void CreateObjectPool<T>(T obj, Transform parent, int size) where T : MonoBehaviour
+    public static List<T> CreateObjectPool<T>(T obj, Transform parent, int size, Action<T> setReady = null, List<T> addToList = null) where T : MonoBehaviour
     {
+        List<T> objectList = new();
+
         for (int i = 0; i < size; i++)
-            CreateObject(obj, parent);
+        {
+            T createdObject = CreateObject(obj, parent, list: objectList);
+
+            setReady?.Invoke(createdObject);
+        }
+            
+
+        addToList?.AddRange(objectList);
+
+        return objectList;
     }
 
     //Instantiates a given number of inactive objects, as a child of a given gameObject
-    public static void CreateObjectPool<T>(T obj, GameObject parent, int size) where T : MonoBehaviour => CreateObjectPool(obj, parent.transform, size);
+    public static List<T> CreateObjectPool<T>(T obj, GameObject parent, int size, Action<T> setReady = null, List<T> addToList = null) where T : MonoBehaviour => CreateObjectPool(obj, parent.transform, size, setReady, addToList);
 
     //Instantiates and returns an inactive object, as a child of a given [gameObject], stored in a given list, and readied with a given method
     public static T CreateObject<T>(T obj, GameObject parent, Action<T> setReady, List<T> list) where T : MonoBehaviour => CreateObject(obj, parent.transform, setReady, list);
@@ -509,23 +521,16 @@ public class GameManager : MonoBehaviour
     //Responsibility is to perform cleanup after a choice option is selected
     //Adds rewards and consumes all cards
     //TO DO : Adds 'rewards' to the player's deck
-    void ChoiceSelection(ECardType[] choiceRewards)
+    void OnChoiceSelection(object sender, CardSelectionEventArgs args)
     {
         ConsumeAllCards();
 
-        for (int i = 0; i < choiceRewards.Length; i++)
+        for (int i = 0; i < args.ResourceRewards.Length; i++)
         {
-            var currentResourceType = choiceRewards[i];
+            var currentResourceType = args.ResourceRewards[i];
 
             AddPoolResourceToHand(currentResourceType);
         }
-    }
-
-    //Ensures a choice is selected when the event is raised
-    void SelectChoice()
-    {
-        onChoiceSelection -= ChoiceSelection;
-        onChoiceSelection += ChoiceSelection;
     }
 
     #region Move To
@@ -611,7 +616,7 @@ public class GameManager : MonoBehaviour
         if (Consumer.Remove(resourceCard))
             onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
     }
-    #endregion Move To
+    #endregion
 
     //Updates the consumer indicator of a given type, by a given amount
     void UpdateConsumerIndicators(ECardType resourceType, int amountToAdd)

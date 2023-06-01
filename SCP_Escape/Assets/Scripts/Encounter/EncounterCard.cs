@@ -6,9 +6,16 @@ using Unity.VisualScripting;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using static GameManager;
+using static EncounterDeck;
 
 public class EncounterCard : MonoBehaviour
 {
+    //On second thought this event is sort of pointless.
+    //It's an event meant to tell the encounter deck that an animation is finished so we can play a new animation from the encounter deck
+    //Why not play the animation here instead?
+
+    public event Action<EncounterCard> FinishedAnimation;
+
     [SerializeField] Encounter encounter;
 
     [Header("Encounter Details")]
@@ -24,13 +31,6 @@ public class EncounterCard : MonoBehaviour
     Transform revealedPosition;
 
     GameObject Nodes => Manager.Nodes;
-
-    /* Functionality of the Encounter Card:
-     * Clicking on the card will slide the encounter to the side and reveal the associated choice cards
-     * Clicking on the card again will slide the encounter to the front and hide the associated choice cards
-     * Selecting a choice will give the rewards to the player. The rewards are given by the choice card and not the EncounterCard
-     * Selecting a choice will fold up all the cards. This is read via the GameManager; an action delegate is invoked by the selected choice that the encounter will read
-     */
 
     readonly List<ChoiceCard> choiceCards = new();
 
@@ -65,9 +65,6 @@ public class EncounterCard : MonoBehaviour
 
         MoveCards();
         LerpTo();
-
-        Manager.onChoiceSelection -= OnChoiceSelection;
-        Manager.onChoiceSelection += OnChoiceSelection;
     }
 
     //Checks if the mouse is over this card
@@ -102,7 +99,7 @@ public class EncounterCard : MonoBehaviour
         //Debug.Log("Revealed Choices, hid encounter");
 
         HideEncounter();
-        MoveChoices(setActive : true);
+        ActivateChoices(setActive : true);
     }
 
     //Purpose is to hide the choices and remove them from play, not allowing them to be selected.
@@ -112,7 +109,7 @@ public class EncounterCard : MonoBehaviour
         //Debug.Log("Hid Choices, revealed encounter");
 
         RevealEncounter();
-        MoveChoices(setActive : false);
+        ActivateChoices(setActive : false);
     }
 
     //Purpose is to start the lerp and move the encounter out of the way to make room for the choices when they're revealed
@@ -147,10 +144,9 @@ public class EncounterCard : MonoBehaviour
 
             transform.position = Vector3.Lerp(startPosition, lerpTo, curve.Evaluate(current));
 
+            //Lerp is finished; cleanup
             if (current == 1)
             {
-                //Debug.Log("Finished Lerp");
-
                 canBeClicked = true;
                 shouldLerp = false;
 
@@ -160,18 +156,26 @@ public class EncounterCard : MonoBehaviour
                     newParent = Manager.GameCanvas.transform;
                 else
                     newParent = Manager.Choices.transform;
-
+                
                 transform.SetParent(newParent, false);
+
+                if (isChoiceSelected)
+                {
+                    Debug.Log("Finished animation, ready to discard");
+
+                    FinishedAnimation.Invoke(this);
+                }
+
             }
         }
     }
 
     //The animation in my head for this is the choices come down in a single pile, then slide over to both sides from the center until all cards are in place.
-    //This could be done by placing node locations, which, come to think of it, I should have done with the 'hidden' and 'revealed' location, instead of figuring it out manually.
-    //System of nodes : Create a second horizontal layout group and organize the nodes that way, turning them on and off and get a perfect adaptable and scalable system for figuring out positions. The only problem I can think of is how to tell which node is which, but that shouldn't be a hard fix.
+    //This could be done by placing node locations.
+    //This is a lot easier to place manually, granted the cards don't move or change too much, than it is to place them procedurally via nodes
 
-    //Purpose is to hide/reveal the children choice cards
-    void MoveChoices(bool setActive)
+    //Purpose is to show or hide the choices by setting them active
+    void ActivateChoices(bool setActive)
     {
         for (int i = 0; i < choiceCards.Count; i++)
         {
@@ -194,15 +198,19 @@ public class EncounterCard : MonoBehaviour
                 Choice currentChoice = encounter.Choices[i];
 
                 choiceCards.Add(currentChoiceCard);
+
                 currentChoiceCard.SetChoice(currentChoice);
                 currentChoiceCard.transform.SetParent(transform);
+
+                currentChoiceCard.ChoiceSelection += OnChoiceSelection;
+            
             }
         }
 
     }
 
     //Purpose of this is to hide the choices on selection
-    void OnChoiceSelection(Resource.ECardType[] nothing)
+    void OnChoiceSelection(object sender, CardSelectionEventArgs args)
     {
         isChoiceSelected = true;
 
