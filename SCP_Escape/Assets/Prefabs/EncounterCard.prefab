@@ -403,15 +403,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b11c14565344cb469f4b1a11e69a26d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  encounter: {fileID: 0}
   encounterName: {fileID: 2272208778361270684}
   flavorText: {fileID: 4846403567286138714}
-  lerpSpeed: 3.5
-  encounter: {fileID: 11400000, guid: 1fc4e85a772b31c4a9eeb6227d038884, type: 2}
   encounterCardLayer:
     serializedVersion: 2
     m_Bits: 512
-  hiddenPosition: {x: 0, y: 6.4}
-  revealedPosition: {x: 0, y: 2.829}
+  lerpSpeed: 3.5
   curve:
     serializedVersion: 2
     m_Curve:
@@ -436,6 +434,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  IsActiveChoice: 0
 --- !u!114 &2016379984666449119
 MonoBehaviour:
   m_ObjectHideFlags: 0

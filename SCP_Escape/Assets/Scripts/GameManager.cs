@@ -102,14 +102,6 @@ public class GameManager : MonoBehaviour
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
 
-    EncounterDeck encounterDeck;
-    EncounterCard currentEncounter;
-
-    public List<Encounter> EncounterDeck { get; private set; } = new();
-    public List<Encounter> DiscardPile { get; private set; } = new();
-
-    public EncounterCard ActiveEncounter { get; private set; }
-
     void Awake()
     {
         if (Manager == null)
@@ -320,6 +312,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Create Objects & Pools
+    //Hopefully I don't need to unsubscribe... 
     void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize, setReady: c => c.ChoiceSelection += OnChoiceSelection);
 
     void CreateEncounterPool() => CreateObjectPool(obj: encounterCard, parent: EncounterPool, size: encounterPoolSize);

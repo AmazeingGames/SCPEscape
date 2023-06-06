@@ -2,8 +2,10 @@ using Mono.Cecil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using static GameManager;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
 //Now I'm thinking I can just put all of the functionality of the encounter deck here instead since the GameManager is already pretty full
@@ -11,20 +13,26 @@ public class EncounterDeck : MonoBehaviour
 {
     //So I can either create an event for the card to be sent to the discard, and the event is raised whenever the card finishes lerping, or I can subscribe to the onChoiceSelection event and wait for the animation to finish before discarding the card.
 
-    public static EncounterDeck Deck { get; private set; }
+    public List<Encounter> StartingEncounters;
+
+    public static EncounterDeck DeckManager { get; private set; }
 
     public EncounterCard ActiveEncounter { get; private set; } = null;
     GameObject EncounterPool => Manager.EncounterPool;
-    List<Encounter> DrawPile => Manager.EncounterDeck;
+
+    public List<Encounter> DrawPile { get; private set; } = new();
+    public List<Encounter> DiscardPile { get; private set; } = new();
 
     void Awake()
     {
-        if (Deck == null)
-            Deck = this;
+        if (DeckManager == null)
+            DeckManager = this;
         else
-            Destroy(Deck);
+            Destroy(DeckManager);
 
         Debug.Log("Encounter Deck");
+
+        FillDrawPile();
     }
 
     private void Update()
@@ -38,9 +46,27 @@ public class EncounterDeck : MonoBehaviour
     void DrawNextEncounter()
     {
         EncounterCard encounter = GetFromEncounterPool();
-        
-        if (encounter == null || ActiveEncounter != null || DrawPile.Count <= 0)
+
+        Debug.Log($"Drew encounter card {encounter} | is null : {encounter == null}");
+
+        bool noEncountersLeft           = encounter == null;
+        bool activeEncounterAlreadySet  = ActiveEncounter != null;
+        bool noCardsInDraw              = DrawPile.Count <= 0;
+
+        if (noEncountersLeft || activeEncounterAlreadySet || noCardsInDraw)
+        {
+            string debugString = "Early return : ";
+
+            if (noEncountersLeft)
+               debugString += "No encounters left in pool. ";
+            if (activeEncounterAlreadySet)
+                debugString += "Trying to set encounter when encounter already exists. ";
+            if (noCardsInDraw)
+                debugString += "No cards left to draw in draw pile. Shuffle deck. ";
+            Debug.Log(debugString);
+
             return;
+        }
 
         SetActiveEncounter(encounter);
     }
@@ -50,18 +76,29 @@ public class EncounterDeck : MonoBehaviour
     {
         ActiveEncounter = activeEncounterCard;
 
+        Debug.Log($"Set active encounter card {ActiveEncounter}");
+
         ActiveEncounter.SetAndMatchEncounter(DrawPile[0]);
 
+        ActiveEncounter.gameObject.SetActive(true);
+
         ActiveEncounter.transform.SetParent(Manager.Choices.transform);
+
+        //This doesn't seem to work
+        foreach (ChoiceCard choiceCard in activeEncounterCard.ChoiceCards)
+        {
+            choiceCard.ChoiceSelection += AddCardToDiscard;
+        }
     }
 
     EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);
 
-    //Purpose is to have a function that can be called by choiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
-    //This will be done with events
-    void AddCardToDiscard(EncounterCard cardToDiscard)
+    //Purpose is to have a function that can be called by ChoiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
+   
+    //For some reason this function isn't being ran
+    void AddCardToDiscard(object sender, CardSelectionEventArgs args)
     {
-
+        Debug.Log("Discard dis card");
     }
 
     //Purpose is to have a function that can be called by the gameManager that will add cards directly to the draw pile that we can draw in the immediate future. Examples are: 'greed', 'famine', and 'raids' in the original game when you have too many total resources, too little of a specific resource, and too much of a specific resource.
@@ -74,6 +111,12 @@ public class EncounterDeck : MonoBehaviour
     void ShuffleDrawPile()
     {
 
+    }
+
+    //Fills the initial encounter deck to contain cards
+    void FillDrawPile()
+    {
+        DrawPile.AddRange(StartingEncounters);
     }
 
     //Purpose is to have a way to combine the draw and discard when we run out of cards to draw.

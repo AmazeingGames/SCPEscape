@@ -32,9 +32,7 @@ public class EncounterCard : MonoBehaviour
 
     GameObject Nodes => Manager.Nodes;
 
-    readonly List<ChoiceCard> choiceCards = new();
-
-    public bool IsActiveChoice;
+    public List<ChoiceCard> ChoiceCards { get; } = new();
 
     bool areChoicesRevealed;
     bool isMouseOver = false;
@@ -173,9 +171,9 @@ public class EncounterCard : MonoBehaviour
     //Purpose is to show or hide the choices by setting them active
     void ActivateChoices(bool setActive)
     {
-        for (int i = 0; i < choiceCards.Count; i++)
+        for (int i = 0; i < ChoiceCards.Count; i++)
         {
-            ChoiceCard currentChoiceCard = choiceCards[i];
+            ChoiceCard currentChoiceCard = ChoiceCards[i];
 
             currentChoiceCard.gameObject.SetActive(setActive);
             currentChoiceCard.transform.SetParent(Manager.Choices.transform);
@@ -185,7 +183,7 @@ public class EncounterCard : MonoBehaviour
     //Grabs the empty choices from the GameManager's pool and supplies them with choice data and puts them into a list.
     void GetChoices()
     {
-        if (choiceCards.Count <= 0)
+        if (ChoiceCards.Count <= 0)
         {
             for (int i = 0; i < encounter.Choices.Count; i++)
             {
@@ -193,7 +191,7 @@ public class EncounterCard : MonoBehaviour
 
                 Choice currentChoice = encounter.Choices[i];
 
-                choiceCards.Add(currentChoiceCard);
+                ChoiceCards.Add(currentChoiceCard);
 
                 currentChoiceCard.SetChoice(currentChoice);
                 currentChoiceCard.transform.SetParent(transform);

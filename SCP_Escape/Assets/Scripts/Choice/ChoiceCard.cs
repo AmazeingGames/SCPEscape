@@ -53,8 +53,6 @@ public class ChoiceCard : MonoBehaviour
 
     List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
-    List<ECardType> overlappingConsumerTypes = new();
-
     readonly List<IconHolder> iconResourceRequirements = new();
 
     public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
