@@ -14,7 +14,7 @@ public class EncounterCard : MonoBehaviour
     //It's an event meant to tell the encounter deck that an animation is finished so we can play a new animation from the encounter deck
     //Why not play the animation here instead?
 
-    public event Action<EncounterCard> FinishedAnimation;
+    //public event Action<EncounterCard> FinishedAnimation;
 
     [SerializeField] Encounter encounter;
 
@@ -96,8 +96,6 @@ public class EncounterCard : MonoBehaviour
     //This would also move the encounter to the side to obscure it.
     void RevealChoices()
     {
-        //Debug.Log("Revealed Choices, hid encounter");
-
         HideEncounter();
         ActivateChoices(setActive : true);
     }
@@ -106,8 +104,6 @@ public class EncounterCard : MonoBehaviour
     //This would also move the encounter to the forefront.
     void ObscureChoices()
     {
-        //Debug.Log("Hid Choices, revealed encounter");
-
         RevealEncounter();
         ActivateChoices(setActive : false);
     }
@@ -163,7 +159,7 @@ public class EncounterCard : MonoBehaviour
                 {
                     Debug.Log("Finished animation, ready to discard");
 
-                    FinishedAnimation.Invoke(this);
+                    //FinishedAnimation.Invoke(this);
                 }
 
             }
@@ -209,7 +205,7 @@ public class EncounterCard : MonoBehaviour
 
     }
 
-    //Purpose of this is to hide the choices on selection
+    //Hides the choices on selection and makes sure the card can't be selected again
     void OnChoiceSelection(object sender, CardSelectionEventArgs args)
     {
         isChoiceSelected = true;

@@ -6,12 +6,14 @@ using UnityEngine;
 using static GameManager;
 
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
+//Now I'm thinking I can just put all of the functionality of the encounter deck here instead since the GameManager is already pretty full
 public class EncounterDeck : MonoBehaviour
 {
     //So I can either create an event for the card to be sent to the discard, and the event is raised whenever the card finishes lerping, or I can subscribe to the onChoiceSelection event and wait for the animation to finish before discarding the card.
 
     public static EncounterDeck Deck { get; private set; }
 
+    public EncounterCard ActiveEncounter { get; private set; } = null;
     GameObject EncounterPool => Manager.EncounterPool;
     List<Encounter> DrawPile => Manager.EncounterDeck;
 
@@ -21,21 +23,36 @@ public class EncounterDeck : MonoBehaviour
             Deck = this;
         else
             Destroy(Deck);
+
+        Debug.Log("Encounter Deck");
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+            DrawNextEncounter();
     }
 
 
     //The purpose of this is to grab from the encounter pool and set it to an encounter
-    EncounterCard DrawNextEncounter()
+    void DrawNextEncounter()
     {
-        if (DrawPile.Count <= 0)
-            return null;
-
         EncounterCard encounter = GetFromEncounterPool();
+        
+        if (encounter == null || ActiveEncounter != null || DrawPile.Count <= 0)
+            return;
 
-        if (encounter != null)
-            encounter.SetAndMatchEncounter(DrawPile[0]);
+        SetActiveEncounter(encounter);
+    }
 
-        return encounter;
+    //Purpose of this is to prepare the given card as the next encounter card
+    void SetActiveEncounter(EncounterCard activeEncounterCard)
+    {
+        ActiveEncounter = activeEncounterCard;
+
+        ActiveEncounter.SetAndMatchEncounter(DrawPile[0]);
+
+        ActiveEncounter.transform.SetParent(Manager.Choices.transform);
     }
 
     EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);

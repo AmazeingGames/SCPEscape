@@ -73,6 +73,10 @@ public class ChoiceCard : MonoBehaviour
     const float delayLength = .1f;
     float timer;
 
+    private void OnEnable() => Manager.OnCardChangeInConsumer += ReadyIcon;
+
+    private void OnDisable() => Manager.OnCardChangeInConsumer -= ReadyIcon;
+
     void Start()
     {
         DataMatchChoice();
@@ -88,34 +92,18 @@ public class ChoiceCard : MonoBehaviour
         SetIsReady();
 
         //Updates based on those variables
+        SetState();
         SetChoiceColor();
-        UpdateIcon();
-        
+
         //
         SelectChoice();
-
-        Debug.Log($"IsClickedDelay : {isClickedDelay}");
-        
-        
-    }
-
-    //Calls the ReadyIcon func whenever a card is changed in the GameManager
-    void UpdateIcon()
-    {
-        //TO DO : Change to events
-        Manager.onCardChangeInConsumer -= ReadyIcon;
-        Manager.onCardChangeInConsumer += ReadyIcon;
     }
 
     //Tells 'gameManager' to : remove all cards in the Consumer and add rewards to the player's hand/deck
     void SelectChoice()
     {
         if (isClickedDelay && Input.GetMouseButtonUp(0) && IsReady)
-        {
-            Debug.Log($"Invoked Choice {flavorText.text}");
-
             ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));
-        }
     }
 
     //Sets the color of the card based on cards in the consumer and whether it's being clicked
@@ -165,7 +153,6 @@ public class ChoiceCard : MonoBehaviour
         if (isClicked)
         {
             isClickedDelay = true;
-
             timer = 0;
         }
         else if (!isMouseHolding)

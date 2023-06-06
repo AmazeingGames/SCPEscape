@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
 
 
     //proably use an event instead
-    public Action<ECardType, bool> onCardChangeInConsumer;
+    public event Action<ECardType, bool> OnCardChangeInConsumer;
 
     public List<ResourceCard> Hand { get; private set; } = new();
     public List<ResourceCard> Consumer { get; private set; } = new List<ResourceCard>();
@@ -563,7 +563,7 @@ public class GameManager : MonoBehaviour
 
         UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
 
-        onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
+        OnCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
     }
 
 
@@ -614,7 +614,7 @@ public class GameManager : MonoBehaviour
     void RemoveFromConsumer(ResourceCard resourceCard)
     {
         if (Consumer.Remove(resourceCard))
-            onCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
+            OnCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
     }
     #endregion
 
