@@ -30,9 +30,7 @@ public class EncounterDeck : MonoBehaviour
         else
             Destroy(DeckManager);
 
-        Debug.Log("Encounter Deck");
-
-        FillDrawPile();
+        ShuffleIntoDeck(StartingEncounters);
     }
 
     private void Update()
@@ -47,8 +45,6 @@ public class EncounterDeck : MonoBehaviour
     {
         EncounterCard encounter = GetFromEncounterPool();
 
-        Debug.Log($"Drew encounter card {encounter} | is null : {encounter == null}");
-
         bool noEncountersLeft           = encounter == null;
         bool activeEncounterAlreadySet  = ActiveEncounter != null;
         bool noCardsInDraw              = DrawPile.Count <= 0;
@@ -62,19 +58,17 @@ public class EncounterDeck : MonoBehaviour
             if (activeEncounterAlreadySet)
                 debugString += "Trying to set encounter when encounter already exists. ";
             if (noCardsInDraw)
+            {
+                ShuffleInDiscard();
                 debugString += "No cards left to draw in draw pile. Shuffle deck. ";
+            }
+
             Debug.Log(debugString);
 
             return;
         }
 
-        SetActiveEncounter(encounter);
-    }
-
-    //Purpose of this is to prepare the given card as the next encounter card
-    void SetActiveEncounter(EncounterCard activeEncounterCard)
-    {
-        ActiveEncounter = activeEncounterCard;
+        ActiveEncounter = encounter;
 
         Debug.Log($"Set active encounter card {ActiveEncounter}");
 
@@ -84,45 +78,60 @@ public class EncounterDeck : MonoBehaviour
 
         ActiveEncounter.transform.SetParent(Manager.Choices.transform);
 
-        //This doesn't seem to work
-        foreach (ChoiceCard choiceCard in activeEncounterCard.ChoiceCards)
+        StartCoroutine(SetActiveEncounter());
+    }
+
+    //Purpose of this is to prepare the given card as the next encounter card
+    IEnumerator SetActiveEncounter()
+    {
+        if (ActiveEncounter.ChoiceCards.Count == 0)
         {
+            yield return null;
+        }
+
+        //This doesn't seem to work
+        foreach (ChoiceCard choiceCard in ActiveEncounter.ChoiceCards)
+        {
+            Debug.Log("Hooked addToDiscard into the choice card");
             choiceCard.ChoiceSelection += AddCardToDiscard;
         }
+
+        yield break;
     }
 
     EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);
 
-    //Purpose is to have a function that can be called by ChoiceCards that will add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
-   
-    //For some reason this function isn't being ran
+    //Purpose is to add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
     void AddCardToDiscard(object sender, CardSelectionEventArgs args)
     {
-        Debug.Log("Discard dis card");
+        foreach (ChoiceCard choiceCard in ActiveEncounter.ChoiceCards)
+            choiceCard.ChoiceSelection -= AddCardToDiscard;
+
+        DrawPile.Remove(ActiveEncounter.Encounter);
+        DiscardPile.Add(ActiveEncounter.Encounter);
+        
+        MoveToPool(ActiveEncounter, EncounterPool);
+
+        ActiveEncounter = null;
     }
 
-    //Purpose is to have a function that can be called by the gameManager that will add cards directly to the draw pile that we can draw in the immediate future. Examples are: 'greed', 'famine', and 'raids' in the original game when you have too many total resources, too little of a specific resource, and too much of a specific resource.
-    void AddCardToDraw()
-    {
-
-    }
 
     //Purpose is to have a way to randomize the draw pile when shuffling cards directly into draw
-    void ShuffleDrawPile()
+    void ShuffleInDiscard()
     {
-
+        ShuffleIntoDeck(DiscardPile);
+        
+        DiscardPile.Clear();
     }
 
-    //Fills the initial encounter deck to contain cards
-    void FillDrawPile()
-    {
-        DrawPile.AddRange(StartingEncounters);
-    }
+    //Purpose is a way into introduce cards into the encounter deck draw pile
+    void ShuffleIntoDeck(List<Encounter> encountersToAdd) => ShuffleIntoDeck(encountersToAdd.ToArray());
 
-    //Purpose is to have a way to combine the draw and discard when we run out of cards to draw.
-    void ShuffleInDeck()
+    void ShuffleIntoDeck(params Encounter[] encountersToAdd)
     {
+        DrawPile.AddRange(encountersToAdd);
 
+        DrawPile.Shuffle();
     }
 
     //Because cards are going to be moved in and out of potential play (i.e. neither in draw nor discard) we're going to likely need an 'EncounterPool' to store cards like 'Greed' or 'Questlines' when they're somewhere other than potential play, meaning the purpose of this is to send an encounterCard to the encounterPool

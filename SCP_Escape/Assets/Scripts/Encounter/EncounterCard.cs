@@ -33,6 +33,7 @@ public class EncounterCard : MonoBehaviour
     GameObject Nodes => Manager.Nodes;
 
     public List<ChoiceCard> ChoiceCards { get; } = new();
+    public Encounter Encounter { get => encounter; private set => encounter = value; }
 
     bool areChoicesRevealed;
     bool isMouseOver = false;
@@ -48,6 +49,9 @@ public class EncounterCard : MonoBehaviour
 
     void Start()
     {
+        //This used to be in Update, not sure why, but consider moving it back in case of bugs
+        GetChoices();
+
         hiddenPosition = Nodes.transform.Find("EncounterHidden");
         revealedPosition = Nodes.transform.Find("EncounterRevealed");
     }
@@ -58,8 +62,6 @@ public class EncounterCard : MonoBehaviour
 
         CheckMouseOver();
         IsClicked();
-
-        GetChoices();
 
         MoveCards();
         LerpTo();
@@ -155,8 +157,7 @@ public class EncounterCard : MonoBehaviour
 
                 if (isChoiceSelected)
                 {
-                    Debug.Log("Finished animation, ready to discard");
-
+                    Debug.Log("Finished animation, ready to play the discard animation. Perhaps I should only play the discard animation when told by the encounter deck? But I do think this should manage the animations, or maybe I should create a separate animation class to handle all of the game's animations...");
                     //FinishedAnimation.Invoke(this);
                 }
 
@@ -215,6 +216,9 @@ public class EncounterCard : MonoBehaviour
     public void SetAndMatchEncounter(Encounter encounter)
     {
         this.encounter = encounter;
+
+        if (encounter == null)
+            return;
 
         flavorText.text = encounter.FlavorText;
         encounterName.text = encounter.EncounterName;

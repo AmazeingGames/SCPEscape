@@ -312,6 +312,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Create Objects & Pools
+
     //Hopefully I don't need to unsubscribe... 
     void CreateChoicePool() => CreateObjectPool(obj: choiceCard, parent: ChoicePool, size: choicePoolSize, setReady: c => c.ChoiceSelection += OnChoiceSelection);
 
@@ -345,7 +346,6 @@ public class GameManager : MonoBehaviour
 
             setReady?.Invoke(createdObject);
         }
-            
 
         addToList?.AddRange(objectList);
 
@@ -369,7 +369,38 @@ public class GameManager : MonoBehaviour
 
         return createdObj;
     }
+    
     #endregion
+
+    //Ensures every active resource card's data matches their scriptable object
+    void DataMatchResources()
+    {
+        var handAndConsumerResources = Hand.Concat(Consumer);
+
+        foreach (ResourceCard resourceCard in handAndConsumerResources)
+            resourceCard.DataMatchResource();
+    }
+
+    //Ensures resource cards in the consumer and hand are size appropriate for their current zone
+    void CheckCardSizes()
+    {
+        CheckCardSize(Hand, handHolderCardScale);
+        CheckCardSize(Consumer, resourceConsumerCardScale);
+
+        static void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
+        {
+            for (int i = 0; i < listToCheck.Count; i++)
+            {
+                var currentCard = listToCheck[i];
+
+                if (currentCard.transform.localScale != mandatorySize)
+                    currentCard.transform.localScale = mandatorySize;
+            }
+        }
+    }
+
+    //We should instead set blanks rather than grab specific value types
+    #region Get From Pool
 
     //Retrieves a number of resource cards from the resource pool and adds them to the player's hand
     void AddPoolResourcesToHand(int anomalies = 0, int escapees = 0, int insanities = 0, int munitions = 0, int rations = 0, int scientists = 0)
@@ -430,35 +461,6 @@ public class GameManager : MonoBehaviour
         MoveCardToHand(cardTypeToAdd);
     }
 
-    //Ensures every active resource card's data matches their scriptable object
-    void DataMatchResources()
-    {
-        var handAndConsumerResources = Hand.Concat(Consumer);
-
-        foreach(ResourceCard resourceCard in handAndConsumerResources)
-            resourceCard.DataMatchResource();
-    }
-
-    //Ensures resource cards in the consumer and hand are size appropriate for their current zone
-    void CheckCardSizes()
-    {
-        CheckCardSize(Hand, handHolderCardScale);
-        CheckCardSize(Consumer, resourceConsumerCardScale);
-
-        static void CheckCardSize(List<ResourceCard> listToCheck, Vector3 mandatorySize)
-        {
-            for (int i = 0; i < listToCheck.Count; i++)
-            {
-                var currentCard = listToCheck[i];
-
-                if (currentCard.transform.localScale != mandatorySize)
-                    currentCard.transform.localScale = mandatorySize;
-            }
-        }
-    }
-
-    //We should instead set blanks rather than grab specific value types
-    #region Get From Pool
     //Returns the first inactive choice from the choice pool
     public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
 
@@ -499,41 +501,14 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    //Removes all cards in the consumer and moves them to the resource pool.
-    //To do : Make a method to move cards into a given pool
-    void ConsumeAllCards()
-    {
-        while (Consumer.Count > 0)
-        {
-            var currentCard = Consumer[0];
-
-            MoveToPool(currentCard, newParent: resourcePool, cleanup: RemoveFromConsumer);
-        }
-    }
-
-    //Responsibility is to perform cleanup after a choice option is selected
-    //Adds rewards and consumes all cards
-    //TO DO : Adds 'rewards' to the player's deck
-    void OnChoiceSelection(object sender, CardSelectionEventArgs args)
-    {
-        ConsumeAllCards();
-
-        for (int i = 0; i < args.ResourceRewards.Length; i++)
-        {
-            var currentResourceType = args.ResourceRewards[i];
-
-            AddPoolResourceToHand(currentResourceType);
-        }
-    }
-
     #region Move To
-    void MoveToPool<T>(T objectToMove, GameObject newParent, Action<T> cleanup = null) where T : MonoBehaviour
+    static public void MoveToPool<T>(T objectToMove, GameObject pool, Action<T> cleanup = null) where T : MonoBehaviour
     {
         cleanup?.Invoke(objectToMove);
 
         objectToMove.gameObject.SetActive(false);
 
-        objectToMove.transform.SetParent(newParent.transform);
+        objectToMove.transform.SetParent(pool.transform);
     }
 
     void MoveCardToHolding(ResourceCard resourceCard)
@@ -609,7 +584,38 @@ public class GameManager : MonoBehaviour
         if (Consumer.Remove(resourceCard))
             OnCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
     }
+
     #endregion
+
+
+    //Removes all cards in the consumer and moves them to the resource pool.
+    //To do : Make a method to move cards into a given pool
+    void ConsumeAllCards()
+    {
+        while (Consumer.Count > 0)
+        {
+            var currentCard = Consumer[0];
+
+            MoveToPool(currentCard, pool: resourcePool, cleanup: RemoveFromConsumer);
+        }
+    }
+
+    //Responsibility is to perform cleanup after a choice option is selected
+    //Adds rewards and consumes all cards
+    //TO DO : Adds 'rewards' to the player's deck
+    void OnChoiceSelection(object sender, CardSelectionEventArgs args)
+    {
+        ConsumeAllCards();
+
+        for (int i = 0; i < args.ResourceRewards.Length; i++)
+        {
+            var currentResourceType = args.ResourceRewards[i];
+
+            AddPoolResourceToHand(currentResourceType);
+        }
+    }
+
+    
 
     //Updates the consumer indicator of a given type, by a given amount
     void UpdateConsumerIndicators(ECardType resourceType, int amountToAdd)
