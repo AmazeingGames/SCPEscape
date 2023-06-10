@@ -54,13 +54,13 @@ public class ChoiceCard : MonoBehaviour
     List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
     readonly List<IconHolder> iconResourceRequirements = new();
+    readonly List<IconHolder> iconResourceRewards = new();
 
     public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
 
     public Choice Choice { get => choice; private set => choice = value; }
 
     public bool IsReady { get; private set; } = false;
-
 
     bool isMouseOver = false;
     bool isMouseHolding = false;
@@ -71,17 +71,24 @@ public class ChoiceCard : MonoBehaviour
     const float delayLength = .1f;
     float timer;
 
-    private void OnEnable() => Manager.OnCardChangeInConsumer += ReadyIcon;
+    private void OnEnable()
+    {
+        Manager.OnCardChangeInConsumer += ReadyIcon;
 
-    private void OnDisable() => Manager.OnCardChangeInConsumer -= ReadyIcon;
+    }
+
+    private void OnDisable()
+    {
+        Manager.OnCardChangeInConsumer -= ReadyIcon;
+    }
 
     void Start()
     {
-        DataMatchChoice();
     }
 
     void Update()
     {
+        Debug.Log($"Choice Card: {flavorText} has {iconResourceRequirements.Count} icon resource requirements");
         //Sets important variables
         IsMouseOver();
         IsClicked();
@@ -101,7 +108,7 @@ public class ChoiceCard : MonoBehaviour
     void SelectChoice()
     {
         if (isClickedDelay && Input.GetMouseButtonUp(0) && IsReady)
-            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));
+            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));            
     }
 
     //Sets the color of the card based on cards in the consumer and whether it's being clicked
@@ -276,7 +283,11 @@ public class ChoiceCard : MonoBehaviour
         return IconResources;
     }
 
-    public void SetChoice(Choice choice) => this.choice = choice;
+    public void SetChoice(Choice choice)
+    {
+        this.choice = choice;
+        DataMatchChoice();
+    }
 
     //Reads the data of the 'choice' scriptable object and sets the 'choiceCard' variables to match
     void DataMatchChoice()
@@ -295,7 +306,7 @@ public class ChoiceCard : MonoBehaviour
         SetAllIcons();
     }
 
-    //
+    //Still don't know what this does
     void ActivateAndDeactivateRewards()
     {
         int actualValues = 0;
@@ -313,15 +324,14 @@ public class ChoiceCard : MonoBehaviour
     //
     void SetAllIcons()
     {
-        SetIcons(choice.ResourceRequirements, requirementsHolder.transform, iconResourceRequirements);
+        SetIcons(listReference: choice.ResourceRequirements, parent: requirementsHolder.transform, listToAdd: iconResourceRequirements);
 
-        SetIcons(choice.ResourceRewards, rewardsHolder.transform, null, false);
+        SetIcons(listReference: choice.ResourceRewards, parent: rewardsHolder.transform, listToAdd: iconResourceRewards, shouldGroupIcons: false);
     }
 
-    //The problem with these two functions is that they still treat all the given icons as individual icons, creating a new icon holder for each icon and supplying every icon holder exactly 1 icon, instead of supplying every icon holder the amount given in the list
-    void SetIcons(List<ECardType>[] listRefernce, Transform parent, List<IconHolder> listToAdd)
+    void SetIcons(List<ECardType>[] listReference, Transform parent, List<IconHolder> listToAdd)
     {
-        foreach (List<ECardType> list in listRefernce)
+        foreach (List<ECardType> list in listReference)
         {
             if (list == null)
                 continue;
@@ -330,11 +340,11 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-    void SetIcons(ECardType[] listRefernce, Transform parent, List<IconHolder> listToAdd, bool shouldGroupIcons)
+    void SetIcons(ECardType[] listReference, Transform parent, List<IconHolder> listToAdd, bool shouldGroupIcons)
     {
-        for (int i = 0; i < listRefernce.Length; i++)
+        for (int i = 0; i < listReference.Length; i++)
         {
-            ECardType currentResourceType = listRefernce[i];
+            ECardType currentResourceType = listReference[i];
 
             if (!IsEnumValueValid(currentResourceType))
             {
@@ -346,7 +356,7 @@ public class ChoiceCard : MonoBehaviour
 
             if (shouldGroupIcons)
             {
-                var resources = (from t in listRefernce select Manager.TypeToResource[t]);
+                var resources = (from t in listReference select Manager.TypeToResource[t]);
 
                 resources.ToList();
 
@@ -355,6 +365,9 @@ public class ChoiceCard : MonoBehaviour
             else
             {
                 Resource resource = Manager.TypeToResource[currentResourceType];
+
+                if (resource == null)
+                    Debug.Log("Resource type is null");
 
                 setIconHolder = Manager.GetFromIconHolderPool(resource);
             }
@@ -410,5 +423,39 @@ public class ChoiceCard : MonoBehaviour
             return text;
         }
         return null;
+    }
+
+    //Purpose is to move the icon holders back to the object pool as well as this object
+    public void DiscardChoice()
+    {
+        EmptyIconHolders();
+
+        Cleanup();
+    }
+
+    void EmptyIconHolders()
+    {
+        List<IconHolder> allIcons = new(iconResourceRequirements);
+
+        allIcons.AddRange(iconResourceRewards);
+
+        foreach (IconHolder iconHolder in allIcons)
+        {
+            foreach (Icon icon in iconHolder.Icons)
+                MoveToPool(icon, Manager.IconPool);
+
+            MoveToPool(iconHolder, Manager.IconHolderPool, ih => ih.Icons.Clear());
+        }
+
+    }
+
+    void Cleanup()
+    {
+        MoveToPool(this, Manager.ChoicePool);
+
+        choice = null;
+
+        iconResourceRequirements.Clear();
+        iconResourceRewards.Clear();
     }
 }

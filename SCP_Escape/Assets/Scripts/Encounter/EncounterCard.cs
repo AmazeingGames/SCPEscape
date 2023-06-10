@@ -157,6 +157,8 @@ public class EncounterCard : MonoBehaviour
 
                 if (isChoiceSelected)
                 {
+                    //What is this and when did this happen?
+
                     Debug.Log("Finished animation, ready to play the discard animation. Perhaps I should only play the discard animation when told by the encounter deck? But I do think this should manage the animations, or maybe I should create a separate animation class to handle all of the game's animations...");
                     //FinishedAnimation.Invoke(this);
                 }
@@ -198,7 +200,6 @@ public class EncounterCard : MonoBehaviour
                 currentChoiceCard.transform.SetParent(transform);
 
                 currentChoiceCard.ChoiceSelection += OnChoiceSelection;
-            
             }
         }
 
@@ -210,6 +211,16 @@ public class EncounterCard : MonoBehaviour
         isChoiceSelected = true;
 
         ObscureChoices();
+
+        foreach (ChoiceCard choiceCard in ChoiceCards)
+            choiceCard.DiscardChoice();
+
+    }
+
+    void DiscardEncounter()
+    {
+        encounter = null;
+        isChoiceSelected = false;
     }
 
     //Purpose is to set all of this card's details to that of an assigned scriptable object encounter

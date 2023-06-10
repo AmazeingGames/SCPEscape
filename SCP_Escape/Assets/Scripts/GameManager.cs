@@ -31,11 +31,11 @@ public class GameManager : MonoBehaviour
     GameObject resourcePool;
     GameObject handHolder;
     GameObject resourceConsumer;
-    GameObject iconPool;
-    GameObject iconHolderPool;
 
+    public GameObject IconPool { get; private set; }
     public GameObject Nodes { get; private set; }
     public GameObject ChoicePool { get; private set; }
+    public GameObject IconHolderPool { get; private set; }
     public GameObject GameCanvas { get; private set; }
     public GameObject EncounterPool { get; private set; }
     public GameObject Choices { get; private set; }
@@ -115,8 +115,8 @@ public class GameManager : MonoBehaviour
         resourcePool = GameObject.Find("ResourcePool");
         resourceConsumer = GameObject.Find("ResourceConsumer");
         ChoicePool = GameObject.Find("ChoicePool");
-        iconPool = GameObject.Find("IconPool");
-        iconHolderPool = GameObject.Find("IconHolderPool");
+        IconPool = GameObject.Find("IconPool");
+        IconHolderPool = GameObject.Find("IconHolderPool");
 
         EncounterPool = GameObject.Find("EncounterPool");
         Choices = GameObject.Find("Choices");
@@ -325,13 +325,13 @@ public class GameManager : MonoBehaviour
                 CreateObject(obj: resourceCard, parent: resourcePool, setReady: card => card.SetResource(resources[i]), list: allCards);
     }
 
-    void CreateIconHolderPool() => CreateObjectPool(obj: iconHolder, parent: iconHolderPool, size: iconHolderPoolSize);
+    void CreateIconHolderPool() => CreateObjectPool(obj: iconHolder, parent: IconHolderPool, size: iconHolderPoolSize);
 
     void CreateIconPool()
     {
         for (int i = 0; i < resources.Count; i++)
             for (int n = 0; n < iconPoolSize; n++)
-                CreateObject(obj: icon, parent: iconPool, setReady: icon => icon.SetResource(resources[i]), list: allIcons);
+                CreateObject(obj: icon, parent: IconPool, setReady: icon => icon.SetResource(resources[i]), list: allIcons);
     }
 
 
@@ -470,7 +470,10 @@ public class GameManager : MonoBehaviour
     //Grabs the first inactive Icon Holder, it grabs all the icons it needs, and then we return it
     public IconHolder GetFromIconHolderPool(params Resource[] resources)
     {
-        IconHolder iconHolder = GetTypeFromPool<IconHolder>(iconHolderPool);
+        IconHolder iconHolder = GetTypeFromPool<IconHolder>(parent: IconHolderPool);
+
+        if (iconHolder == null)
+            Debug.Log("Icon holder is null");
 
         iconHolder.GrabIcons(resources);
 
@@ -478,16 +481,19 @@ public class GameManager : MonoBehaviour
     }
 
     //Returns the first inactive icon matching a given resource type, from the icon pool
-    public Icon GetFromIconPool(ECardType resourceType) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource.CardType == resourceType);
+    public Icon GetFromIconPool(ECardType resourceType) => GetTypeFromPool<Icon>(IconPool, i => i.IconResource.CardType == resourceType);
 
     //Returns the first inactive icon matching a given resource object, from the icon pool
-    public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(iconPool, i => i.IconResource == resource);
+    public Icon GetFromIconPool(Resource resource) => GetTypeFromPool<Icon>(IconPool, i => i.IconResource == resource);
 
     //Returns the first inactive object from a given object pool that matches a given condition, if a condition is given
     public static T GetTypeFromPool<T>(GameObject parent, Predicate<T> extraCondition = null) where T : MonoBehaviour
     {
         if (!(parent.transform.childCount > 0))
+        {
+            Debug.Log($"There are no children objects of type, \"{typeof(T).Name}\" in, \"{parent.name}\", left to grab. ");
             return null;
+        }
 
         for (int i = 0; i < parent.transform.childCount; i++)
         {
