@@ -528,7 +528,7 @@ MonoBehaviour:
   choiceCard: {fileID: 2747229927738076562, guid: 3b35ecfb087e5574b878c1d21d74cb36, type: 3}
   encounterPoolSize: 5
   encounterCard: {fileID: 3489944119379325690, guid: 1198ac8ed4964f042962ce7d61f097dc, type: 3}
-  choicePoolSize: 10
+  choicePoolSize: 3
   iconPoolSize: 20
   iconHolderPoolSize: 20
   icon: {fileID: -2078903064163315046, guid: 645b1bc3b3832324a8cdc90be54b8688, type: 3}
