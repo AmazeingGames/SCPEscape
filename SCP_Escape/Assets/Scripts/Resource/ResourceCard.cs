@@ -34,11 +34,6 @@ public class ResourceCard : MonoBehaviour
 
     }
 
-    void Awake()
-    {
-
-    }
-
     void Start()
     {
         //Debug.Log($"Is GameManager.Deck null? : {GameManager.Deck == null}");

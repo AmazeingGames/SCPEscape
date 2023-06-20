@@ -74,7 +74,6 @@ public class ChoiceCard : MonoBehaviour
     private void OnEnable()
     {
         Manager.OnCardChangeInConsumer += ReadyIcon;
-
     }
 
     private void OnDisable()
@@ -88,7 +87,7 @@ public class ChoiceCard : MonoBehaviour
 
     void Update()
     {
-        Debug.Log($"Choice Card: {flavorText} has {iconResourceRequirements.Count} icon resource requirements");
+        //Debug.Log($"Choice Card: {flavorText} has {iconResourceRequirements.Count} icon resource requirements");
         //Sets important variables
         IsMouseOver();
         IsClicked();

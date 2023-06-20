@@ -7,14 +7,12 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using static GameManager;
 using static EncounterDeck;
+using static EncounterAnimator;
+using Animation = EncounterAnimator.Animation;
 
 public class EncounterCard : MonoBehaviour
 {
-    //On second thought this event is sort of pointless.
-    //It's an event meant to tell the encounter deck that an animation is finished so we can play a new animation from the encounter deck
-    //Why not play the animation here instead?
-
-    //public event Action<EncounterCard> FinishedAnimation;
+    public event EventHandler<CardAnimationEventArgs> CardAnimation = null;
 
     [SerializeField] Encounter encounter;
 
@@ -23,14 +21,6 @@ public class EncounterCard : MonoBehaviour
     [SerializeField] TextMeshProUGUI flavorText;
     [SerializeField] LayerMask encounterCardLayer;
 
-    [Header("Encounter Lerping")]
-    [SerializeField] float lerpSpeed = .5f;
-    [SerializeField] AnimationCurve curve;
-
-    Transform hiddenPosition;
-    Transform revealedPosition;
-
-    GameObject Nodes => Manager.Nodes;
 
     public List<ChoiceCard> ChoiceCards { get; } = new();
     public Encounter Encounter { get => encounter; private set => encounter = value; }
@@ -41,19 +31,16 @@ public class EncounterCard : MonoBehaviour
     bool isChoiceSelected = false;
     bool canBeClicked = true;
 
-    bool isHiding;
-    bool shouldLerp;
-    float current;
-    Vector2 lerpTo;
-    Vector3 startPosition;
+    public Action LerpStart;
+    public Action LerpEnd;
 
     void Start()
     {
+        LerpStart += OnLerpStart;
+        LerpEnd += OnLerpEnd;
+
         //This used to be in Update, not sure why, but consider moving it back in case of bugs
         GetChoices();
-
-        hiddenPosition = Nodes.transform.Find("EncounterHidden");
-        revealedPosition = Nodes.transform.Find("EncounterRevealed");
     }
 
     void Update()
@@ -64,11 +51,20 @@ public class EncounterCard : MonoBehaviour
         IsClicked();
 
         MoveCards();
-        LerpTo();
+    }
+
+    private void OnEnable()
+    {
+        CardAnimation += AnimationManager.OnCardAnimation;
+    }
+
+    private void OnDisable()
+    {
+        CardAnimation += AnimationManager.OnCardAnimation;
     }
 
     //Checks if the mouse is over this card
-    void CheckMouseOver() => isMouseOver = GameManager.IsOver(encounterCardLayer, transform);
+    void CheckMouseOver() => isMouseOver = IsOver(encounterCardLayer, transform);
 
     //Checks if the player is clicking on the card
     void IsClicked() => isClicked = (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0));
@@ -83,103 +79,13 @@ public class EncounterCard : MonoBehaviour
         if (isClicked)
         {
             if (areChoicesRevealed)
-                ObscureChoices();
+                CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() 
+                { Animation.HideChoices, Animation.RevealEncounter }));
             else
-                RevealChoices();
+                CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() 
+                { Animation.RevealChoices, Animation.HideEncounter }));
 
             areChoicesRevealed = !areChoicesRevealed;
-        }
-    }
-
-    //Ideally the animations would play out like this: A card is drawn from the deck, placed face down in the center of the table and flips over revealing the encounter. Clicking causes it to slide to the side, and choice cards to slide out from under it, revealing the player's options
-    //Purpose is to reveal the choices and put them into play, allowing them to be selected.
-    //This would also move the encounter to the side to obscure it.
-    void RevealChoices()
-    {
-        HideEncounter();
-        ActivateChoices(setActive : true);
-    }
-
-    //Purpose is to hide the choices and remove them from play, not allowing them to be selected.
-    //This would also move the encounter to the forefront.
-    void ObscureChoices()
-    {
-        RevealEncounter();
-        ActivateChoices(setActive : false);
-    }
-
-    //Purpose is to start the lerp and move the encounter out of the way to make room for the choices when they're revealed
-    void HideEncounter() => StartLerp(isHiding: true, lerpTo: hiddenPosition.position, newParent: Manager.GameCanvas.transform);
-
-    //Purpose is to start the lerp and move the encounter front and center
-    void RevealEncounter() => StartLerp(isHiding : false, lerpTo : revealedPosition.position, newParent : null);
-
-    //Responsible for setting the variables needed to actually lerp
-    void StartLerp(bool isHiding, Vector2 lerpTo, Transform newParent)
-    {
-        if (newParent != null)
-            transform.SetParent(newParent);
-
-        current = 0;
-        startPosition = transform.position;
-
-        this.isHiding = isHiding;
-        this.lerpTo = lerpTo;
-
-        shouldLerp = true;
-    }
-
-    //Purpose is to animate moving the card up and down when clicking the encounter, and set the proper parent once lerp is finished
-    void LerpTo()
-    {
-        if (shouldLerp)
-        {
-            canBeClicked = false;
-
-            current = Mathf.MoveTowards(current, 1, lerpSpeed * Time.deltaTime);
-
-            transform.position = Vector3.Lerp(startPosition, lerpTo, curve.Evaluate(current));
-
-            //Lerp is finished; cleanup
-            if (current == 1)
-            {
-                canBeClicked = true;
-                shouldLerp = false;
-
-                Transform newParent;
-
-                if (isHiding)
-                    newParent = Manager.GameCanvas.transform;
-                else
-                    newParent = Manager.Choices.transform;
-                
-                transform.SetParent(newParent, false);
-
-                if (isChoiceSelected)
-                {
-                    //What is this and when did this happen?
-
-                    Debug.Log("Finished animation, ready to play the discard animation. Perhaps I should only play the discard animation when told by the encounter deck? But I do think this should manage the animations, or maybe I should create a separate animation class to handle all of the game's animations...");
-                    //FinishedAnimation.Invoke(this);
-                }
-
-            }
-        }
-    }
-
-    //The animation in my head for this is the choices come down in a single pile, then slide over to both sides from the center until all cards are in place.
-    //This could be done by placing node locations.
-    //This is a lot easier to place manually, granted the cards don't move or change too much, than it is to place them procedurally via nodes
-
-    //Purpose is to show or hide the choices by setting them active
-    void ActivateChoices(bool setActive)
-    {
-        for (int i = 0; i < ChoiceCards.Count; i++)
-        {
-            ChoiceCard currentChoiceCard = ChoiceCards[i];
-
-            currentChoiceCard.gameObject.SetActive(setActive);
-            currentChoiceCard.transform.SetParent(Manager.Choices.transform);
         }
     }
 
@@ -210,14 +116,23 @@ public class EncounterCard : MonoBehaviour
     {
         isChoiceSelected = true;
 
-        ObscureChoices();
+        CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() { Animation.DiscardEncounter }));
 
         foreach (ChoiceCard choiceCard in ChoiceCards)
             choiceCard.DiscardChoice();
-
     }
 
-    void DiscardEncounter()
+    void OnLerpStart()
+    {
+        canBeClicked = false;
+    }
+
+    void OnLerpEnd()
+    {
+        canBeClicked = true;
+    }
+
+    void DiscardCleanup()
     {
         encounter = null;
         isChoiceSelected = false;

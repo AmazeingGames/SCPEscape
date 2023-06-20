@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using static GameManager;
+using static EncounterAnimator;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 //The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
@@ -33,7 +34,7 @@ public class EncounterDeck : MonoBehaviour
         ShuffleIntoDeck(StartingEncounters);
     }
 
-    private void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha0))
             DrawNextEncounter();
@@ -68,6 +69,8 @@ public class EncounterDeck : MonoBehaviour
             return;
         }
 
+        Debug.Log("set encounter");
+
         ActiveEncounter = encounter;
 
         Debug.Log($"Set active encounter card {ActiveEncounter}");
@@ -85,16 +88,12 @@ public class EncounterDeck : MonoBehaviour
     IEnumerator SetActiveEncounter()
     {
         if (ActiveEncounter.ChoiceCards.Count == 0)
-        {
             yield return null;
-        }
 
-        //This doesn't seem to work
-        foreach (ChoiceCard choiceCard in ActiveEncounter.ChoiceCards)
-        {
-            Debug.Log("Hooked addToDiscard into the choice card");
-            choiceCard.ChoiceSelection += AddCardToDiscard;
-        }
+        AnimationManager.DiscardEncounter += AddCardToDiscard;
+
+        foreach (ChoiceCard card in ActiveEncounter.ChoiceCards)
+            card.gameObject.SetActive(true);
 
         yield break;
     }
@@ -102,17 +101,20 @@ public class EncounterDeck : MonoBehaviour
     EncounterCard GetFromEncounterPool() => GetTypeFromPool<EncounterCard>(EncounterPool);
 
     //Purpose is to add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
-    void AddCardToDiscard(object sender, CardSelectionEventArgs args)
+    void AddCardToDiscard(EncounterCard cardToDiscard)
     {
-        foreach (ChoiceCard choiceCard in ActiveEncounter.ChoiceCards)
-            choiceCard.ChoiceSelection -= AddCardToDiscard;
+        Debug.Log("Adding card to discard");
 
-        DrawPile.Remove(ActiveEncounter.Encounter);
-        DiscardPile.Add(ActiveEncounter.Encounter);
+        DrawPile.Remove(cardToDiscard.Encounter);
+        DiscardPile.Add(cardToDiscard.Encounter);
         
-        MoveToPool(ActiveEncounter, EncounterPool);
+        MoveToPool(cardToDiscard, EncounterPool);
 
-        ActiveEncounter = null;
+        if (cardToDiscard == ActiveEncounter)
+        {
+            Debug.Log("Set Active Encounter null");
+            ActiveEncounter = null;
+        }
     }
 
 

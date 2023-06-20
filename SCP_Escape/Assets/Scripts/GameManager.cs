@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static GameManager Manager;
+    public static GameManager Manager { get; private set; }
 
     GameObject resourcePool;
     GameObject handHolder;
@@ -126,12 +126,6 @@ public class GameManager : MonoBehaviour
         resources = new List<Resource> { ration, escapee, scientist, insanity, munition, anomaly };
         resources1 = new List<Resource> { ration1, escapee1, scientist1, insanity1, munition1, anomaly1 };
 
-        CreateEncounterPool();
-        CreateResourcePool();
-        CreateIconPool();
-        CreateChoicePool();
-        CreateIconHolderPool();
-
         TypeToResource = new Dictionary<ECardType, Resource>()
         {
             { ECardType.Anomaly  ,  anomaly1    },
@@ -145,6 +139,13 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        CreateEncounterPool();
+        CreateResourcePool();
+        CreateIconPool();
+        CreateChoicePool();
+        CreateIconHolderPool();
+
+
         AddStartingResources();
 
         SwapResources(resources1);
