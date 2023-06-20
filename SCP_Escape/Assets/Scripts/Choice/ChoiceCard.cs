@@ -11,6 +11,7 @@ using static Resource;
 using static GameManager;
 using static EncounterDeck;
 using static System.Type;
+using Mono.Cecil;
 
 //TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
 public class ChoiceCard : MonoBehaviour
@@ -51,6 +52,8 @@ public class ChoiceCard : MonoBehaviour
 
     public event EventHandler<CardSelectionEventArgs> ChoiceSelection;
 
+    public Action ReadyStartingIcons;
+
     List<ECardType> CardTypesInConsumer => ConvertResourceCardListToResourceType(Manager.Consumer);
 
     readonly List<IconHolder> iconResourceRequirements = new();
@@ -79,6 +82,11 @@ public class ChoiceCard : MonoBehaviour
     private void OnDisable()
     {
         Manager.OnCardChangeInConsumer -= ReadyIcon;
+    }
+
+    private void Awake()
+    {
+        ReadyStartingIcons += ImmediatelyReadyIcons;
     }
 
     void Start()
@@ -220,6 +228,12 @@ public class ChoiceCard : MonoBehaviour
 
         IsReady = (consumerTypes.Count() == iconResourceRequirements.Count() && areAllIconsReadied);
 
+    }
+
+    void ImmediatelyReadyIcons()
+    {
+        foreach (ECardType resource in CardTypesInConsumer)
+            ReadyIcon(resource, true);
     }
 
     //Sets the value of 'isReady' for one of the icon requirements based on the given paramates

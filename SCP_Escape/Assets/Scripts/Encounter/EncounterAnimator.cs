@@ -57,7 +57,6 @@ public class EncounterAnimator : MonoBehaviour
         hiddenPosition = Nodes.transform.Find("EncounterHidden");
         revealedPosition = Nodes.transform.Find("EncounterRevealed");
         fullyHiddenPosition = Nodes.transform.Find("FullyHiddenPosition");
-
     }
 
     private void Update()

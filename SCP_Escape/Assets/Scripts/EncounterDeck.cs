@@ -93,7 +93,10 @@ public class EncounterDeck : MonoBehaviour
         AnimationManager.DiscardEncounter += AddCardToDiscard;
 
         foreach (ChoiceCard card in ActiveEncounter.ChoiceCards)
+        {
             card.gameObject.SetActive(true);
+            card.ReadyStartingIcons();
+        }
 
         yield break;
     }
