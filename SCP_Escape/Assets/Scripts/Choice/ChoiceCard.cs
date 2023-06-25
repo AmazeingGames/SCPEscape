@@ -115,7 +115,7 @@ public class ChoiceCard : MonoBehaviour
     void SelectChoice()
     {
         if (isClickedDelay && Input.GetMouseButtonUp(0) && IsReady)
-            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));            
+            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));
     }
 
     //Sets the color of the card based on cards in the consumer and whether it's being clicked
