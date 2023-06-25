@@ -219,7 +219,7 @@ public class GameManager : MonoBehaviour
     public void AddIcon(Icon iconToAdd) => allIcons.Add(iconToAdd);
 
     //Given a list of Resource Cards, returns a list of their resource types 
-    public static List<ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards) => ListToResourceTypeList(resourceCards, t => t._Resource.CardType);
+    public static List<ECardType> ConvertResourceCardListToResourceType(List<ResourceCard> resourceCards) => ListToResourceTypeList(resourceCards, t => t.Resource.CardType);
 
     //Given a list of Resource Objects, returns a list of their resource type
     public static List<ECardType> ConvertResourceCardListToResourceType(List<Resource> resourceCards) => ListToResourceTypeList(resourceCards, t => t.CardType);
@@ -241,7 +241,7 @@ public class GameManager : MonoBehaviour
     }
 
     //Sets the resource object of all resources cards
-    void SwapResources(List<Resource> resources) => SetResourceObject(allCards, c => c.SetResource(ReturnResourceMatch(resources, c._Resource.CardType)));
+    void SwapResources(List<Resource> resources) => SetResourceObject(allCards, c => c.SetResource(ReturnResourceMatch(resources, c.Resource.CardType)));
 
     //Sets the resource object of all resource icons
     void SwapIcons(List<Resource> resources) => SetResourceObject(allIcons, i => i.SetResource(ReturnResourceMatch(resources, i.IconResource.CardType)));
@@ -422,7 +422,7 @@ public class GameManager : MonoBehaviour
             }
 
             if (card.gameObject.activeSelf == false)
-                switch (card._Resource.CardType)
+                switch (card.Resource.CardType)
                 {
                     case ECardType.Anomaly:
                         AddResourceIfAvailable(ref anomalies);
@@ -466,7 +466,7 @@ public class GameManager : MonoBehaviour
     public ChoiceCard GetFromChoicePool() => GetTypeFromPool<ChoiceCard>(ChoicePool);
 
     //Returns the first inactive resource matching a given resource type, from the resource pool
-    ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c._Resource.CardType == resourceType);
+    ResourceCard GetFromResourcePool(ECardType resourceType) => GetTypeFromPool<ResourceCard>(resourcePool, c => c.Resource.CardType == resourceType);
 
     //Grabs the first inactive Icon Holder, it grabs all the icons it needs, and then we return it
     public IconHolder GetFromIconHolderPool(params Resource[] resources)
@@ -532,13 +532,13 @@ public class GameManager : MonoBehaviour
 
     void MoveCardToConsumer(ResourceCard resourceCard)
     {
-        var parent = resourceConsumer.transform.Find(resourceCard._Resource.CardType.ToString());
+        var parent = resourceConsumer.transform.Find(resourceCard.Resource.CardType.ToString());
 
         MoveTo(resourceCard, parent, keepWorldPosition: false, newLocalScale: resourceConsumerCardScale, addToList: Consumer, displayIndicator: true, removeFromLists: Hand);
 
-        UpdateConsumerIndicators(resourceCard._Resource.CardType, -1);
+        UpdateConsumerIndicators(resourceCard.Resource.CardType, -1);
 
-        OnCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, true);
+        OnCardChangeInConsumer?.Invoke(resourceCard.Resource.CardType, true);
     }
 
 
@@ -589,7 +589,7 @@ public class GameManager : MonoBehaviour
     void RemoveFromConsumer(ResourceCard resourceCard)
     {
         if (Consumer.Remove(resourceCard))
-            OnCardChangeInConsumer?.Invoke(resourceCard._Resource.CardType, false);
+            OnCardChangeInConsumer?.Invoke(resourceCard.Resource.CardType, false);
     }
 
     #endregion
@@ -644,7 +644,7 @@ public class GameManager : MonoBehaviour
         List<ResourceCard> resourceCards = new();
 
         foreach (ResourceCard card in Consumer)
-            if (card._Resource.CardType == resourceType)
+            if (card.Resource.CardType == resourceType)
                 resourceCards.Add(card);
 
         return resourceCards;
@@ -664,13 +664,13 @@ public class GameManager : MonoBehaviour
 
             regularScale = holdingResourceCard.transform.localScale;
 
-            regularSortingOrder = holdingResourceCard._CanvasComponent.sortingOrder;
+            regularSortingOrder = holdingResourceCard.CanvasComponent.sortingOrder;
 
             holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
             
-            holdingResourceCard._CanvasComponent.sortingLayerID = holdingCardLayer;
+            holdingResourceCard.CanvasComponent.sortingLayerID = holdingCardLayer;
 
-            UpdateConsumerIndicators(holdingResourceCard._Resource.CardType, -1);
+            UpdateConsumerIndicators(holdingResourceCard.Resource.CardType, -1);
         }
     }
 
@@ -680,12 +680,12 @@ public class GameManager : MonoBehaviour
         if (holdingResourceCard != null && Input.GetMouseButtonUp(0))
         {
             holdingResourceCard.transform.localScale = regularScale;
-            holdingResourceCard._CanvasComponent.sortingOrder = regularSortingOrder;
+            holdingResourceCard.CanvasComponent.sortingOrder = regularSortingOrder;
 
             if (IsOverHandHolder() && IsOverResourceConsumer())
                 Debug.LogWarning("Mouse is over two colliders. Bug.");
 
-            var resources = GetResourcesFromConsumer(holdingResourceCard._Resource.CardType);
+            var resources = GetResourcesFromConsumer(holdingResourceCard.Resource.CardType);
             
             if (IsOverResourceConsumer() && resources.Count < 5)
                 MoveCardToConsumer(holdingResourceCard);

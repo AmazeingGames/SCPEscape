@@ -4,84 +4,67 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using JetBrains.Annotations;
+using UnityEngine.Serialization;
 
 public class ResourceCard : MonoBehaviour
 {
-    [SerializeField] Resource resource;
+    [field: FormerlySerializedAs("resource")]               [field: SerializeField] public Resource Resource { get; private set; }
 
-    [SerializeField] Image textureComponent;
-    [SerializeField] TextMeshProUGUI initialComponent;
-    [SerializeField] Canvas canvasComponent;
-    [SerializeField] Image resourceSymbol;
+    [field: FormerlySerializedAs("textureComponent")]       [field: SerializeField] public Image TextureComponent { get; private set; }
+    [field: FormerlySerializedAs("initialComponent")]       [field: SerializeField] public TextMeshProUGUI InitialComponent { get; private set; }
+    [field: FormerlySerializedAs("canvasComponent")]        [field: SerializeField] public Canvas CanvasComponent { get; private set; }
+    [field: FormerlySerializedAs("resourceSymbol")]         [field: SerializeField] public Image ResourceSymbol { get; private set; }
 
-    [SerializeField] Image indicatorBorder;
-    [SerializeField] Image indicatorNumber;
-    [SerializeField] Image indicatorBackground;
+    [field: FormerlySerializedAs("indicatorBorder")]        [field: SerializeField] public Image IndicatorBorder { get; private set; }
+    [field: FormerlySerializedAs("indicatorNumber")]        [field: SerializeField] public Image IndicatorNumber { get; private set; }
+    [field: FormerlySerializedAs("indicatorBackground")]    [field: SerializeField] public Image IndicatorBackground { get; private set; }
 
-    [SerializeField] Image CardWhite;
-    [SerializeField] Image CardSafeArea;
-    [SerializeField] Icon icon;
-
-    public Image IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
-    public Image IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }
-    public Image IndicatorNumber { get => indicatorNumber; private set => indicatorNumber = value; }
-    public Image ResourceSymbol { get => resourceSymbol; private set => resourceSymbol = value; }
-    public Resource _Resource { get => resource; private set => resource = value; }
-    public Canvas _CanvasComponent { get => canvasComponent; private set => canvasComponent = value; }
-
-    public void SetIcon()
-    {
-
-    }
+    [field: FormerlySerializedAs("CardWhite")]              [field: SerializeField] public Image CardWhite { get; private set; }
+    [field: FormerlySerializedAs("CardSafeArea")]           [field: SerializeField] public Image CardSafeArea { get; private set; }
+    [field: FormerlySerializedAs("icon")]                   [field: SerializeField] public Icon Icon { get; private set; }
 
     void Start()
     {
-        //Debug.Log($"Is GameManager.Deck null? : {GameManager.Deck == null}");
-
-        if (resource == null)
-        {
+        if (Resource == null)
             Debug.LogWarning("Resource should not be null");
-        }
         else
-        {
             DataMatchResource();
-        }
         
-        icon.SetResource(resource);
+        Icon.SetResource(Resource);
     }
 
     public void SetResource(Resource resource)
     {
-        this.resource = resource;
+        Resource = resource;
 
         DataMatchResource();
     }
 
     public void DataMatchResource()
     {
-        resourceSymbol.sprite = resource.Symbol;
-        textureComponent.sprite = resource.Texture;
-        initialComponent.text = resource.Initial.ToString();
-        initialComponent.color = resource.InitialColor;
-        resourceSymbol.color = resource.SymbolColor;
-        textureComponent.color = resource.TextureColor;
-        textureComponent.rectTransform.position = resource.TextureOffeset;
+        ResourceSymbol.sprite = Resource.Symbol;
+        TextureComponent.sprite = Resource.Texture;
+        InitialComponent.text = Resource.Initial.ToString();
+        InitialComponent.color = Resource.InitialColor;
+        ResourceSymbol.color = Resource.SymbolColor;
+        TextureComponent.color = Resource.TextureColor;
+        TextureComponent.rectTransform.position = Resource.TextureOffeset;
 
-        indicatorBackground.sprite = resource.IndicatorBackground;
-        indicatorBackground.color = resource.IndicatorBackgroundColor;
-        indicatorBorder.sprite = resource.IndicatorBorder;
-        indicatorBorder.color = resource.IndicatorBorderColor;
+        IndicatorBackground.sprite = Resource.IndicatorBackground;
+        IndicatorBackground.color = Resource.IndicatorBackgroundColor;
+        IndicatorBorder.sprite = Resource.IndicatorBorder;
+        IndicatorBorder.color = Resource.IndicatorBorderColor;
 
-        CardSafeArea.color = resource.CardColor;
-        CardWhite.color = resource.CardColor;
+        CardSafeArea.color = Resource.CardColor;
+        CardWhite.color = Resource.CardColor;
 
-        resourceSymbol.preserveAspect = true;
-        textureComponent.preserveAspect = true;
+        ResourceSymbol.preserveAspect = true;
+        TextureComponent.preserveAspect = true;
     }
 
     public void PrintCard()
     {
-        Debug.Log($"Card Type is: {resource.CardType}, Symbol is {resource.Symbol}, Texture is {resource.Texture}, Color is , Initial is {resource.Initial}");
+        Debug.Log($"Card Type is: {Resource.CardType}, Symbol is {Resource.Symbol}, Texture is {Resource.Texture}, Color is , Initial is {Resource.Initial}");
     }
 
 }

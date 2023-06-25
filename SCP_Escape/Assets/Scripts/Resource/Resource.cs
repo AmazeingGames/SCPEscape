@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.TextCore.Text;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(menuName = "Cards/Resources")]
 
@@ -10,33 +11,19 @@ public class Resource : ScriptableObject
 {
     public enum ECardType { Anomaly, Escapee, Insanity, Munition, Ration, Scientist }
 
-    [SerializeField] ECardType cardType;
-    [SerializeField] Sprite indicatorBackground;
-    [SerializeField] Sprite indicatorBorder;
-    [SerializeField] Sprite symbol;
-    [SerializeField] Sprite texture;
-    [SerializeField] Color indicatorBackgroundColor;
-    [SerializeField] Color indicatorBorderColor;
-    [SerializeField] Color symbolColor;
-    [SerializeField] Color textureColor;
-    [SerializeField] char initial;
-    [SerializeField] Color initialColor;
-    [SerializeField] Vector2 textureOffeset;
-    [SerializeField] Color cardColor;
-
-    public ECardType CardType { get => cardType; private set => cardType = value; }
-    public Sprite Symbol { get => symbol; private set => symbol = value; }
-    public Sprite Texture { get => texture; private set => texture = value; }
-    public Sprite IndicatorBackground { get => indicatorBackground; private set => indicatorBackground = value; }
-    public Vector2 TextureOffeset { get => textureOffeset; private set => textureOffeset = value; }
-    public Color IndicatorBackgroundColor { get => indicatorBackgroundColor; private set => indicatorBackgroundColor = value; }
-    public Color IndicatorBorderColor { get => indicatorBorderColor; private set => indicatorBorderColor = value; }
-    public Sprite IndicatorBorder { get => indicatorBorder; private set => indicatorBorder = value; }
-    public Color InitialColor { get => initialColor; private set => initialColor = value; }
-    public char Initial { get => initial; private set => initial = value; }
-    public Color SymbolColor { get => symbolColor; private set => symbolColor = value; }
-    public Color TextureColor { get => textureColor; private set => textureColor = value; }
-    public Color CardColor { get => cardColor; private set => cardColor = value; }
+    [field: FormerlySerializedAs("cardType")]                   [field: SerializeField] public ECardType CardType { get; private set; }
+    [field: FormerlySerializedAs("indicatorBackground")]        [field: SerializeField] public Sprite IndicatorBackground { get; private set; }
+    [field: FormerlySerializedAs("indicatorBorder")]            [field: SerializeField] public Sprite IndicatorBorder { get; private set; }
+    [field: FormerlySerializedAs("symbol")]                     [field: SerializeField] public Sprite Symbol { get; private set; }
+    [field: FormerlySerializedAs("texture")]                    [field: SerializeField] public Sprite Texture { get; private set; }
+    [field: FormerlySerializedAs("indicatorBackgroundColor")]   [field: SerializeField] public Color IndicatorBackgroundColor { get; private set; }
+    [field: FormerlySerializedAs("indicatorBorderColor")]       [field: SerializeField] public Color IndicatorBorderColor { get; private set; }
+    [field: FormerlySerializedAs("symbolColor")]                [field: SerializeField] public Color SymbolColor { get; private set; }
+    [field: FormerlySerializedAs("textureColor")]               [field: SerializeField] public Color TextureColor { get; private set; }
+    [field: FormerlySerializedAs("initial")]                    [field: SerializeField] public char Initial { get; private set; }
+    [field: FormerlySerializedAs("initialColor")]               [field: SerializeField] public Color InitialColor { get; private set; }
+    [field: FormerlySerializedAs("textureOffeset")]             [field: SerializeField] public Vector2 TextureOffeset { get; private set; }
+    [field: FormerlySerializedAs("cardColor")]                  [field: SerializeField] public Color CardColor { get; private set; }
 
     public bool HasBeenPlayed { get; protected set; }
     public bool HasBeenConsumed { get; protected set; }
