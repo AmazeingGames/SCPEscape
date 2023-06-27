@@ -12,7 +12,7 @@ using Animation = EncounterAnimator.Animation;
 
 public class EncounterCard : MonoBehaviour
 {
-    public event EventHandler<CardAnimationEventArgs> CardAnimation = null;
+    public event EventHandler<CardAnimationEventArgs> StartCardAnimation = null;
 
     [SerializeField] Encounter encounter;
 
@@ -31,20 +31,19 @@ public class EncounterCard : MonoBehaviour
     bool isChoiceSelected = false;
     bool canBeClicked = true;
 
-    public Action LerpStart;
-    public Action LerpEnd;
+    public Action LerpStarted;
+    public Action LerpFinished;
 
     void Start()
     {
-        LerpStart += OnLerpStart;
-        LerpEnd += OnLerpEnd;
-
-        //This used to be in Update, not sure why, but consider moving it back in case of bugs
-        GetChoices();
     }
 
     void Update()
     {
+        GetChoices(); //Maybe move this to only be called when needed.
+
+        //Debug.Log("Choice cards count : " + ChoiceCards.Count);
+
         SetAndMatchEncounter(encounter);
 
         CheckMouseOver();
@@ -55,12 +54,20 @@ public class EncounterCard : MonoBehaviour
 
     private void OnEnable()
     {
-        CardAnimation += AnimationManager.OnCardAnimation;
+        StartCardAnimation += AnimationManager.OnCardAnimation;
+        AnimationManager.DiscardEncounter += DiscardCleanup;
+
+        LerpStarted += OnLerpStart;
+        LerpFinished += OnLerpEnd;
     }
 
     private void OnDisable()
     {
-        CardAnimation += AnimationManager.OnCardAnimation;
+        StartCardAnimation -= AnimationManager.OnCardAnimation;
+        AnimationManager.DiscardEncounter -= DiscardCleanup;
+
+        LerpStarted -= OnLerpStart;
+        LerpFinished -= OnLerpEnd;
     }
 
     //Checks if the mouse is over this card
@@ -79,11 +86,18 @@ public class EncounterCard : MonoBehaviour
         if (isClicked)
         {
             if (areChoicesRevealed)
-                CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() 
+            {
+                //Debug.Log("Invoking animation : Reveal encounter");
+
+                StartCardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>()
                 { Animation.HideChoices, Animation.RevealEncounter }));
+            }
             else
-                CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() 
+            {
+                StartCardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>()
                 { Animation.RevealChoices, Animation.HideEncounter }));
+            }
+                
 
             areChoicesRevealed = !areChoicesRevealed;
         }
@@ -104,6 +118,7 @@ public class EncounterCard : MonoBehaviour
 
                 currentChoiceCard.SetChoice(currentChoice);
                 currentChoiceCard.transform.SetParent(transform);
+                currentChoiceCard.transform.position = new Vector3(100, 100, currentChoiceCard.transform.position.z);
 
                 currentChoiceCard.ChoiceSelection += OnChoiceSelection;
             }
@@ -116,7 +131,7 @@ public class EncounterCard : MonoBehaviour
     {
         isChoiceSelected = true;
 
-        CardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() { Animation.DiscardEncounter }));
+        StartCardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() { Animation.DiscardEncounter }));
 
         foreach (ChoiceCard choiceCard in ChoiceCards)
             choiceCard.DiscardChoice();
@@ -132,15 +147,22 @@ public class EncounterCard : MonoBehaviour
         canBeClicked = true;
     }
 
-    void DiscardCleanup()
+    //This doesn't actually need the paramater, but it's called via an event that does.
+    void DiscardCleanup(EncounterCard encounterCard)
     {
+        //Debug.Log("Discard cleanup");
+        
         encounter = null;
         isChoiceSelected = false;
+        areChoicesRevealed = false;
+        ChoiceCards.Clear();
     }
 
     //Purpose is to set all of this card's details to that of an assigned scriptable object encounter
     public void SetAndMatchEncounter(Encounter encounter)
     {
+        if (encounter == null)
+            Debug.LogWarning("Setting encounter to null");
         this.encounter = encounter;
 
         if (encounter == null)

@@ -107,7 +107,7 @@ public class ChoiceCard : MonoBehaviour
     void SelectChoice()
     {
         if (isClickedDelay && Input.GetMouseButtonUp(0) && IsReady)
-            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));            
+            ChoiceSelection?.Invoke(this, new CardSelectionEventArgs(choice.ResourceRewards, choice.EncounterRewards));
     }
 
     //Sets the color of the card based on cards in the consumer and whether it's being clicked
@@ -194,6 +194,15 @@ public class ChoiceCard : MonoBehaviour
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
     void SetIsReady()
     {
+        //choice is null, encounter deck discard pile keeps duplicating, functions that should be called only once are being called for every choice. Instead they should be called only once.
+
+        if (choice == null)
+        {
+            Debug.LogError("Choice is null");
+            return;
+
+        }
+
         List<ECardType> consumerTypes = CardTypesInConsumer;
         List<List<ECardType>> requirementTypes = choice.ResourceRequirements.ToList();
 
@@ -453,6 +462,11 @@ public class ChoiceCard : MonoBehaviour
         MoveToPool(this, Manager.ChoicePool);
 
         choice = null;
+
+        ChoiceState = EChoiceState.Unready;
+        IsReady = false;
+        isMouseOver = false;
+        isClickedDelay = false;
 
         iconResourceRequirements.Clear();
         iconResourceRewards.Clear();

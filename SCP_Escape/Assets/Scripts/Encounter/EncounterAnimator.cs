@@ -48,7 +48,6 @@ public class EncounterAnimator : MonoBehaviour
         else
             Destroy(AnimationManager);
 
-        Debug.Log($"Animation Manager null : {AnimationManager == null}");
     }
 
     // Start is called before the first frame update
@@ -60,21 +59,18 @@ public class EncounterAnimator : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        
-    }
-
+    //This is calling the discard animation too many times. One additional for every time we discard a card
     public void OnCardAnimation(object sender, CardAnimationEventArgs args)
     {
         foreach (List<Animation> animations in args.AnimationsToPlay)
         {
             foreach (Animation animation in animations)
             {
-                Debug.Log($"Playing animation : \"{animation}\"");
+                //Debug.Log($"Playing animation : \"{animation}\"");
                 switch (animation)
                 {
                     case Animation.DiscardEncounter:
+                        Debug.Log("this was called x times on discard");
                         StartCoroutine(LerpEncounterCard(args.CardToAnimate, lerpTo: revealedPosition.position, newParent: Manager.Choices.transform, animationEvent: Animation.DiscardEncounter));
 
                         ActivateChoices(args.CardToAnimate.ChoiceCards, setActive: false);
@@ -108,9 +104,11 @@ public class EncounterAnimator : MonoBehaviour
     }
 
     //Purpose is to animate moving the card up and down when clicking the encounter, and set the proper parent once lerp is finished
+    //This is being called an extra time for every time, for some reason
+
     public IEnumerator LerpEncounterCard(EncounterCard encounterCard, Vector2 lerpTo, bool shouldSetTempParent = true, Transform tempParent = null, bool shouldSetNewParent = true, Transform newParent = null, Animation animationEvent = Animation.Unknown)
     {
-        encounterCard.LerpStart();
+        encounterCard.LerpStarted();
 
         var lerpStartPosition = encounterCard.transform.position;
 
@@ -119,11 +117,17 @@ public class EncounterAnimator : MonoBehaviour
 
         encounterCard.transform.position = lerpStartPosition;
 
+        float animationLength = 0;
         current = 0;
         startPosition = encounterCard.transform.position;
 
+        Debug.Log($"Current is {current}");
+        Debug.Log($"startPosition is {startPosition}");
+
+
         while (true)
         {
+            animationLength += Time.deltaTime;
 
             current = Mathf.MoveTowards(current, 1, lerpSpeed * Time.deltaTime);
 
@@ -132,10 +136,13 @@ public class EncounterAnimator : MonoBehaviour
             //Lerp is finished; cleanup
             if (current == 1)
             {
-                Debug.Log("Coroutine finished");
+               Debug.Log($"Animation finished in {animationLength} seconds. "); // Why is the length of the animation being cut in half each time?
 
                 if (shouldSetNewParent)
                     encounterCard.transform.SetParent(newParent, false);
+                
+                encounterCard.gameObject.SetActive(true); //it's weird I need to set active here; I don't know what's setting it to false in the first place...
+                encounterCard.LerpFinished();
 
                 switch (animationEvent)
                 {
@@ -144,7 +151,7 @@ public class EncounterAnimator : MonoBehaviour
                     case Animation.DrawEncounter:
                         break;
                     case Animation.DiscardEncounter:
-                        Debug.Log("Invoked discard encounter");
+                        //Debug.Log("Invoked discard encounter");
                         DiscardEncounter.Invoke(encounterCard);
                         break;
                     case Animation.HideEncounter:
@@ -157,7 +164,6 @@ public class EncounterAnimator : MonoBehaviour
                         break;
                 }
 
-                encounterCard.LerpEnd();
 
                 yield break;
             }
@@ -172,8 +178,16 @@ public class EncounterAnimator : MonoBehaviour
         {
             ChoiceCard currentChoiceCard = choiceCards[i];
 
-            currentChoiceCard.gameObject.SetActive(setActive);
-            currentChoiceCard.transform.SetParent(Manager.Choices.transform);
+            if (setActive)
+            {
+                currentChoiceCard.transform.SetParent(Manager.Choices.transform);
+            }
+            else
+            {
+                currentChoiceCard.transform.SetParent(null);
+                transform.position = new Vector3(100, 100, currentChoiceCard.transform.position.z);
+            }
+
         }
     }
 }
