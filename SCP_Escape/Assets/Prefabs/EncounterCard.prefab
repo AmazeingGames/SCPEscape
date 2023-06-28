@@ -409,7 +409,7 @@ MonoBehaviour:
   encounterCardLayer:
     serializedVersion: 2
     m_Bits: 512
-  willBeClickedTimerLength: 0.15
+  CoyoteClickTimerLength: 0.15
 --- !u!114 &2016379984666449119
 MonoBehaviour:
   m_ObjectHideFlags: 0
