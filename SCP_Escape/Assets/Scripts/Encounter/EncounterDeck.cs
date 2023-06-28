@@ -8,8 +8,8 @@ using static GameManager;
 using static EncounterAnimator;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
-//The architecture of this should be like a black box the GameManager can use to perform actions related to the encounter deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
-//Now I'm thinking I can just put all of the functionality of the encounter deck here instead since the GameManager is already pretty full
+//The architecture of this should be like a black box the GameManager can use to perform actions related to the encounterCard deck. The gamemanager will manage the actual deck and the encounterDeck will act as an assistant-manager (assistant to the manager)
+//Now I'm thinking I can just put all of the functionality of the encounterCard deck here instead since the GameManager is already pretty full
 public class EncounterDeck : MonoBehaviour
 {
     //So I can either create an event for the card to be sent to the discard, and the event is raised whenever the card finishes lerping, or I can subscribe to the onChoiceSelection event and wait for the animation to finish before discarding the card.
@@ -18,7 +18,8 @@ public class EncounterDeck : MonoBehaviour
 
     public static EncounterDeck DeckManager { get; private set; }
 
-    public EncounterCard ActiveEncounter { get; private set; } = null;
+    public EncounterCard ActiveEncounterCard { get; private set; } = null;
+    public Encounter EncounterInUse { get; private set; } = null;
     GameObject EncounterPool => Manager.EncounterPool;
 
     public List<Encounter> DrawPile { get; private set; } = new();
@@ -34,20 +35,38 @@ public class EncounterDeck : MonoBehaviour
         ShuffleIntoDeck(StartingEncounters);
     }
 
+    private void Start()
+    {
+        AnimationManager.DiscardEncounter += AddCardToDiscard;
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha0))
             DrawNextEncounter();
     }
 
+    private void OnEnable()
+    {
+        if (AnimationManager != null)
+        {
+            AnimationManager.DiscardEncounter += AddCardToDiscard;
+        }
+    }
 
-    //The purpose of this is to grab from the encounter pool and set it to an encounter
+    private void OnDisable()
+    {
+        AnimationManager.DiscardEncounter -= AddCardToDiscard;
+    }
+
+
+    //The purpose of this is to grab from the encounterCard pool and set it to an encounterCard
     void DrawNextEncounter()
     {
-        EncounterCard encounter = GetFromEncounterPool();
+        EncounterCard encounterCard = GetFromEncounterPool();
 
-        bool noEncountersLeft           = encounter == null;
-        bool activeEncounterAlreadySet  = ActiveEncounter != null;
+        bool noEncountersLeft           = encounterCard == null;
+        bool activeEncounterAlreadySet  = ActiveEncounterCard != null;
         bool noCardsInDraw              = DrawPile.Count <= 0;
 
         if (noEncountersLeft || activeEncounterAlreadySet || noCardsInDraw)
@@ -57,43 +76,53 @@ public class EncounterDeck : MonoBehaviour
             if (noEncountersLeft)
                debugString += "No encounters left in pool. ";
             if (activeEncounterAlreadySet)
-                debugString += "Trying to set encounter when encounter already exists. ";
+                debugString += "Trying to set encounterCard when encounterCard already exists. ";
             if (noCardsInDraw)
             {
                 ShuffleInDiscard();
                 debugString += "No cards left to draw in draw pile. Shuffle deck. ";
             }
 
-            Debug.Log(debugString);
+            //Debug.Log(debugString);
 
             return;
         }
 
-        Debug.Log("set encounter");
+        //Debug.Log("set encounterCard");
 
-        ActiveEncounter = encounter;
+        ActiveEncounterCard = encounterCard;
 
-        Debug.Log($"Set active encounter card {ActiveEncounter}");
+        EncounterInUse = DrawPile[0];
 
-        ActiveEncounter.SetAndMatchEncounter(DrawPile[0]);
+        DrawPile.Remove(EncounterInUse);
 
-        ActiveEncounter.gameObject.SetActive(true);
+        if (EncounterInUse == null)
+            Debug.LogWarning("encounter is null");
 
-        ActiveEncounter.transform.SetParent(Manager.Choices.transform);
+        ActiveEncounterCard.SetAndMatchEncounter(EncounterInUse);
+
+        ActiveEncounterCard.gameObject.SetActive(true);
+
+        ActiveEncounterCard.transform.SetParent(Manager.Choices.transform);
+
+        //Debug.Log(ActiveEncounterCard.Encounter);
 
         StartCoroutine(SetActiveEncounter());
     }
 
-    //Purpose of this is to prepare the given card as the next encounter card
+    //Purpose of this is to prepare the given card as the next encounterCard card
     IEnumerator SetActiveEncounter()
     {
-        if (ActiveEncounter.ChoiceCards.Count == 0)
+        if (ActiveEncounterCard.ChoiceCards.Count == 0)
             yield return null;
 
         AnimationManager.DiscardEncounter += AddCardToDiscard;
 
-        foreach (ChoiceCard card in ActiveEncounter.ChoiceCards)
-        {
+        //foreach (ChoiceCard card in ActiveEncounter.ChoiceCards)
+        //{
+
+        foreach (ChoiceCard card in ActiveEncounterCard.ChoiceCards)
+        { 
             card.gameObject.SetActive(true);
             card.ReadyStartingIcons();
         }
@@ -106,20 +135,22 @@ public class EncounterDeck : MonoBehaviour
     //Purpose is to add a card to the Encounter deck discard pile, to be shuffled in the next time we need more encounters
     void AddCardToDiscard(EncounterCard cardToDiscard)
     {
-        Debug.Log("Adding card to discard");
+        //Debug.Log("Adding card to discard");
 
-        DrawPile.Remove(cardToDiscard.Encounter);
-        DiscardPile.Add(cardToDiscard.Encounter);
-        
+        //Debug.Log($"Is encounter in use null ? {EncounterInUse == null}");
+
+        if (EncounterInUse != null)
+            DiscardPile.Add(EncounterInUse); //I'm not really sure why this would be null in the first place...
+
+        EncounterInUse = null;
+
         MoveToPool(cardToDiscard, EncounterPool);
 
-        if (cardToDiscard == ActiveEncounter)
+        if (cardToDiscard == ActiveEncounterCard)
         {
-            Debug.Log("Set Active Encounter null");
-            ActiveEncounter = null;
+            ActiveEncounterCard = null;
         }
     }
-
 
     //Purpose is to have a way to randomize the draw pile when shuffling cards directly into draw
     void ShuffleInDiscard()
@@ -129,7 +160,7 @@ public class EncounterDeck : MonoBehaviour
         DiscardPile.Clear();
     }
 
-    //Purpose is a way into introduce cards into the encounter deck draw pile
+    //Purpose is a way into introduce cards into the encounterCard deck draw pile
     void ShuffleIntoDeck(List<Encounter> encountersToAdd) => ShuffleIntoDeck(encountersToAdd.ToArray());
 
     void ShuffleIntoDeck(params Encounter[] encountersToAdd)
