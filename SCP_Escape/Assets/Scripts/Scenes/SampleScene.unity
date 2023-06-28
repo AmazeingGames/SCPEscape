@@ -526,7 +526,7 @@ MonoBehaviour:
   newestCardLayer: 0
   defaultLayer: 0
   choiceCard: {fileID: 2747229927738076562, guid: 3b35ecfb087e5574b878c1d21d74cb36, type: 3}
-  encounterPoolSize: 5
+  encounterPoolSize: 1
   encounterCard: {fileID: 3489944119379325690, guid: 1198ac8ed4964f042962ce7d61f097dc, type: 3}
   choicePoolSize: 3
   iconPoolSize: 20

@@ -66,11 +66,10 @@ public class EncounterAnimator : MonoBehaviour
         {
             foreach (Animation animation in animations)
             {
-                //Debug.Log($"Playing animation : \"{animation}\"");
+
                 switch (animation)
                 {
                     case Animation.DiscardEncounter:
-                        Debug.Log("this was called x times on discard");
                         StartCoroutine(LerpEncounterCard(args.CardToAnimate, lerpTo: revealedPosition.position, newParent: Manager.Choices.transform, animationEvent: Animation.DiscardEncounter));
 
                         ActivateChoices(args.CardToAnimate.ChoiceCards, setActive: false);
@@ -121,8 +120,8 @@ public class EncounterAnimator : MonoBehaviour
         current = 0;
         startPosition = encounterCard.transform.position;
 
-        Debug.Log($"Current is {current}");
-        Debug.Log($"startPosition is {startPosition}");
+        //Debug.Log($"Current is {current}");
+        //Debug.Log($"startPosition is {startPosition}");
 
 
         while (true)
@@ -136,7 +135,7 @@ public class EncounterAnimator : MonoBehaviour
             //Lerp is finished; cleanup
             if (current == 1)
             {
-               Debug.Log($"Animation finished in {animationLength} seconds. "); // Why is the length of the animation being cut in half each time?
+                //Debug.Log($"Animation finished in {animationLength} seconds. "); // Why is the length of the animation being cut in half each time?
 
                 if (shouldSetNewParent)
                     encounterCard.transform.SetParent(newParent, false);

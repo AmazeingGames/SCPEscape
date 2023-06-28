@@ -134,7 +134,10 @@ public class EncounterCard : MonoBehaviour
         StartCardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>() { Animation.DiscardEncounter }));
 
         foreach (ChoiceCard choiceCard in ChoiceCards)
+        {
             choiceCard.DiscardChoice();
+            choiceCard.ChoiceSelection -= OnChoiceSelection;
+        }
     }
 
     void OnLerpStart()
