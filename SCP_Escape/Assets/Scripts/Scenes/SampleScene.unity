@@ -526,7 +526,7 @@ MonoBehaviour:
   newestCardLayer: 0
   defaultLayer: 0
   choiceCard: {fileID: 2747229927738076562, guid: 3b35ecfb087e5574b878c1d21d74cb36, type: 3}
-  encounterPoolSize: 5
+  encounterPoolSize: 1
   encounterCard: {fileID: 3489944119379325690, guid: 1198ac8ed4964f042962ce7d61f097dc, type: 3}
   choicePoolSize: 3
   iconPoolSize: 20
@@ -1658,7 +1658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d59227f51b626604fa6eae7c0552a721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lerpSpeed: 0.5
+  lerpSpeed: 1.8
   curve:
     serializedVersion: 2
     m_Curve:
