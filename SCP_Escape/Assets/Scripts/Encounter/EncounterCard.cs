@@ -31,6 +31,9 @@ public class EncounterCard : MonoBehaviour
     bool isChoiceSelected = false;
     bool canBeClicked = true;
 
+    [SerializeField] float CoyoteClickTimerLength;
+    float CoyoteClickTime = 0f;
+
     public Action LerpStarted;
     public Action LerpFinished;
 
@@ -50,6 +53,8 @@ public class EncounterCard : MonoBehaviour
         IsClicked();
 
         MoveCards();
+
+        CoyoteClickTime -= Time.deltaTime;
     }
 
     private void OnEnable()
@@ -74,7 +79,23 @@ public class EncounterCard : MonoBehaviour
     void CheckMouseOver() => isMouseOver = IsOver(encounterCardLayer, transform);
 
     //Checks if the player is clicking on the card
-    void IsClicked() => isClicked = (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0));
+    void IsClicked()
+    {
+
+        isClicked = (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0));
+
+        if (Input.GetMouseButtonDown(0) && isMouseOver)
+        {
+            if (!canBeClicked)
+                CoyoteClickTime = CoyoteClickTimerLength;
+        }
+
+        if (canBeClicked && CoyoteClickTime > 0)
+        {
+            isClicked = true;
+            CoyoteClickTime = 0;
+        }
+    }
 
     //Purpose is to reveal/hide choices when the encounter is clicked.
     //Choices will be initially hidden from the player, clicking the encounter reveals them and hides the encounter. Clicking the encounter again, hides the choices, and repeat.
@@ -87,8 +108,6 @@ public class EncounterCard : MonoBehaviour
         {
             if (areChoicesRevealed)
             {
-                //Debug.Log("Invoking animation : Reveal encounter");
-
                 StartCardAnimation?.Invoke(this, new CardAnimationEventArgs(cardToAnimate: this, animationsToPlay: new List<Animation>()
                 { Animation.HideChoices, Animation.RevealEncounter }));
             }
