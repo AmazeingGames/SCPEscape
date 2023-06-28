@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [CreateAssetMenu(menuName = "Cards/Encounters")]
@@ -15,17 +16,9 @@ public class Encounter : ScriptableObject
      * Functionality of the encounter:
      * Choices need to be able to add/remove encounter cards to the deck
      */
-    [SerializeField] string encounterName;
-    [SerializeField] string flavorText;
-    [SerializeField] List<Choice> choices = new();
-    [SerializeField] Image cardArt;
-    [SerializeField] bool isConstantEncounter;
-
-
-    public List<Choice> Choices { get => choices; private set => choices = value; }
-    public string EncounterName { get => encounterName; private set => encounterName = value; }
-    public string FlavorText { get => flavorText; private set => flavorText = value; }
-    public Image CardArt { get => cardArt; private set => cardArt = value; }
-    public bool IsConstantEncounter { get => isConstantEncounter; private set => isConstantEncounter = value; }
-
+    [field: FormerlySerializedAs("encounterName")]          [field: SerializeField] public string EncounterName;
+    [field: FormerlySerializedAs("flavorText")]             [field: SerializeField] public string FlavorText;
+    [field: FormerlySerializedAs("choices")]                [field: SerializeField] public List<Choice> Choices = new();
+    [field: FormerlySerializedAs("cardArt")]                [field: SerializeField] public Image CardArt;
+    [field: FormerlySerializedAs("isConstantEncounter")]    [field: SerializeField] public bool IsConstantEncounter;
 }
