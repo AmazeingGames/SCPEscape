@@ -40,10 +40,6 @@ public class GameManager : MonoBehaviour
     public GameObject EncounterPool { get; private set; }
     public GameObject Choices { get; private set; }
 
-    [SerializeField] int holdingCardLayer;
-    [SerializeField] int newestCardLayer;
-    [SerializeField] int defaultLayer;
-
     [SerializeField] ChoiceCard choiceCard;
 
     [SerializeField] int encounterPoolSize;
@@ -80,10 +76,6 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<ECardType, Resource> TypeToResource { get; private set; } = new();
 
-    public bool hasAddedResources = false;
-
-
-    //proably use an event instead
     public event Action<ECardType, bool> OnCardChangeInConsumer;
 
     public List<ResourceCard> Hand { get; private set; } = new();
@@ -98,7 +90,6 @@ public class GameManager : MonoBehaviour
     public List<Sprite> indicators;
 
     ResourceCard holdingResourceCard = null;
-    Vector3 grabbedPosition;
     Vector3 regularScale = Vector3.one;
     int regularSortingOrder = 0;
 
@@ -668,8 +659,6 @@ public class GameManager : MonoBehaviour
 
             holdingResourceCard.transform.localScale *= holdingCardScaleMultiplier;
             
-            holdingResourceCard.CanvasComponent.sortingLayerID = holdingCardLayer;
-
             UpdateConsumerIndicators(holdingResourceCard.Resource.CardType, -1);
         }
     }

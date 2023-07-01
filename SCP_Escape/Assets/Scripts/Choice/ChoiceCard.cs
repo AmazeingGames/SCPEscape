@@ -12,23 +12,12 @@ using static GameManager;
 using static EncounterDeck;
 using static System.Type;
 using Mono.Cecil;
+using static System.Text.StringBuilder;
+using System.Text;
 
 //TO DO: Fix issue where pressing the encounter card automatically selects the choice card underneath
 public class ChoiceCard : MonoBehaviour
 {
-    /* Things a Choice Card GameObject Needs:
-     * 1. A boxCollider Component - Detects when pressed, mouse is over, when is pressed
-     * 2. Icon Displays (loss) - 5 Icon displays that can change their sprite in order to match the resource cost
-     * 3. Icon Displays (gain) - 5 Icon displays that can change their sprite in order to match the resource reward
-     * 4. Layout Group (gain) - Holds the reward icons and organizes them
-     * 5. Layour Group (loss) - Holds the cost icons and organizes them
-     * 6. Text MPro (flavor) - Holds the flavor text for the choice
-     * 7. Text MPro (gain) - Holds the reward text if the reward is to add cards
-     * 8. Choice Object - Holds the card data to data match
-     *  a. Highlight - Highlights the card when the player hovers over it 
-     */
-    
-
     [SerializeField] Choice choice;
     [Header("Card Properties")]
     [SerializeField] LayerMask choiceCardLayer;
@@ -60,9 +49,6 @@ public class ChoiceCard : MonoBehaviour
     readonly List<IconHolder> iconResourceRewards = new();
 
     public EChoiceState ChoiceState { get; private set; } = EChoiceState.Unready;
-
-    public Choice Choice { get => choice; private set => choice = value; }
-
     public bool IsReady { get; private set; } = false;
 
     bool isMouseOver = false;
@@ -95,7 +81,6 @@ public class ChoiceCard : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log($"Choice Card: {flavorText} has {iconResourceRequirements.Count} icon resource requirements");
         //Sets important variables
         IsMouseOver();
         IsClicked();
@@ -202,13 +187,10 @@ public class ChoiceCard : MonoBehaviour
     //Returns a bool true if all the resources are met and the exact amount of resources are contained
     void SetIsReady()
     {
-        //choice is null, encounter deck discard pile keeps duplicating, functions that should be called only once are being called for every choice. Instead they should be called only once.
-
         if (choice == null)
         {
-            Debug.LogError("Choice is null");
+            Debug.LogWarning("Choice is null");
             return;
-
         }
 
         List<ECardType> consumerTypes = CardTypesInConsumer;
@@ -265,26 +247,25 @@ public class ChoiceCard : MonoBehaviour
         {
             IconHolder currentIconHolder = iconResourceRequirements[i];
 
-            if (currentIconHolder.ContainsType(resourceType))
+            if (!currentIconHolder.ContainsType(resourceType) || currentIconHolder.IsAnyIconReady == isReadyingIcon)
             {
-                bool shouldSet = true;
+                continue;
+            }
 
-                if (currentIconHolder.IsAnyIconReady != isReadyingIcon)
-                {
-                    if (i + 1 < iconResourceRequirements.Count)
-                    {
-                        var nextIconHolder = iconResourceRequirements[i + 1];
+            bool shouldSet = true;
 
-                        if (!isReadyingIcon && nextIconHolder.ContainsType(resourceType) && nextIconHolder.IsAnyIconReady != isReadyingIcon)
-                            shouldSet = false;
-                    }
+            if (i + 1 < iconResourceRequirements.Count)
+            {
+                var nextIconHolder = iconResourceRequirements[i + 1];
 
-                    if (shouldSet)
-                    {
-                        currentIconHolder.SetReady(isReadyingIcon);
-                        break;
-                    }
-                }
+                if (!isReadyingIcon && nextIconHolder.ContainsType(resourceType) && nextIconHolder.IsAnyIconReady != isReadyingIcon)
+                    shouldSet = false;
+            }
+
+            if (shouldSet)
+            {
+                currentIconHolder.SetReady(isReadyingIcon);
+                break;
             }
         }
     }
@@ -405,44 +386,37 @@ public class ChoiceCard : MonoBehaviour
         }
     }
 
-    //Enum.IsDefined checks if a value is contatined in an enumeration; but that still doesn't explain what this code is for
-    //Why would/wouldn't converting an Enum to a type make it no longer contained in the enumeration?
-    //What is the usefulness from this check??
     //I'm still confused about this
     static bool IsEnumValueValid(Enum enumeration)
     {
         bool isDefined = Enum.IsDefined(enumeration.GetType(), enumeration);
 
-        //Debug.Log($"Enumeration: {enumeration}. Enumeration.GetType() : {enumeration.GetType()}. IsDefined : {isDefined}");
-
         return isDefined;
     }
-        
-
-    //
-    //Consider using string builder class instead
-    string GetRewardText()
+            string GetRewardText()
     {
         if (choice.ResourceRewards.Count() > 0)
         {
-            string text = "Add";
+
+            StringBuilder text = new();
+            text.Append("Add");
 
             for (int i = 0; i < choice.EncounterRewards.Count; i++)
             {
                 var current = choice.EncounterRewards[i];
-                text += $" \"{current.name}\"";
+                text.Append($" \"{current.name}\"");
 
                 if (i + 1 < choice.EncounterRewards.Count)
                 {
                     if (i + 2 == choice.EncounterRewards.Count)
-                        text += " and";
+                        text.Append(" and");
                     else
-                        text += ",";
+                        text.Append(",");
                 }
 
             }
-            text += " to the encounter deck.";
-            return text;
+            text.Append(" to the encounter deck.");
+            return text.ToString();
         }
         return null;
     }

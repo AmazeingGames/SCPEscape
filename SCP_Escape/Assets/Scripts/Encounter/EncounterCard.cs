@@ -9,12 +9,13 @@ using static GameManager;
 using static EncounterDeck;
 using static EncounterAnimator;
 using Animation = EncounterAnimator.Animation;
+using UnityEngine.Serialization;
 
 public class EncounterCard : MonoBehaviour
 {
     public event EventHandler<CardAnimationEventArgs> StartCardAnimation = null;
 
-    [SerializeField] Encounter encounter;
+    [field: FormerlySerializedAs("encounter")] [field: SerializeField] public Encounter Encounter { get; private set; }
 
     [Header("Encounter Details")]
     [SerializeField] TextMeshProUGUI encounterName;
@@ -23,7 +24,6 @@ public class EncounterCard : MonoBehaviour
 
 
     public List<ChoiceCard> ChoiceCards { get; } = new();
-    public Encounter Encounter { get => encounter; private set => encounter = value; }
 
     bool areChoicesRevealed;
     bool isMouseOver = false;
@@ -43,11 +43,9 @@ public class EncounterCard : MonoBehaviour
 
     void Update()
     {
-        GetChoices(); //Maybe move this to only be called when needed.
+        GetChoices();
 
-        //Debug.Log("Choice cards count : " + ChoiceCards.Count);
-
-        SetAndMatchEncounter(encounter);
+        SetAndMatchEncounter(Encounter);
 
         CheckMouseOver();
         IsClicked();
@@ -81,7 +79,6 @@ public class EncounterCard : MonoBehaviour
     //Checks if the player is clicking on the card
     void IsClicked()
     {
-
         isClicked = (canBeClicked && isMouseOver && Input.GetMouseButtonDown(0));
 
         if (Input.GetMouseButtonDown(0) && isMouseOver)
@@ -127,11 +124,11 @@ public class EncounterCard : MonoBehaviour
     {
         if (ChoiceCards.Count <= 0)
         {
-            for (int i = 0; i < encounter.Choices.Count; i++)
+            for (int i = 0; i < Encounter.Choices.Count; i++)
             {
                 ChoiceCard currentChoiceCard = Manager.GetFromChoicePool();
 
-                Choice currentChoice = encounter.Choices[i];
+                Choice currentChoice = Encounter.Choices[i];
 
                 ChoiceCards.Add(currentChoiceCard);
 
@@ -169,15 +166,16 @@ public class EncounterCard : MonoBehaviour
         canBeClicked = true;
     }
 
-    //This doesn't actually need the paramater, but it's called via an event that does.
     void DiscardCleanup(EncounterCard encounterCard)
     {
-        //Debug.Log("Discard cleanup");
+        if (encounterCard == this)
+        {
+            Encounter = null;
+            isChoiceSelected = false;
+            areChoicesRevealed = false;
+            ChoiceCards.Clear();
+        }
         
-        encounter = null;
-        isChoiceSelected = false;
-        areChoicesRevealed = false;
-        ChoiceCards.Clear();
     }
 
     //Purpose is to set all of this card's details to that of an assigned scriptable object encounter
@@ -185,7 +183,7 @@ public class EncounterCard : MonoBehaviour
     {
         if (encounter == null)
             Debug.LogWarning("Setting encounter to null");
-        this.encounter = encounter;
+        Encounter = encounter;
 
         if (encounter == null)
             return;

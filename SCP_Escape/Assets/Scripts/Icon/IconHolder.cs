@@ -10,10 +10,7 @@ using System;
 
 public class IconHolder : MonoBehaviour
 {
-    //public List<Icon> Icons { get; private set; } = new();
-
     public List<Icon> Icons;
-
 
     public bool IsAnyIconReady { get; private set; }
 

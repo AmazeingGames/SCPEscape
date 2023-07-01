@@ -61,10 +61,4 @@ public class ResourceCard : MonoBehaviour
         ResourceSymbol.preserveAspect = true;
         TextureComponent.preserveAspect = true;
     }
-
-    public void PrintCard()
-    {
-        Debug.Log($"Card Type is: {Resource.CardType}, Symbol is {Resource.Symbol}, Texture is {Resource.Texture}, Color is , Initial is {Resource.Initial}");
-    }
-
 }

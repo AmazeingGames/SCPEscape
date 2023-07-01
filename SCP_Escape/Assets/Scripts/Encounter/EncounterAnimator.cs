@@ -8,7 +8,6 @@ using static GameManager;
 
 public class EncounterAnimator : MonoBehaviour
 {
-
     public enum Animation { Unknown, DrawEncounter, DiscardEncounter, HideEncounter, RevealEncounter, HideChoices, RevealChoices }
 
     public event Action<EncounterCard> DiscardEncounter = null;
@@ -119,10 +118,6 @@ public class EncounterAnimator : MonoBehaviour
         current = 0;
         startPosition = encounterCard.transform.position;
 
-        //Debug.Log($"Current is {current}");
-        //Debug.Log($"startPosition is {startPosition}");
-
-
         while (true)
         {
             animationLength += Time.deltaTime;
@@ -134,8 +129,6 @@ public class EncounterAnimator : MonoBehaviour
             //Lerp is finished; cleanup
             if (current == 1)
             {
-                //Debug.Log($"Animation finished in {animationLength} seconds. "); // Why is the length of the animation being cut in half each time?
-
                 if (shouldSetNewParent)
                     encounterCard.transform.SetParent(newParent, false);
                 
@@ -149,7 +142,6 @@ public class EncounterAnimator : MonoBehaviour
                     case Animation.DrawEncounter:
                         break;
                     case Animation.DiscardEncounter:
-                        //Debug.Log("Invoked discard encounter");
                         DiscardEncounter.Invoke(encounterCard);
                         break;
                     case Animation.HideEncounter:
